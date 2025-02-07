@@ -4,6 +4,9 @@
 [ext_resource type="PackedScene" uid="uid://caouw3p4vblpe" path="res://src/player.tscn" id="2_6qhh7"]
 [ext_resource type="PackedScene" uid="uid://dp8eklmomd1ny" path="res://uploads_files_2784016_CargoShip_01.fbx" id="3_c86eb"]
 [ext_resource type="Shader" path="res://src/ocean.gdshader" id="4_vqjie"]
+[ext_resource type="Script" path="res://src/mesh_instance_3d.gd" id="5_iin1e"]
+[ext_resource type="PackedScene" uid="uid://c4844epla60a" path="res://src/Scout_Boat.fbx" id="6_c4521"]
+[ext_resource type="Script" path="res://src/BoatSpawner.gd" id="7_r6vvm"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_yd1mq"]
 size = Vector2(500, 500)
@@ -19,25 +22,6 @@ shader_parameter/frequency = 2.0
 shader_parameter/noise_factor = 0.2
 shader_parameter/water_color = Vector3(0, 0.4, 0.8)
 
-[sub_resource type="Environment" id="Environment_vok0h"]
-ambient_light_energy = 1.25
-fog_enabled = true
-fog_light_color = Color(0.730748, 0.756489, 0.796938, 1)
-fog_light_energy = 1.12
-fog_height = 0.15
-fog_height_density = 0.027
-volumetric_fog_enabled = true
-volumetric_fog_density = 0.0235
-volumetric_fog_emission_energy = 0.5
-volumetric_fog_gi_inject = 0.13
-volumetric_fog_anisotropy = -0.2
-volumetric_fog_detail_spread = 0.5
-volumetric_fog_ambient_inject = 0.7
-
-[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_jy3tt"]
-
-[sub_resource type="Compositor" id="Compositor_fjxph"]
-
 [node name="world" type="Node3D"]
 script = ExtResource("1_reqsu")
 
@@ -48,15 +32,26 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0487, 6.90438, -34.6075)
 transform = Transform3D(2.54016, 0, 0, 0, 2.67266, 0, 0, 0, 2.31288, -0.161593, 0, -1.7869)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.306479, 0, 0, 0, 1.15261, 0, 0, 0, 0.851697, 0.186186, -0.0297947, -89.4808)
+transform = Transform3D(0.306479, 0, 0, 0, 1.15261, 0, 0, 0, 0.851697, 0.186186, -0.0297947, -179.603)
 mesh = SubResource("PlaneMesh_yd1mq")
 surface_material_override/0 = SubResource("ShaderMaterial_2ya0x")
+script = ExtResource("5_iin1e")
 
-[node name="OmniLight3D" type="OmniLight3D" parent="MeshInstance3D"]
-transform = Transform3D(3.26287, 0, 0, 0, 0.867598, 0, 0, 0, -1.17413, 0, 20.0485, 62.301)
-light_energy = 32.295
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -0.690176, 0.723642, 0, -0.723642, -0.690176, -0.0940819, 85.925, -296.742)
+light_color = Color(1, 0.999877, 0.952209, 1)
+light_energy = 2.918
+light_indirect_energy = 0.929
+light_volumetric_fog_energy = 0.848
+light_angular_distance = 0.5
+shadow_enabled = true
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_vok0h")
-camera_attributes = SubResource("CameraAttributesPractical_jy3tt")
-compositor = SubResource("Compositor_fjxph")
+[node name="Scout_Boat" parent="." instance=ExtResource("6_c4521")]
+transform = Transform3D(-0.0279042, 0, -0.999611, 0, 1, 0, 0.999611, 0, -0.0279042, -2.47124, 1.80412, -53.9082)
+
+[node name="Spawner" type="Node3D" parent="."]
+script = ExtResource("7_r6vvm")
+
+[node name="Timer" type="Node3D" parent="Spawner"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
