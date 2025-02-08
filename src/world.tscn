@@ -1,10 +1,9 @@
-[gd_scene load_steps=10 format=3 uid="uid://ch4hxedcrq001"]
+[gd_scene load_steps=9 format=3 uid="uid://ch4hxedcrq001"]
 
 [ext_resource type="Script" path="res://src/world.gd" id="1_reqsu"]
 [ext_resource type="PackedScene" uid="uid://caouw3p4vblpe" path="res://src/player.tscn" id="2_6qhh7"]
 [ext_resource type="PackedScene" uid="uid://dp8eklmomd1ny" path="res://uploads_files_2784016_CargoShip_01.fbx" id="3_c86eb"]
 [ext_resource type="Shader" path="res://src/ocean.gdshader" id="4_vqjie"]
-[ext_resource type="Script" path="res://src/mesh_instance_3d.gd" id="5_iin1e"]
 [ext_resource type="PackedScene" uid="uid://c4844epla60a" path="res://src/Scout_Boat.fbx" id="6_c4521"]
 [ext_resource type="Script" path="res://src/BoatSpawner.gd" id="7_r6vvm"]
 
@@ -28,14 +27,13 @@ script = ExtResource("1_reqsu")
 [node name="player" parent="." instance=ExtResource("2_6qhh7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0487, 6.90438, -34.6075)
 
-[node name="uploads_files_2784016_CargoShip_01" parent="." instance=ExtResource("3_c86eb")]
+[node name="PlayerBoat" parent="." instance=ExtResource("3_c86eb")]
 transform = Transform3D(2.54016, 0, 0, 0, 2.67266, 0, 0, 0, 2.31288, -0.161593, 0, -1.7869)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(0.306479, 0, 0, 0, 1.15261, 0, 0, 0, 0.851697, 0.186186, -0.0297947, -179.603)
 mesh = SubResource("PlaneMesh_yd1mq")
 surface_material_override/0 = SubResource("ShaderMaterial_2ya0x")
-script = ExtResource("5_iin1e")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -0.690176, 0.723642, 0, -0.723642, -0.690176, -0.0940819, 85.925, -296.742)
@@ -51,7 +49,8 @@ transform = Transform3D(-0.0279042, 0, -0.999611, 0, 1, 0, 0.999611, 0, -0.02790
 
 [node name="Spawner" type="Node3D" parent="."]
 script = ExtResource("7_r6vvm")
+player_boat_path = NodePath("../PlayerBoat")
 
-[node name="Timer" type="Node3D" parent="Spawner"]
+[node name="Timer" type="Timer" parent="Spawner"]
 
 [node name="Camera3D" type="Camera3D" parent="."]
