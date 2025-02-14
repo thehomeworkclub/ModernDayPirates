@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://cfx3yf2matu60"]
+
+[ext_resource type="ArrayMesh" uid="uid://ce4gln134irve" path="res://src/Scout_Boat.obj" id="1_4o8bn"]
+[ext_resource type="Script" path="res://EnemyBoat.gd" id="2_avq6u"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yqylv"]
+size = Vector3(164.592, 278.339, 495.144)
+
+[node name="EnemyNode" type="CharacterBody3D"]
+
+[node name="EnemyBoat" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.0260784, 0, 0, 0, 0.0220855, 0, 0, 0, 0.0248349, 0, 0, 0)
+mesh = ExtResource("1_4o8bn")
+script = ExtResource("2_avq6u")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EnemyBoat"]
+transform = Transform3D(1.84977, 0, 0, 0, 1, 0, 0, 0, 1.54265, -5.20825, 138.67, 41.5396)
+shape = SubResource("BoxShape3D_yqylv")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="EnemyBoat"]
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="EnemyBoat"]
