@@ -1,0 +1,63 @@
+[gd_scene load_steps=11 format=3 uid="uid://dti3tmq0y0leh"]
+
+[ext_resource type="PackedScene" uid="uid://ds2gxiccgqbfe" path="res://Gun.tscn" id="1_tq5c1"]
+[ext_resource type="Script" path="res://Player.gd" id="1_vw7ct"]
+[ext_resource type="PackedScene" uid="uid://bmpimc7okdghl" path="res://Bullet.tscn" id="2_fhhdu"]
+[ext_resource type="Script" path="res://EnemySpawner.gd" id="2_xdull"]
+[ext_resource type="PackedScene" uid="uid://bdjsg4y1dhl0f" path="res://Enemy.tscn" id="4_lkhmh"]
+[ext_resource type="PackedScene" uid="uid://bcfxrp7gegi45" path="res://Boat.tscn" id="6_0bb58"]
+[ext_resource type="Shader" path="res://ocean.gdshader" id="7_kakas"]
+[ext_resource type="Script" path="res://RoundBoard.gd" id="8_rmocl"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_y1l8n"]
+size = Vector2(250, 250)
+subdivide_width = 65
+subdivide_depth = 125
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xr1l8"]
+render_priority = 1
+shader = ExtResource("7_kakas")
+shader_parameter/amplitude = 2.0
+shader_parameter/speed = 1.0
+shader_parameter/frequency = 2.0
+shader_parameter/noise_factor = 0.2
+shader_parameter/water_color = Vector3(0, 0.4, 0.8)
+
+[node name="Node3D" type="Node3D"]
+
+[node name="Player" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.24827, -16.6647)
+script = ExtResource("1_vw7ct")
+
+[node name="Head" type="Node3D" parent="Player"]
+
+[node name="Camera3D" type="Camera3D" parent="Player/Head"]
+transform = Transform3D(-1, 0, -7.82271e-08, 0, 1, 0, 7.82271e-08, 0, -1, -0.176, 0, 0)
+
+[node name="GunPivot" type="Node3D" parent="Player/Head"]
+transform = Transform3D(1, 0, 0, 0, 1.05226, 0, 0, 0, 0.894814, 0, 0, 0)
+
+[node name="Gun" parent="Player/Head/GunPivot" instance=ExtResource("1_tq5c1")]
+transform = Transform3D(-0.106698, 0, -0.994291, 0, 0.950334, 0, 1.11117, 0, -0.11924, -0.447631, -0.29922, 0.486637)
+bullet_scene = ExtResource("2_fhhdu")
+
+[node name="EnemySpawner" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 71.1774)
+script = ExtResource("2_xdull")
+enemy_scene = ExtResource("4_lkhmh")
+
+[node name="Area3D" parent="." instance=ExtResource("6_0bb58")]
+transform = Transform3D(-2.64326, 0, -1.67425e-07, 0, 2.62623, 0, 2.31081e-07, 0, -1.91512, 8.38106, 0, -36.1083)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+
+[node name="sea" type="MeshInstance3D" parent="."]
+transform = Transform3D(-1.71122e-07, 0, -2.70399, 0, 1, 0, 3.91482, 0, -1.18195e-07, 0, -1.73188, 162.095)
+mesh = SubResource("PlaneMesh_y1l8n")
+surface_material_override/0 = SubResource("ShaderMaterial_xr1l8")
+
+[node name="Node3D" type="Node3D" parent="."]
+transform = Transform3D(463.086, 0, 0, 0, 253.705, 0, 0, 0, 1, 0, 6.9544, -31.8352)
+script = ExtResource("8_rmocl")
+
+[node name="Label3D" type="Label3D" parent="Node3D"]

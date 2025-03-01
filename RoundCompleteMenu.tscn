@@ -1,0 +1,105 @@
+[gd_scene load_steps=4 format=3 uid="uid://cy3gg7qdgvlqc"]
+
+[ext_resource type="Script" path="res://RoundCompleteMenu.gd" id="1_p1sgq"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gaxrj"]
+bg_color = Color(0.141176, 0.141176, 0.141176, 0.909804)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8, 0.8, 0.8, 0.996078)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_4ow7f"]
+font_size = 32
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 3
+shadow_color = Color(0, 0, 0, 0.701961)
+
+[node name="RoundCompleteMenu" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_p1sgq")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -200.0
+offset_right = 250.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_gaxrj")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Round Complete!"
+label_settings = SubResource("LabelSettings_4ow7f")
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Stats" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Round: 1 of 3
+Enemies Defeated: 20"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="RewardsTitle" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Rewards:"
+horizontal_alignment = 1
+
+[node name="Rewards" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Silver: +30
+Gold: +5"
+horizontal_alignment = 1
+
+[node name="HSeparator3" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="ContinueButton" type="Button" parent="Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Continue to Next Round"
+
+[node name="MenuButton" type="Button" parent="Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Return to Campaign Menu"

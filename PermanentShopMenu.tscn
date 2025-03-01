@@ -1,0 +1,278 @@
+[gd_scene load_steps=4 format=3 uid="uid://bn8vyhndkqpru"]
+
+[ext_resource type="Script" path="res://PermanentShopMenu.gd" id="1_8q1nh"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4oqud"]
+bg_color = Color(0.141176, 0.141176, 0.141176, 0.909804)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8, 0.8, 0.8, 0.996078)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_d2n4q"]
+font_size = 32
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 3
+shadow_color = Color(0, 0, 0, 0.701961)
+
+[node name="PermanentShopMenu" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8q1nh")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -300.0
+offset_right = 350.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4oqud")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Permanent Upgrades"
+label_settings = SubResource("LabelSettings_d2n4q")
+horizontal_alignment = 1
+
+[node name="CurrencyDisplay" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Bronze" type="Label" parent="Panel/VBoxContainer/CurrencyDisplay"]
+layout_mode = 2
+text = "Bronze: 0"
+horizontal_alignment = 1
+
+[node name="VSeparator" type="VSeparator" parent="Panel/VBoxContainer/CurrencyDisplay"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="Silver" type="Label" parent="Panel/VBoxContainer/CurrencyDisplay"]
+layout_mode = 2
+text = "Silver: 0"
+horizontal_alignment = 1
+
+[node name="VSeparator2" type="VSeparator" parent="Panel/VBoxContainer/CurrencyDisplay"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="Gold" type="Label" parent="Panel/VBoxContainer/CurrencyDisplay"]
+layout_mode = 2
+text = "Gold: 0"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="UpgradesGrid" type="GridContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="DamageMultPanel" type="Panel" parent="Panel/VBoxContainer/UpgradesGrid"]
+custom_minimum_size = Vector2(330, 150)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/VBoxContainer/UpgradesGrid/DamageMultPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Name" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/DamageMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Damage Multiplier"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/DamageMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Increases all damage dealt by 10%"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Level" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/DamageMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Level: 0"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/DamageMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Cost: 5 Gold"
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/VBoxContainer/UpgradesGrid/DamageMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Buy"
+
+[node name="CoinMultPanel" type="Panel" parent="Panel/VBoxContainer/UpgradesGrid"]
+custom_minimum_size = Vector2(330, 150)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/VBoxContainer/UpgradesGrid/CoinMultPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Name" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/CoinMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Bronze Multiplier"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/CoinMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Increases bronze earned by 10%"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Level" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/CoinMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Level: 0"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/CoinMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Cost: 4 Gold"
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/VBoxContainer/UpgradesGrid/CoinMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Buy"
+
+[node name="HealthMultPanel" type="Panel" parent="Panel/VBoxContainer/UpgradesGrid"]
+custom_minimum_size = Vector2(330, 150)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/VBoxContainer/UpgradesGrid/HealthMultPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Name" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/HealthMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Health Multiplier"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/HealthMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Increases max health by 10%"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Level" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/HealthMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Level: 0"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/HealthMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Cost: 6 Gold"
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/VBoxContainer/UpgradesGrid/HealthMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Buy"
+
+[node name="RegenMultPanel" type="Panel" parent="Panel/VBoxContainer/UpgradesGrid"]
+custom_minimum_size = Vector2(330, 150)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/VBoxContainer/UpgradesGrid/RegenMultPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Name" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/RegenMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Regen Multiplier"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/RegenMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Increases health regeneration by 20%"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Level" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/RegenMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Level: 0"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="Panel/VBoxContainer/UpgradesGrid/RegenMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Cost: 6 Gold"
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/VBoxContainer/UpgradesGrid/RegenMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Buy"
+
+[node name="HSeparator2" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="CloseButton" type="Button" parent="Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 10
+text = "Return to Campaign Menu"

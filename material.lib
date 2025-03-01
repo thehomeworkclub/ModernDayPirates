@@ -1,0 +1,14 @@
+# Aspose.3D Wavefront OBJ Exporter
+# Copyright 2004-2024 Aspose Pty Ltd.
+# File created: 02/07/2025 01:00:59
+
+newmtl PolyPack_Boats
+	Ka 0.05087609 0.05087609 0.05087609
+	Kd 0.8 0.8 0.8
+	Ke 0 0 0
+	illum 2
+	Ks 0.8 0.8 0.8
+	Ns 25
+	d 1
+	Tr 0
+	map_Kd D:\CAD Personal (H)\Blender\LowPoly\Boats\PolyPackBoats.png

@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://b8njexxkmd401"
+path="res://.godot/imported/uploads_files_2784016_CargoShip_01.obj-3b5ad5847fc816d230e48c8f1c66e6bd.mesh"
+
+[deps]
+
+files=["res://.godot/imported/uploads_files_2784016_CargoShip_01.obj-3b5ad5847fc816d230e48c8f1c66e6bd.mesh"]
+
+source_file="res://uploads_files_2784016_CargoShip_01.obj"
+dest_files=["res://.godot/imported/uploads_files_2784016_CargoShip_01.obj-3b5ad5847fc816d230e48c8f1c66e6bd.mesh", "res://.godot/imported/uploads_files_2784016_CargoShip_01.obj-3b5ad5847fc816d230e48c8f1c66e6bd.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

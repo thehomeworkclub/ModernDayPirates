@@ -1,0 +1,26 @@
+[gd_scene load_steps=6 format=3 uid="uid://bdjsg4y1dhl0f"]
+
+[ext_resource type="Script" path="res://Enemy.gd" id="1_lwojd"]
+[ext_resource type="ArrayMesh" uid="uid://cj7m221bfgu3c" path="res://Scout_Boat.obj" id="2_bpkol"]
+[ext_resource type="Shader" path="res://Enemy.gdshader" id="3_tkt4v"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cunhr"]
+size = Vector3(0.8, 0.3, 1.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gagb8"]
+render_priority = 0
+shader = ExtResource("3_tkt4v")
+
+[node name="Enemy" type="Area3D"]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_lwojd")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+shape = SubResource("BoxShape3D_cunhr")
+
+[node name="ScoutBoat" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01, 0, 0, 0)
+mesh = ExtResource("2_bpkol")
+surface_material_override/0 = SubResource("ShaderMaterial_gagb8")

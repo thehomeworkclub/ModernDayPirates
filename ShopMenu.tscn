@@ -1,0 +1,673 @@
+[gd_scene load_steps=3 format=3 uid="uid://b5u1xxmdfurlg"]
+
+[ext_resource type="Script" path="res://ShopMenu.gd" id="1_j2eam"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b7rqg"]
+bg_color = Color(0.145098, 0.188235, 0.282353, 0.878431)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="ShopMenu" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_j2eam")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.282353)
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -300.0
+offset_right = 500.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_b7rqg")
+
+[node name="Title" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -125.5
+offset_top = 10.0
+offset_right = 125.5
+offset_bottom = 50.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 28
+text = "Upgrade Shop"
+horizontal_alignment = 1
+
+[node name="CurrencyDisplay" type="HBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 50.0
+offset_right = 200.0
+offset_bottom = 90.0
+grow_horizontal = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="Bronze" type="Label" parent="Panel/CurrencyDisplay"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.721569, 0.501961, 0.215686, 1)
+text = "Bronze: 0"
+
+[node name="Silver" type="Label" parent="Panel/CurrencyDisplay"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.729412, 0.729412, 0.729412, 1)
+text = "Silver: 0"
+
+[node name="Gold" type="Label" parent="Panel/CurrencyDisplay"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.960784, 0.823529, 0.0509804, 1)
+text = "Gold: 0"
+
+[node name="TabContainer" type="TabContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 90.0
+offset_right = -20.0
+offset_bottom = -60.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Weapons" type="ScrollContainer" parent="Panel/TabContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Weapons"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer"]
+layout_mode = 2
+text = "Ship Weapons (Bronze)"
+horizontal_alignment = 1
+
+[node name="Info" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Choose a weapon type for your ship"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Panel/TabContainer/Weapons/VBoxContainer"]
+layout_mode = 2
+
+[node name="WeaponGrid" type="GridContainer" parent="Panel/TabContainer/Weapons/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 2
+
+[node name="StandardGun" type="Panel" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid"]
+custom_minimum_size = Vector2(450, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/StandardGun"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/StandardGun/VBoxContainer"]
+layout_mode = 2
+text = "Standard Gun"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/StandardGun/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Basic single-shot weapon"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/StandardGun/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.721569, 0.501961, 0.215686, 1)
+theme_override_font_sizes/font_size = 12
+text = "Free"
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/StandardGun/VBoxContainer"]
+layout_mode = 2
+text = "Equipped"
+
+[node name="RapidGun" type="Panel" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid"]
+custom_minimum_size = Vector2(450, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/RapidGun"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/RapidGun/VBoxContainer"]
+layout_mode = 2
+text = "Rapid Fire Gun"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/RapidGun/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Fires 2.5x faster with same damage"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/RapidGun/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.721569, 0.501961, 0.215686, 1)
+theme_override_font_sizes/font_size = 12
+text = "25 Bronze"
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/RapidGun/VBoxContainer"]
+layout_mode = 2
+text = "Buy"
+
+[node name="DoubleGun" type="Panel" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid"]
+custom_minimum_size = Vector2(450, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/DoubleGun"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/DoubleGun/VBoxContainer"]
+layout_mode = 2
+text = "Double Barrel"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/DoubleGun/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Fires two bullets in parallel"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/DoubleGun/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.721569, 0.501961, 0.215686, 1)
+theme_override_font_sizes/font_size = 12
+text = "40 Bronze"
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/DoubleGun/VBoxContainer"]
+layout_mode = 2
+text = "Buy"
+
+[node name="SpreadGun" type="Panel" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid"]
+custom_minimum_size = Vector2(450, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/SpreadGun"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/SpreadGun/VBoxContainer"]
+layout_mode = 2
+text = "Spread Shot"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/SpreadGun/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Fires three bullets in a spread pattern"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/SpreadGun/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.721569, 0.501961, 0.215686, 1)
+theme_override_font_sizes/font_size = 12
+text = "60 Bronze"
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/SpreadGun/VBoxContainer"]
+layout_mode = 2
+text = "Buy"
+
+[node name="PowerGun" type="Panel" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid"]
+custom_minimum_size = Vector2(450, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/PowerGun"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/PowerGun/VBoxContainer"]
+layout_mode = 2
+text = "Power Cannon"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/PowerGun/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Slow but powerful shots (3x damage)"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/PowerGun/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.721569, 0.501961, 0.215686, 1)
+theme_override_font_sizes/font_size = 12
+text = "75 Bronze"
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/TabContainer/Weapons/VBoxContainer/WeaponGrid/PowerGun/VBoxContainer"]
+layout_mode = 2
+text = "Buy"
+
+[node name="Team" type="ScrollContainer" parent="Panel/TabContainer"]
+visible = false
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Team"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Team/VBoxContainer"]
+layout_mode = 2
+text = "Team Upgrades (Silver)"
+horizontal_alignment = 1
+
+[node name="Info" type="Label" parent="Panel/TabContainer/Team/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Upgrade your team skills (resets after campaign)"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Panel/TabContainer/Team/VBoxContainer"]
+layout_mode = 2
+
+[node name="UpgradeTree" type="VBoxContainer" parent="Panel/TabContainer/Team/VBoxContainer"]
+layout_mode = 2
+
+[node name="DamagePanel" type="Panel" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/DamagePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/DamagePanel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/DamagePanel/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Damage Bonus"
+horizontal_alignment = 1
+
+[node name="Level" type="Label" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/DamagePanel/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Level: 0"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/DamagePanel/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Increases damage by 10% per level"
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/DamagePanel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Upgrade (15 Silver)"
+
+[node name="SecondTier" type="HBoxContainer" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="CoinPanel" type="Panel" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier"]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/CoinPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/CoinPanel/VBoxContainer"]
+layout_mode = 2
+text = "Coin Bonus"
+horizontal_alignment = 1
+
+[node name="Level" type="Label" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/CoinPanel/VBoxContainer"]
+layout_mode = 2
+text = "Level: 0"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/CoinPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Gain 15% more bronze per level"
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/CoinPanel/VBoxContainer"]
+layout_mode = 2
+text = "Upgrade (20 Silver)"
+
+[node name="RegenPanel" type="Panel" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier"]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/RegenPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/RegenPanel/VBoxContainer"]
+layout_mode = 2
+text = "Health Regeneration"
+horizontal_alignment = 1
+
+[node name="Level" type="Label" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/RegenPanel/VBoxContainer"]
+layout_mode = 2
+text = "Level: 0"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/RegenPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Heal +1 health after each wave"
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/RegenPanel/VBoxContainer"]
+layout_mode = 2
+text = "Upgrade (20 Silver)"
+
+[node name="HealthPanel" type="Panel" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier"]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/HealthPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/HealthPanel/VBoxContainer"]
+layout_mode = 2
+text = "Max Health"
+horizontal_alignment = 1
+
+[node name="Level" type="Label" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/HealthPanel/VBoxContainer"]
+layout_mode = 2
+text = "Level: 0"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/HealthPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Increase max health by 10% per level"
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="Panel/TabContainer/Team/VBoxContainer/UpgradeTree/SecondTier/HealthPanel/VBoxContainer"]
+layout_mode = 2
+text = "Upgrade (20 Silver)"
+
+[node name="Permanent" type="ScrollContainer" parent="Panel/TabContainer"]
+visible = false
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Permanent"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer"]
+layout_mode = 2
+text = "Permanent Upgrades (Gold)"
+horizontal_alignment = 1
+
+[node name="Info" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "These upgrades persist across all campaigns"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Panel/TabContainer/Permanent/VBoxContainer"]
+layout_mode = 2
+
+[node name="PermanentGrid" type="GridContainer" parent="Panel/TabContainer/Permanent/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 2
+
+[node name="DamageMultPanel" type="Panel" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid"]
+custom_minimum_size = Vector2(450, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/DamageMultPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/DamageMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Hardened Bullets"
+horizontal_alignment = 1
+
+[node name="Level" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/DamageMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Level: 0"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/DamageMultPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Multiply all damage by 1.1x per level"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/DamageMultPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.960784, 0.823529, 0.0509804, 1)
+theme_override_font_sizes/font_size = 12
+text = "5 Gold"
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/DamageMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Buy"
+
+[node name="CoinMultPanel" type="Panel" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid"]
+custom_minimum_size = Vector2(450, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/CoinMultPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/CoinMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Treasure Hunter"
+horizontal_alignment = 1
+
+[node name="Level" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/CoinMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Level: 0"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/CoinMultPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Multiply bronze income by 1.1x per level"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/CoinMultPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.960784, 0.823529, 0.0509804, 1)
+theme_override_font_sizes/font_size = 12
+text = "4 Gold"
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/CoinMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Buy"
+
+[node name="HealthMultPanel" type="Panel" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid"]
+custom_minimum_size = Vector2(450, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/HealthMultPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/HealthMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Reinforced Hull"
+horizontal_alignment = 1
+
+[node name="Level" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/HealthMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Level: 0"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/HealthMultPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Multiply max health by 1.1x per level"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/HealthMultPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.960784, 0.823529, 0.0509804, 1)
+theme_override_font_sizes/font_size = 12
+text = "6 Gold"
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/HealthMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Buy"
+
+[node name="RegenMultPanel" type="Panel" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid"]
+custom_minimum_size = Vector2(450, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/RegenMultPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/RegenMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Advanced Repair"
+horizontal_alignment = 1
+
+[node name="Level" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/RegenMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Level: 0"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/RegenMultPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Multiply health regeneration by 1.2x per level"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/RegenMultPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.960784, 0.823529, 0.0509804, 1)
+theme_override_font_sizes/font_size = 12
+text = "6 Gold"
+horizontal_alignment = 1
+
+[node name="BuyButton" type="Button" parent="Panel/TabContainer/Permanent/VBoxContainer/PermanentGrid/RegenMultPanel/VBoxContainer"]
+layout_mode = 2
+text = "Buy"
+
+[node name="CompleteButton" type="Button" parent="Panel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -50.0
+offset_right = 100.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Continue to Next Wave"

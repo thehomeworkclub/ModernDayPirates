@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://ds2gxiccgqbfe"]
+
+[ext_resource type="Script" path="res://Gun.gd" id="1_fq33d"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_krbl6"]
+
+[node name="Gun" type="Node3D"]
+script = ExtResource("1_fq33d")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.264625, 0, 0, 0, 0.255042, 0, 0, 0)
+mesh = SubResource("BoxMesh_krbl6")
+
+[node name="Muzzle" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.2)
