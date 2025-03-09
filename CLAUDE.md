@@ -1,30 +1,35 @@
-# CLAUDE.md - Agent Guidelines for Juice Game Project
+# CLAUDE.md - Agent Guidelines for Modern Day Pirates
 
 ## Project Overview
-- 3D boat defense game built with Godot Engine/GDScript
-- Player controls a boat with gun to defend against enemy waves
-- Round-based progression with increasing difficulty
+- 3D boat defense game built with Godot Engine 4.3/GDScript
+- Player controls a boat with weapons to defend against enemy waves
+- Campaign-based progression with shop upgrades and currency system
 
 ## Development Commands
 - Open project: `godot -e .` (or open Godot Engine and select project)
 - Run game: F5 in Godot Editor or `godot --path .`
-- Export game: Use Export menu in Godot Editor
+- Debug mode: Add `-d` flag to `godot` command
+- Export game: Use Export menu in Godot Editor (see export_presets.cfg)
 
 ## Code Style Guidelines
 - Use GDScript's typing system: `func shoot() -> void:`
 - Properties with `@export` for inspector exposure
 - Node references with `@onready var node = $Path/To/Node`
-- Follow existing naming conventions:
+- Naming conventions:
   - snake_case for variables and functions
-  - PascalCase for classes/nodes
+  - PascalCase for classes/nodes/scenes
   - ALL_CAPS for constants
 - Signal connections via code using connect()
 - Object cleanup with queue_free()
-- Avoid deep nesting of conditionals
-- Keep function responsibilities focused
+- Debug logging with print("DEBUG: ...")
+- Keep functions focused on single responsibility
 
 ## Project Structure
-- Scripts (.gd) correspond to scene files (.tscn)
-- GameManager serves as central game controller
-- Enemy spawning handled by dedicated EnemySpawner
-- Use existing patterns when adding new functionality
+- Game state management:
+  - GameManager.gd: Core game logic and progression
+  - CurrencyManager.gd: In-game economy
+  - ShipManager.gd: Ship positioning and management
+- Modular architecture with signals for inter-component communication
+- Scene/script pairs (.tscn/.gd) for all game entities
+- Model assets in Container/ directory
+- EnemySpawner handles wave generation and difficulty scaling

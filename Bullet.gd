@@ -40,7 +40,8 @@ func _physics_process(delta: float) -> void:
 		print("DEBUG: Bullet at ", global_position)
 
 func _on_area_entered(area: Area3D) -> void:
-	print("DEBUG: Bullet collided with ", area.name, " in group? ", area.is_in_group("Enemy"))
+	print("DEBUG: Bullet collided with ", area.name, " in group? ", 
+		area.is_in_group("Enemy"), "/", area.is_in_group("EnemyBomb"))
 	
 	# More detailed collision detection
 	if area.is_in_group("Enemy"):
@@ -50,6 +51,12 @@ func _on_area_entered(area: Area3D) -> void:
 			queue_free()
 		else:
 			print("WARNING: Enemy doesn't have take_damage method")
+	elif area.is_in_group("EnemyBomb"):
+		# Handle collision with bomb
+		print("DEBUG: Bullet hit bomb")
+		if area.has_method("explode"):
+			area.explode(false)  # Explode but don't damage player
+		queue_free()
 	elif area.get_parent() and area.get_parent().is_in_group("Enemy"):
 		# In case it's a child of an enemy
 		print("DEBUG: Hitting enemy parent with ", damage, " damage")

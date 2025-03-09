@@ -1,6 +1,7 @@
-[gd_scene load_steps=15 format=3 uid="uid://dti3tmq0y0leh"]
+[gd_scene load_steps=18 format=3 uid="uid://dti3tmq0y0leh"]
 
 [ext_resource type="PackedScene" uid="uid://ds2gxiccgqbfe" path="res://Gun.tscn" id="1_tq5c1"]
+[ext_resource type="Script" path="res://BombCleaner.gd" id="1_uchtu"]
 [ext_resource type="Script" path="res://Player.gd" id="1_vw7ct"]
 [ext_resource type="PackedScene" uid="uid://bmpimc7okdghl" path="res://Bullet.tscn" id="2_fhhdu"]
 [ext_resource type="Script" path="res://EnemySpawner.gd" id="2_xdull"]
@@ -8,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://bcfxrp7gegi45" path="res://Boat.tscn" id="6_0bb58"]
 [ext_resource type="Shader" path="res://ocean.gdshader" id="7_kakas"]
 [ext_resource type="Script" path="res://RoundBoard.gd" id="8_rmocl"]
+[ext_resource type="PackedScene" path="res://TargetPlane.tscn" id="9_q0qot"]
 
 [sub_resource type="Compositor" id="Compositor_lq8ew"]
 
@@ -72,11 +74,19 @@ fog_height = -258.69
 fog_height_density = 0.0665
 adjustment_enabled = true
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eq1s2"]
+transparency = 1
+albedo_color = Color(0, 0.5, 1, 0.2)
+emission_enabled = true
+emission = Color(0, 0.5, 1, 0.5)
+emission_energy_multiplier = 0.3
+
 [node name="Node3D" type="Node3D"]
 transform = Transform3D(4.7837, 0, 0, 0, 4.7837, 0, 0, 0, 4.7837, 0, 0, 0)
+script = ExtResource("1_uchtu")
 
 [node name="Player" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.24827, -16.6647)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.24827, -16.5409)
 script = ExtResource("1_vw7ct")
 
 [node name="Head" type="Node3D" parent="Player"]
@@ -96,7 +106,7 @@ transform = Transform3D(-0.106698, 0, -0.994291, 0, 0.950334, 0, 1.11117, 0, -0.
 bullet_scene = ExtResource("2_fhhdu")
 
 [node name="EnemySpawner" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 71.1774)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
 script = ExtResource("2_xdull")
 enemy_scene = ExtResource("4_lkhmh")
 
@@ -104,6 +114,7 @@ enemy_scene = ExtResource("4_lkhmh")
 transform = Transform3D(-2.64326, 0, -1.67425e-07, 0, 2.62623, 0, 2.31081e-07, 0, -1.91512, 8.38106, 0, -36.1083)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(5.43708, 0, 0, 0, 3.96763, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="sea" type="MeshInstance3D" parent="."]
 transform = Transform3D(-1.71122e-07, 0, -2.70399, 0, 1, 0, 3.91482, 0, -1.18195e-07, 0, -1.73188, 162.095)
@@ -136,3 +147,10 @@ directional_shadow_split_3 = 0.219
 directional_shadow_fade_start = 1.0
 directional_shadow_max_distance = 670.0
 directional_shadow_pancake_size = 0.0
+
+[node name="TargetPlane" parent="." instance=ExtResource("9_q0qot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.514231, 0, 0.1, -0.259436)
+material_override = SubResource("StandardMaterial3D_eq1s2")
+
+[node name="BombCleaner" type="Node" parent="."]
+script = ExtResource("1_uchtu")

@@ -24,7 +24,7 @@ func _on_restart_pressed() -> void:
 	queue_free()
 
 func _on_menu_pressed() -> void:
-	# Return to campaign menu
+	# Return to 3D campaign menu
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://CampaignMenu.tscn")
+	get_tree().change_scene_to_file("res://3dcampaignmenu.tscn")
 	queue_free()

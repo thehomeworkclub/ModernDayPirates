@@ -10,6 +10,13 @@ var mouse_captured: bool = true
 func _ready() -> void:
 	# Start with mouse captured for gameplay
 	capture_mouse()
+	
+	# Make sure we're not at the origin (0,0,0)
+	if global_position == Vector3.ZERO:
+		# Use the original transform position from the scene
+		var expected_position = Vector3(0, 7.24827, -30.0)
+		global_position = expected_position
+		print("DEBUG: Fixed player position to ", global_position)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and mouse_captured:
