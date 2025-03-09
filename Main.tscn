@@ -149,7 +149,7 @@ directional_shadow_max_distance = 670.0
 directional_shadow_pancake_size = 0.0
 
 [node name="TargetPlane" parent="." instance=ExtResource("9_q0qot")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.514231, 0, 0.1, -0.259436)
+transform = Transform3D(0.667082, 0, 0, 0, 1, 0, 0, 0, 0.514231, 0, 0.1, 0.789568)
 material_override = SubResource("StandardMaterial3D_eq1s2")
 
 [node name="BombCleaner" type="Node" parent="."]

@@ -292,6 +292,13 @@ func start_wave() -> void:
 	wave_in_progress = true
 	wave_start_time = Time.get_ticks_msec() / 1000.0  # Convert to seconds
 	
+	# CRITICAL FIX: Clean up any leftover target markers that look like bombs
+	# This is important to prevent orange spheres stuck to boats
+	var markers = get_tree().get_nodes_in_group("TargetMarker")
+	for marker in markers:
+		print("DEBUG: Removing leftover target marker: " + marker.name)
+		marker.queue_free()
+	
 	print("DEBUG: Starting wave " + str(current_wave) + " of round " + str(current_round))
 	print("DEBUG: Wave will have " + str(enemies_per_wave) + " enemies")
 	

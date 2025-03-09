@@ -79,6 +79,13 @@ func ensure_visibility() -> void:
 	if has_node("ScoutBoat"):
 		$ScoutBoat.visible = true
 		print("DEBUG: Made ScoutBoat model visible for enemy " + str(enemy_id))
+		
+	# CRITICAL FIX: Check for any unwanted bomb-like children and remove them
+	for child in get_children():
+		if child.name.to_lower().contains("bomb") or child.name.to_lower().contains("sphere") or child.name.to_lower().contains("marker"):
+			if child.name != "ScoutBoat" and child.name != "CollisionShape3D":
+				print("DEBUG: Found and removing unwanted bomb-like model: " + child.name)
+				child.queue_free()
 
 # Check with GameManager if this ship should be the bomber
 func check_bomber_status() -> void:
@@ -144,38 +151,6 @@ func _physics_process(delta: float) -> void:
 	if global_position.y != 0:
 		global_position.y = 0
 		
-	# Add some debug visualization - remove in production
-	if Engine.get_physics_frames() % 120 == 0:  # Less frequent debug output
-		print("DEBUG: Enemy at position: ", global_position, " moving with speed: ", adjusted_speed)
-
-# New function for shooting bombs while the ship is moving
-func shoot_bombs_while_moving(delta: float) -> void:
-	# All ships can shoot occasionally while moving
-	# Calculate distance to player
-	var distance_to_player = global_position.distance_to(player_position)
-	
-	# Output debug info occasionally
-	if Engine.get_physics_frames() % 300 == 0:
-		print("DEBUG: Moving enemy bomb check - distance to player: ", distance_to_player, 
-		", bomb timer: ", time_since_last_bomb, ", can bomb: ", can_shoot_bombs)
-	
-	# Only shoot if within range (close enough to hit, but not too close)
-	var max_shoot_range = 250.0  # Greatly increased shooting range to match actual distances
-	var min_shoot_range = 15.0  # Don't shoot if too close
-	
-	if distance_to_player < max_shoot_range && distance_to_player > min_shoot_range:
-		time_since_last_bomb += delta
-		if time_since_last_bomb >= bomb_cooldown * 1.5:  # Less frequent shooting while moving
-			# Higher chance to throw a bomb while moving
-			var roll = randf()
-			var chance_threshold = bomb_chance * 0.6  # Increased from 30% to 60% of normal chance
-			print("DEBUG: Moving enemy bomb roll: ", roll, " vs threshold: ", chance_threshold)
-			
-			if roll <= chance_threshold:
-				print("DEBUG: Moving enemy attempting to shoot bomb!")
-				shoot_bomb()
-			time_since_last_bomb = 0.0
-
 # Function for shooting bombs when the ship is stationary
 func shoot_bombs_while_stationary(delta: float) -> void:
 	# Shoot bombs at player - prioritize designated bombers
@@ -218,141 +193,87 @@ func shoot_bomb() -> void:
 	# This ensures no accumulation of stuck bombs
 	var existing_bombs = get_tree().get_nodes_in_group("EnemyBomb")
 	for bomb in existing_bombs:
-		# Only remove bombs that are close to this enemy or not initialized
-		if (bomb.global_position - global_position).length() < 10.0 or \
-		   (bomb.has_method("is_initialized") and not bomb.is_initialized()):
-			print("DEBUG: Removing existing bomb before shooting new one")
+		# Remove ALL bombs that originated from this enemy - prevents accumulation
+		if is_instance_valid(bomb) and bomb.has_method("get_owner_id") and bomb.get_owner_id() == enemy_id:
+			print("DEBUG: Removing existing bomb from enemy " + str(enemy_id))
 			bomb.queue_free()
 	
 	# Increment debug counter
 	bombs_shot_count += 1
 	print("DEBUG: Enemy " + str(enemy_id) + " (designated bomber) attempting to shoot bomb #" + str(bombs_shot_count))
 	
-	# IMPROVED: Check if EnemyBomb scene exists and use that instead of creating manually
-	var bomb_scene = load("res://EnemyBomb.tscn")
-	var bomb
+	# Create the bomb as a completely separate entity in the scene - never attached to the enemy boat
+	var bomb = Area3D.new()
+	bomb.name = "EnemyBomb_" + str(enemy_id) + "_" + str(bombs_shot_count)
+	bomb.add_to_group("EnemyBomb")
 	
-	if bomb_scene:
-		# Use the proper scene if available
-		bomb = bomb_scene.instantiate()
-		print("DEBUG: Using EnemyBomb.tscn scene")
-	else:
-		# Fallback to manual creation
-		print("DEBUG: EnemyBomb.tscn not found, creating bomb manually")
-		# Create a bomb (using a sphere)
-		bomb = Area3D.new()
-		bomb.add_to_group("EnemyBomb")
-		
-		# Set up collision
-		bomb.collision_layer = 8  # Bomb layer (new layer)
-		bomb.collision_mask = 3   # Player (1) and Bullet (2) layers
-		
-		# Create collision shape
-		var collision = CollisionShape3D.new()
-		var sphere_shape = SphereShape3D.new()
-		sphere_shape.radius = 1.5  # Much bigger collision radius for easier shooting
-		collision.shape = sphere_shape
-		bomb.add_child(collision)
-		
-		# Create main bomb body (sphere)
-		var mesh_instance = MeshInstance3D.new()
-		var sphere_mesh = SphereMesh.new()
-		sphere_mesh.radius = 1.5  # Much bigger visual size for easier visibility
-		sphere_mesh.height = 3.0  # Keep the height proportional
-		mesh_instance.mesh = sphere_mesh
-		
-		# Create bomb material with stronger emissive properties for better visibility
-		var material = StandardMaterial3D.new()
-		material.albedo_color = Color(0.9, 0.1, 0.0)  # Brighter red
-		material.metallic = 0.7
-		material.roughness = 0.3
-		material.emission_enabled = true
-		material.emission = Color(1.0, 0.3, 0.0)
-		material.emission_energy = 2.5  # Increased glow
-		sphere_mesh.material = material
-		
-		bomb.add_child(mesh_instance)
-		
-		# Add a glowing trail effect (smaller spheres)
-		var trail_parent = Node3D.new()
-		trail_parent.name = "Trail"
-		bomb.add_child(trail_parent)
-		
-		# Create trail material (more intense emission)
-		var trail_material = StandardMaterial3D.new()
-		trail_material.albedo_color = Color(1.0, 0.5, 0.0)
-		trail_material.emission_enabled = true
-		trail_material.emission = Color(1.0, 0.7, 0.2)
-		trail_material.emission_energy = 5.0  # Increased emission for better visibility
-		
-		# Create more and larger sparks around the main bomb for better visibility
-		for i in range(6):  # Increased number of sparks
-			var spark = MeshInstance3D.new()
-			var spark_mesh = SphereMesh.new()
-			spark_mesh.radius = 0.25  # Larger sparks
-			spark_mesh.height = 0.5   # Larger sparks
-			spark_mesh.material = trail_material
-			spark.mesh = spark_mesh
-			
-			# Position sparks in a circle around the bomb
-			var angle = i * 2.0 * PI / 6.0
-			spark.position = Vector3(cos(angle) * 1.0, sin(angle) * 1.0, 0)  # Wider circle
-			trail_parent.add_child(spark)
+	# Set up collision
+	bomb.collision_layer = 8  # Bomb layer (new layer)
+	bomb.collision_mask = 3   # Player (1) and Bullet (2) layers
 	
-		# Add the script to the manually created bomb
-		print("DEBUG: Loading bomb script...")
-		var script = load("res://EnemyBomb.gd")
-		if !script:
-			print("ERROR: Failed to load EnemyBomb.gd script")
-			bomb.queue_free()
-			return
-			
-		# Set the script BEFORE adding to scene
+	# Create collision shape
+	var collision = CollisionShape3D.new()
+	var sphere_shape = SphereShape3D.new()
+	sphere_shape.radius = 1.5  # Much bigger collision radius for easier shooting
+	collision.shape = sphere_shape
+	bomb.add_child(collision)
+	
+	# Create main bomb body (sphere)
+	var mesh_instance = MeshInstance3D.new()
+	mesh_instance.name = "BombMesh"
+	var sphere_mesh = SphereMesh.new()
+	sphere_mesh.radius = 1.5  # Much bigger visual size for easier visibility
+	sphere_mesh.height = 3.0  # Keep the height proportional
+	mesh_instance.mesh = sphere_mesh
+	
+	# Create bomb material with stronger emissive properties for better visibility
+	var material = StandardMaterial3D.new()
+	material.albedo_color = Color(0.9, 0.1, 0.0)  # Brighter red
+	material.metallic = 0.7
+	material.roughness = 0.3
+	material.emission_enabled = true
+	material.emission = Color(1.0, 0.3, 0.0)
+	material.emission_energy = 2.5  # Increased glow
+	sphere_mesh.material = material
+	
+	mesh_instance.mesh.surface_set_material(0, material)
+	bomb.add_child(mesh_instance)
+	
+	# Add a script to the bomb
+	var script = load("res://EnemyBomb.gd")
+	if script:
 		bomb.set_script(script)
-	
-	# Calculate direction to player
-	var direction = (player_position - global_position).normalized()
-	print("DEBUG: Enemy at " + str(global_position) + " shooting bomb")
-	
-	# IMPROVED: Position the bomb above the ship with an offset toward the player
-	# This helps ensure the bomb has a more direct path to the player
-	var forward_offset = direction * 2.0  # Position bomb slightly ahead in player direction
-	var spawn_position = Vector3(forward_offset.x, 2.5, forward_offset.z)  # Higher up to be more visible
-	
-	# FIRST add the bomb as a child of THIS ENEMY so it starts at the right position
-	add_child(bomb)
-	
-	# Position the bomb
-	bomb.position = spawn_position
-	print("DEBUG: Bomb added as child of enemy, position: " + str(bomb.global_position))
-	
-	# Initialize bomb with precise targeting to player
-	if bomb.has_method("initialize"):
-		# IMPROVED: Create a more precise targeting mechanism
-		# Calculate a position very close to the player with minimal offset
-		var player_precision_target = player_position + Vector3(randf_range(-0.3, 0.3), 0, randf_range(-0.3, 0.3))
-		
-		# Store global position for maintaining it after reparenting
-		var global_pos_before = bomb.global_position
-		
-		# Initialize the bomb with player as target for precise landing
-		bomb.initialize(direction, bomb_damage, player_ref)
-		
-		# Once initialized, reparent to scene root for independent movement
-		remove_child(bomb)
-		get_tree().current_scene.add_child(bomb)
-		
-		# Fix position after reparenting to maintain the same global position
-		bomb.global_position = global_pos_before
-		
-		print("DEBUG: Bomb successfully initialized to target player at " + str(player_precision_target))
 	else:
-		print("ERROR: Bomb lacks initialize method!")
+		print("ERROR: Failed to load EnemyBomb.gd script")
 		bomb.queue_free()
 		return
+		
+	# Calculate direction to player
+	var direction = (player_position - global_position).normalized()
 	
-	# Verify bomb position after initialization
-	print("DEBUG: Bomb successfully reparented, position: " + str(bomb.global_position))
+	# Position the bomb above the enemy with an offset toward the player
+	var spawn_offset = direction * 2.0  # Position bomb slightly ahead in player direction
+	var bomb_pos = global_position + Vector3(spawn_offset.x, 2.5, spawn_offset.z)
+	
+	# IMPORTANT: First add to scene, then position - this ensures it's not attached to the enemy
+	get_tree().current_scene.add_child(bomb)
+	bomb.global_position = bomb_pos
+	
+	# Explicitly set the bomb's transform to ensure it doesn't inherit from parent
+	bomb.global_transform.origin = bomb_pos
+	
+	# Now initialize the bomb with targeting information AFTER it's in the scene
+	if bomb.has_method("initialize"):
+		# Initialize with this enemy's ID as the owner
+		bomb.set_owner_id(enemy_id)
+		
+		# Initialize the bomb with target information
+		bomb.initialize(direction, bomb_damage, player_ref)
+		
+		print("DEBUG: Bomb successfully initialized for enemy " + str(enemy_id))
+	else:
+		print("ERROR: Bomb creation failed!")
+		bomb.queue_free()
 
 func _on_area_entered(area: Area3D) -> void:
 	print("DEBUG: Enemy collision with ", area.name)
@@ -371,6 +292,13 @@ func take_damage(damage: int) -> void:
 	
 	if health <= 0:
 		print("DEBUG: Enemy defeated! ID: ", enemy_id)
+		
+		# Clean up any bombs from this enemy before destruction
+		var existing_bombs = get_tree().get_nodes_in_group("EnemyBomb")
+		for bomb in existing_bombs:
+			if is_instance_valid(bomb) and bomb.has_method("get_owner_id") and bomb.get_owner_id() == enemy_id:
+				print("DEBUG: Removing bomb from defeated enemy " + str(enemy_id))
+				bomb.queue_free()
 		
 		# Award bronze for defeating enemy
 		CurrencyManager.add_bronze(bronze_value)

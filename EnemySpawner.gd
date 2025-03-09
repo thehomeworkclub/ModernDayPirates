@@ -27,6 +27,12 @@ func _ready() -> void:
 	
 	print("DEBUG: EnemySpawner initialized at position: ", global_position)
 	
+	# CRITICAL FIX: Clean up any existing target markers to prevent orange sphere issues
+	var markers = get_tree().get_nodes_in_group("TargetMarker")
+	for marker in markers:
+		print("DEBUG: Removing existing target marker: " + marker.name)
+		marker.queue_free()
+	
 	# Create and start a timer to spawn enemies at fixed intervals.
 	spawn_timer = Timer.new()
 	spawn_timer.wait_time = 0.3  # Fast timer for batch spawning
@@ -99,18 +105,9 @@ func start_wave_spawning() -> void:
 	start_next_batch()
 
 func calculate_first_batch_size() -> void:
-	# Calculate batch size based on difficulty (10-20% of total enemies)
-	var difficulty_factor = 0.0
-	match GameManager.difficulty:
-		"Easy": difficulty_factor = 0.1  # 10% at a time (1-2 enemies)
-		"Normal": difficulty_factor = 0.12
-		"Hard": difficulty_factor = 0.15
-		"Very Hard": difficulty_factor = 0.18
-		"Extreme": difficulty_factor = 0.2  # 20% at a time (4-5 enemies)
-	
-	# Calculate first batch size (at least 1 enemy, at most the calculated percentage)
-	var batch_size = int(ceil(GameManager.enemies_per_wave * difficulty_factor))
-	current_batch_size = max(1, min(batch_size, GameManager.enemies_per_wave))
+	# Always spawn just 1 enemy at a time regardless of difficulty
+	# This ensures they don't all appear at once and gives player time to react
+	current_batch_size = 1
 	
 	print("DEBUG: First batch will spawn " + str(current_batch_size) + " enemies")
 
@@ -162,16 +159,9 @@ func check_for_next_batch() -> void:
 		print("DEBUG: All enemies already spawned, no need for next batch")
 		return
 	
-	# Calculate threshold for spawning next batch - with difficulty factored in
-	var difficulty_factor = 0.0
-	match GameManager.difficulty:
-		"Easy": difficulty_factor = 0.1  # Only when few enemies remain
-		"Normal": difficulty_factor = 0.15
-		"Hard": difficulty_factor = 0.2
-		"Very Hard": difficulty_factor = 0.25
-		"Extreme": difficulty_factor = 0.3  # Allow more active enemies
-		
-	var threshold = max(2, int(GameManager.enemies_per_wave * difficulty_factor))
+	# Fixed threshold of 1 - only spawn next enemy when there is at most 1 active enemy
+	# This ensures enemies spawn one at a time with plenty of time between them
+	var threshold = 1
 	
 	# Count actual active enemies based on our tracked list
 	var active_count = count_active_enemies()
@@ -354,29 +344,8 @@ func spawn_enemy_with_random_positions() -> void:
 	# Track spawning in GameManager
 	GameManager.enemies_spawned_in_wave += 1
 	
-	# Create a visual debug marker if it's a debug build
-	if OS.is_debug_build():
-		var marker = MeshInstance3D.new()
-		marker.name = "TargetMarker" + str(enemies_spawned)
-		marker.add_to_group("TargetMarker")  # Add to group for easy finding
-		
-		# Small sphere
-		var sphere = SphereMesh.new()
-		sphere.radius = 1.0
-		sphere.height = 2.0
-		marker.mesh = sphere
-		
-		# Orange material
-		var material = StandardMaterial3D.new()
-		material.albedo_color = Color(1.0, 0.5, 0.0, 0.5)
-		material.emission_enabled = true
-		material.emission = Color(1.0, 0.5, 0.0)
-		material.emission_energy = 1.5
-		sphere.material = material
-		
-		# Set position and defer adding to scene
-		marker.position = spawn_position
-		get_tree().current_scene.call_deferred("add_child", marker)
+	# Don't create visual debug markers - they were causing the bomb appearance issue
+	# Debug enemy positions through the console logs instead
 	
 	# Make sure the enemy is visible
 	enemy.visible = true
