@@ -3,7 +3,7 @@ extends Area3D
 @export var base_health: int = 3
 @export var base_speed: float = 8.0  # Significantly increased speed
 @export var base_bronze_value: int = 2
-@export var bomb_damage: int = 5
+@export var bomb_damage: int = 15     # INCREASED damage to make bomb hits more obvious
 @export var bomb_cooldown: float = 4.0  # Reduced cooldown to increase bomb frequency
 @export var bomb_chance: float = 0.7    # Increased chance to throw a bomb when cooldown expires
 @export var player_ship_barrier: float = 150.0  # Massively increased distance from player where ships stop
@@ -189,14 +189,22 @@ func shoot_bomb() -> void:
 		print("DEBUG: Can't shoot bomb - no player reference")
 		return
 		
-	# FIXED APPROACH: Clear out ALL existing bombs before creating a new one
-	# This ensures no accumulation of stuck bombs
+	# COMMENTED OUT: Code that was removing existing bombs
+	# This was clearing old bombs when creating new ones
+	# var existing_bombs = get_tree().get_nodes_in_group("EnemyBomb")
+	# for bomb in existing_bombs:
+	# 	# Remove ALL bombs that originated from this enemy - prevents accumulation
+	# 	if is_instance_valid(bomb) and bomb.has_method("get_owner_id") and bomb.get_owner_id() == enemy_id:
+	# 		print("DEBUG: Removing existing bomb from enemy " + str(enemy_id))
+	# 		bomb.queue_free()
+	
+	# Instead, just count existing bombs for debugging
 	var existing_bombs = get_tree().get_nodes_in_group("EnemyBomb")
+	var count = 0
 	for bomb in existing_bombs:
-		# Remove ALL bombs that originated from this enemy - prevents accumulation
 		if is_instance_valid(bomb) and bomb.has_method("get_owner_id") and bomb.get_owner_id() == enemy_id:
-			print("DEBUG: Removing existing bomb from enemy " + str(enemy_id))
-			bomb.queue_free()
+			count += 1
+	print("DEBUG: Enemy has " + str(count) + " existing bombs")
 	
 	# Increment debug counter
 	bombs_shot_count += 1
@@ -293,12 +301,20 @@ func take_damage(damage: int) -> void:
 	if health <= 0:
 		print("DEBUG: Enemy defeated! ID: ", enemy_id)
 		
-		# Clean up any bombs from this enemy before destruction
+		# COMMENTED OUT: Code that was removing bombs when enemy is defeated
+		# var existing_bombs = get_tree().get_nodes_in_group("EnemyBomb")
+		# for bomb in existing_bombs:
+		#     if is_instance_valid(bomb) and bomb.has_method("get_owner_id") and bomb.get_owner_id() == enemy_id:
+		#         print("DEBUG: Removing bomb from defeated enemy " + str(enemy_id))
+		#         bomb.queue_free()
+		
+		# Instead, just count and log existing bombs for debugging
 		var existing_bombs = get_tree().get_nodes_in_group("EnemyBomb")
+		var bomb_count = 0
 		for bomb in existing_bombs:
 			if is_instance_valid(bomb) and bomb.has_method("get_owner_id") and bomb.get_owner_id() == enemy_id:
-				print("DEBUG: Removing bomb from defeated enemy " + str(enemy_id))
-				bomb.queue_free()
+				bomb_count += 1
+		print("DEBUG: Enemy " + str(enemy_id) + " defeated, leaving " + str(bomb_count) + " active bombs!")
 		
 		# Award bronze for defeating enemy
 		CurrencyManager.add_bronze(bronze_value)

@@ -20,6 +20,9 @@ func _ready() -> void:
 	collision_layer = 1  # Player layer
 	collision_mask = 12  # Enemy (4) and Bomb (8) layers
 	
+	# CRITICAL: Create a larger collision box around the boat for bomb detection
+	#create_damage_box()
+	
 	# Connect signals
 	area_entered.connect(_on_area_entered)
 	area_exited.connect(_on_area_exited)
@@ -29,6 +32,46 @@ func _ready() -> void:
 	
 	# Debug collision info
 	print("DEBUG: Boat collision shape set up, layer: ", collision_layer, ", mask: ", collision_mask)
+
+## Create a larger collision box around the boat to detect bombs more reliably
+#func create_damage_box() -> void:
+	## Check if we already have a collision shape
+	#var existing_shape = get_node_or_null("CollisionShape3D")
+	#
+	## If we don't have one, create a new one
+	#if not existing_shape:
+		#existing_shape = CollisionShape3D.new()
+		#existing_shape.name = "CollisionShape3D"
+		#add_child(existing_shape)
+	#
+	## Create a larger box shape
+	#var box_shape = BoxShape3D.new()
+	#box_shape.size = Vector3(8.0, 5.0, 10.0)  # Much larger box for better bomb detection
+	#
+	## Apply the shape
+	#existing_shape.shape = box_shape
+	#
+	## Optional visual representation of the box (for debugging)
+	#var debug_mesh = MeshInstance3D.new()
+	#debug_mesh.name = "DebugCollisionBox"
+	#debug_mesh.mesh = BoxMesh.new()
+	#debug_mesh.mesh.size = box_shape.size
+	#
+	## Make it semi-transparent
+	#var material = StandardMaterial3D.new()
+	#material.albedo_color = Color(1.0, 0.0, 0.0, 0.3)  # Semi-transparent red
+	#material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	#debug_mesh.mesh.material = material
+	#
+	## Position slightly above the boat for visibility
+	#debug_mesh.position = Vector3(0, 0.5, 0)
+	#
+	## Only show in debug builds
+	#if OS.is_debug_build():
+		#add_child(debug_mesh)
+		#print("DEBUG: Added visual debug collision box")
+	#
+	#print("DEBUG: Created larger damage box for bomb detection with size: ", box_shape.size)
 
 func create_health_display() -> void:
 	# Create a simple health label
@@ -125,12 +168,32 @@ func upgrade_max_health(bonus: float) -> void:
 	update_health_display()
 
 func _on_area_entered(area: Area3D) -> void:
+	print("DEBUG: Boat detected collision with: ", area.name, ", groups: ", area.get_groups())
+	
 	if area.is_in_group("Enemy"):
 		enemies_in_range += 1
+		print("DEBUG: Enemy entered range, count: ", enemies_in_range)
 	elif area.is_in_group("EnemyBomb"):
-		# Handle bomb collision
+		# ULTRA-RELIABLE BOMB DETECTION - Large collision box ensures this will trigger
+		print("DEBUG: 💥 BOMB HIT BOAT DIRECTLY! 💥")
+		
+		# Get bomb damage if available or use higher default damage
+		var bomb_damage = 15  # Higher default damage
+		if area.has_method("get_damage"):
+			bomb_damage = area.get_damage()
+		elif area.get("damage") != null:
+			bomb_damage = area.get("damage")
+		
+		# Apply damage directly
+		take_damage(bomb_damage)
+		print("DEBUG: 💥 HEALTH REDUCED by ", bomb_damage, " from bomb hit! 💥")
+		
+		# Then trigger explosion
 		if area.has_method("explode"):
 			area.explode(true)  # Explode and damage player
+		else:
+			# If no explode method, destroy the bomb anyway
+			area.queue_free()
 
 func _on_area_exited(area: Area3D) -> void:
 	if area.is_in_group("Enemy"):
