@@ -12,6 +12,9 @@ var wave_in_progress: bool = false
 
 # Storage for used target positions to avoid overlap
 var used_target_positions = []
+var min_spawn_distance: float = 25.0  # Increased minimum distance between enemy spawns
+# Y level for ship spawning - adjust this to place ships at the right height above the ocean
+@export var ship_spawn_height: float = -1.5  # Much lower value to be closer to ocean
 
 # NEW: Store enemies we've spawned this wave for stronger tracking
 var spawned_enemies = []
@@ -288,7 +291,7 @@ func _on_Timer_timeout() -> void:
 		# Check for wave completion
 		check_wave_completion()
 
-# Spawn an enemy with completely random positions
+# Spawn an enemy with approach animation from far away
 func spawn_enemy_with_random_positions() -> void:
 	if not enemy_scene:
 		print("ERROR: No enemy scene assigned!")
@@ -300,52 +303,87 @@ func spawn_enemy_with_random_positions() -> void:
 	enemy.speed_multiplier = GameManager.enemy_speed * GameManager.wave_difficulty_multiplier
 	enemy.health_multiplier = GameManager.enemy_health * GameManager.wave_difficulty_multiplier
 	
-	# Find TargetPlane for enemy initial spawn positions
+	# Find TargetPlane for enemy target positions (where they will stop)
 	var target_plane = get_tree().current_scene.get_node_or_null("TargetPlane") 
 	
-	# Default spawn area if no target plane
+	# FORCE a reasonable target area regardless of what's in the scene
 	var spawn_min_x = -20.0
 	var spawn_max_x = 20.0
 	var spawn_min_z = -15.0
 	var spawn_max_z = 15.0
 	
+	# Debug the target plane position
 	if target_plane:
-		# If target plane exists, use its size and position
-		if target_plane is MeshInstance3D and target_plane.mesh is PlaneMesh:
-			var plane_mesh = target_plane.mesh as PlaneMesh
-			var plane_size = plane_mesh.size
-			spawn_min_x = target_plane.global_position.x - plane_size.x/2
-			spawn_max_x = target_plane.global_position.x + plane_size.x/2
-			spawn_min_z = target_plane.global_position.z - plane_size.y/2
-			spawn_max_z = target_plane.global_position.z + plane_size.y/2
-			print("DEBUG: Using TargetPlane for enemy spawn area: ", spawn_min_x, ",", spawn_max_x, " / ", spawn_min_z, ",", spawn_max_z)
+		print("DEBUG: TargetPlane position: ", target_plane.global_position)
+		
+		# Check if it's in an extreme location
+		if abs(target_plane.global_position.z) > 100:
+			print("WARNING: TargetPlane position is extreme! Using default spawn area")
+		else:
+			# If target plane exists AND is in a reasonable position, use its size and position
+			if target_plane is MeshInstance3D and target_plane.mesh is PlaneMesh:
+				var plane_mesh = target_plane.mesh as PlaneMesh
+				var plane_size = plane_mesh.size
+				spawn_min_x = target_plane.global_position.x - plane_size.x/2
+				spawn_max_x = target_plane.global_position.x + plane_size.x/2
+				spawn_min_z = target_plane.global_position.z - plane_size.y/2
+				spawn_max_z = target_plane.global_position.z + plane_size.y/2
 	
-	# Create a random spawn position in the spawn area
-	var spawn_position = Vector3(
-		randf_range(spawn_min_x, spawn_max_x),  # Random X position
-		0.0,                                    # Y is always 0
-		randf_range(spawn_min_z, spawn_max_z)   # Random Z position in spawn range
+	# Force a reasonable spawn area regardless of what was calculated
+	spawn_min_z = clamp(spawn_min_z, -20.0, 0.0)
+	spawn_max_z = clamp(spawn_max_z, 0.0, 20.0)
+	
+	print("DEBUG: FINAL enemy spawn area: ", spawn_min_x, ",", spawn_max_x, " / ", spawn_min_z, ",", spawn_max_z)
+	
+	# Create a random final position in the spawn area that's not too close to other enemies
+	var target_position = find_valid_spawn_position(spawn_min_x, spawn_max_x, spawn_min_z, spawn_max_z)
+	
+	# CRITICAL: Validate target location to make sure it's in a reasonable range
+	if abs(target_position.z) > 50:
+		print("WARNING: Target Z is too extreme, clamping to reasonable range")
+		# Force the target to be in a reasonable range
+		target_position.z = clamp(target_position.z, -20.0, 20.0)
+	
+	# Calculate starting position far away in a STRAIGHT LINE behind the target position
+	var far_distance = 150.0  # Increased distance - ships need to spawn much farther away
+	# Create starting position with SAME X coordinate but farther back in Z
+	var start_position = Vector3(
+		target_position.x,      # Keep the SAME X coordinate for straight-line approach
+		ship_spawn_height,      # Use the configured Y height to position at ocean level
+		target_position.z + far_distance  # Position behind in Z axis (positive Z is behind)
 	)
 	
+	# CRITICAL: Verify position is in a reasonable range
+	if abs(start_position.z) > 200:
+		print("WARNING: Z position is too extreme! Adjusting to reasonable range")
+		start_position.z = target_position.z + 150.0  # Force a reasonable distance
+	
+	print("DEBUG: Ship will approach in straight line from ", start_position, " to ", target_position)
+	
 	# Position must be set BEFORE adding to scene to avoid flash at origin
-	# Just setting a property doesn't require deferred calls
-	enemy.position = spawn_position
-
+	enemy.position = start_position
+	
+	# Set up approach animation parameters
+	enemy.start_position = start_position
+	enemy.target_position = target_position
+	enemy.is_approaching = true
+	
 	# Add enemy to scene with position already set
 	get_tree().current_scene.call_deferred("add_child", enemy)
 	await get_tree().create_timer(0.1).timeout  # Wait a bit longer for proper initialization
 	
 	# Ensure position is still correct after adding to scene
-	enemy.position = spawn_position
-	
-	# Set target position to the same as spawn position - no movement needed
-	enemy.target_position = spawn_position
+	enemy.position = start_position
 	
 	# Track spawning in GameManager
 	GameManager.enemies_spawned_in_wave += 1
 	
 	# Don't create visual debug markers - they were causing the bomb appearance issue
 	# Debug enemy positions through the console logs instead
+	
+	# IMPORTANT: Force the correct Y position to match ocean level
+	enemy.global_position.y = ship_spawn_height
+	print("DEBUG: Forcing ship Y position to: ", ship_spawn_height)
 	
 	# Make sure the enemy is visible
 	enemy.visible = true
@@ -362,6 +400,62 @@ func spawn_enemy_with_random_positions() -> void:
 	
 	# Increment enemies spawned counter
 	enemies_spawned += 1
+	
+	# Check for overlapping ships after each spawn (debug)
+	if enemies_spawned % 3 == 0:  # Don't check every time to reduce spam
+		check_for_overlapping_ships()
+
+# Find a valid spawn position that's not too close to existing enemies
+func find_valid_spawn_position(min_x: float, max_x: float, min_z: float, max_z: float) -> Vector3:
+	var max_attempts = 20  # Prevent infinite loops
+	var attempts = 0
+	var valid_position_found = false
+	var position = Vector3.ZERO
+	
+	while not valid_position_found and attempts < max_attempts:
+		# Generate a random position - use the configurable Y height
+		position = Vector3(
+			randf_range(min_x, max_x),  # Random X position
+			ship_spawn_height,          # Use configured height to match ocean
+			randf_range(min_z, max_z)   # Random Z position
+		)
+		
+		# Check distance to all existing enemies
+		var too_close = false
+		
+		# First check against tracked used positions
+		for used_pos in used_target_positions:
+			if position.distance_to(used_pos) < min_spawn_distance:
+				too_close = true
+				break
+				
+		# Also check against all active enemies
+		if not too_close:
+			for enemy in spawned_enemies:
+				if is_instance_valid(enemy):
+					if position.distance_to(enemy.global_position) < min_spawn_distance:
+						too_close = true
+						break
+		
+		# If position is good, we've found a valid spot
+		if not too_close:
+			valid_position_found = true
+		else:
+			attempts += 1
+			
+	# If we couldn't find a good position after max attempts, just use the last one
+	# In worst case, this will still be a valid random position within bounds
+	
+	# Remember this position to avoid future overlaps
+	used_target_positions.append(position)
+	
+	# Debug info
+	if valid_position_found:
+		print("DEBUG: Found valid spawn position at attempt ", attempts)
+	else:
+		print("DEBUG: Could not find non-overlapping position after ", attempts, " attempts")
+		
+	return position
 
 # Unified wave completion check that coordinates with GameManager
 func check_wave_completion() -> void:
@@ -396,3 +490,22 @@ func complete_wave() -> void:
 	
 	# Notify GameManager
 	GameManager.complete_wave()
+	
+# DEBUG FUNCTION TO CHECK FOR OVERLAPPING SHIPS
+func check_for_overlapping_ships() -> void:
+	# Collect valid enemies
+	var enemies = []
+	for enemy in spawned_enemies:
+		if is_instance_valid(enemy):
+			enemies.append(enemy)
+			
+	# Check distances between all pairs of enemies
+	for i in range(enemies.size()):
+		for j in range(i + 1, enemies.size()):
+			var distance = enemies[i].global_position.distance_to(enemies[j].global_position)
+			if distance < min_spawn_distance:  # Too close
+				print("WARNING: Enemies " + str(enemies[i].enemy_id) + " and " + str(enemies[j].enemy_id) + 
+					" are too close! Distance: " + str(distance))
+					
+	# Log the result
+	print("DEBUG: Checked distances between " + str(enemies.size()) + " enemies")

@@ -109,6 +109,7 @@ bullet_scene = ExtResource("2_fhhdu")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
 script = ExtResource("2_xdull")
 enemy_scene = ExtResource("4_lkhmh")
+ship_spawn_height = 0.0
 
 [node name="Area3D" parent="." instance=ExtResource("6_0bb58")]
 transform = Transform3D(-2.64326, 0, -1.67425e-07, 0, 2.62623, 0, 2.31081e-07, 0, -1.91512, 8.38106, 0, -36.1083)
@@ -117,7 +118,7 @@ transform = Transform3D(-2.64326, 0, -1.67425e-07, 0, 2.62623, 0, 2.31081e-07, 0
 transform = Transform3D(5.43708, 0, 0, 0, 3.96763, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="sea" type="MeshInstance3D" parent="."]
-transform = Transform3D(-1.71122e-07, 0, -2.70399, 0, 1, 0, 3.91482, 0, -1.18195e-07, 0, -1.73188, 162.095)
+transform = Transform3D(-1.71122e-07, 0, -2.70399, 0, 1, 0, 3.91482, 0, -1.18195e-07, 0, -0.230235, 162.095)
 mesh = SubResource("PlaneMesh_y1l8n")
 surface_material_override/0 = SubResource("ShaderMaterial_xr1l8")
 
@@ -149,7 +150,7 @@ directional_shadow_max_distance = 670.0
 directional_shadow_pancake_size = 0.0
 
 [node name="TargetPlane" parent="." instance=ExtResource("9_q0qot")]
-transform = Transform3D(0.667082, 0, 0, 0, 1, 0, 0, 0, 0.514231, 0, 0.1, 0.789568)
+transform = Transform3D(0.667082, 0, 0, 0, 1, 0, 0, 0, 0.514231, 0, -1.24286, 0.789568)
 material_override = SubResource("StandardMaterial3D_eq1s2")
 
 [node name="BombCleaner" type="Node" parent="."]

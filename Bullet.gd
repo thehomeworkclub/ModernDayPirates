@@ -62,6 +62,10 @@ func _on_area_entered(area: Area3D) -> void:
 		print("DEBUG: Hitting enemy parent with ", damage, " damage")
 		area.get_parent().take_damage(damage)
 		queue_free()
+	elif area.is_in_group("Player"):
+		# Skip damaging player - bullets should not damage the player
+		print("DEBUG: Hit player but ignoring collision (player bullets shouldn't damage player)")
+		return
 	else:
 		print("DEBUG: Hit something that is not an enemy: ", area.name)
 

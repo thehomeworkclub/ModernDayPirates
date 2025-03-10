@@ -99,7 +99,7 @@ func update_health_display() -> void:
 			health_display.add_theme_color_override("font_color", Color(1, 0, 0))  # Red
 		elif health_percent < 0.7:
 			health_display.add_theme_color_override("font_color", Color(1, 1, 0))  # Yellow
-		else:
+	else:
 			health_display.add_theme_color_override("font_color", Color(0, 1, 0))  # Green
 
 func _physics_process(delta: float) -> void:
@@ -190,7 +190,7 @@ func _on_area_entered(area: Area3D) -> void:
 		
 		# Then trigger explosion
 		if area.has_method("explode"):
-			area.explode(true)  # Explode and damage player
+			area.explode()
 		else:
 			# If no explode method, destroy the bomb anyway
 			area.queue_free()

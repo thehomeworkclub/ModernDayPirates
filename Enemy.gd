@@ -19,8 +19,23 @@ var player_ref: Node = null
 var player_position: Vector3 = Vector3.ZERO
 
 # Target position variables
-var target_position: Vector3 = Vector3.ZERO
+var target_position: Vector3 = Vector3.ZERO  # Final position where ship stops
 var target_position_node: Node = null
+
+# Ship approach animation variables
+var start_position: Vector3 = Vector3.ZERO  # Position far away where ship starts
+var is_approaching: bool = true  # Whether ship is still moving to target position
+var approach_speed: float = 70.0  # Much faster speed for dramatic approach
+var approach_threshold: float = 1.0  # Distance at which to consider arrival reached
+
+# Boat bobbing and bouncing variables - REALISTIC VALUES FOR SMALL BOATS
+var bobbing_time: float = 0.0
+var bob_height_multiplier: float = 0.1  # Height of bobbing motion (reduced)
+var bob_frequency: float = 6.0  # Speed of bobbing (slightly slower for more realism)
+var pitch_multiplier: float = 0.08  # Much smaller pitch angle - boats don't tilt that much
+var roll_multiplier: float = 0.04  # Reduced roll - small boats are more stable at speed
+var boat_model: Node3D = null  # Reference to the actual boat model for rotation
+var planing_angle: float = 0.12  # Constant upward tilt when moving fast (nose up)
 
 # Bombing capability - will be controlled centrally
 var can_shoot_bombs: bool = false
@@ -36,6 +51,12 @@ func _ready() -> void:
 	# Register with the GameManager to get a unique ID
 	enemy_id = GameManager.register_enemy()
 	
+	# Make sure the player's boat is in Player group
+	var player_boat_node = get_tree().current_scene.find_child("Area3D", true, false)
+	if player_boat_node != null and not player_boat_node.is_in_group("Player"):
+		print("DEBUG: Adding player's boat to Player group")
+		player_boat_node.add_to_group("Player")
+	
 	# Basic collision setup - keep it simple
 	collision_layer = 4  # Enemy layer
 	collision_mask = 2   # Bullet layer
@@ -43,6 +64,15 @@ func _ready() -> void:
 	# Ensure collision detection is enabled
 	monitoring = true
 	monitorable = true
+	
+	# Get reference to the boat model
+	boat_model = get_node_or_null("ScoutBoat")
+	if not boat_model:
+		# Try to find it with a different approach
+		for child in get_children():
+			if child is MeshInstance3D or "Boat" in child.name:
+				boat_model = child
+				break
 	
 	# Calculate health based on difficulty
 	var round_bonus = GameManager.current_round - 1
@@ -55,14 +85,23 @@ func _ready() -> void:
 	# Connect signal using the new signal syntax
 	area_entered.connect(_on_area_entered)
 	
-	# Find the player's boat first, since visibility depends on proper initialization
+	# Find the player by searching the Player group first
 	var players = get_tree().get_nodes_in_group("Player")
 	if players.size() > 0:
 		player_ref = players[0]
 		player_position = player_ref.global_position
+		print("DEBUG: Enemy found player via Player group")
 	else:
-		print("WARNING: No player found, enemy may not behave correctly")
-		
+		print("DEBUG: No player found in Player group")
+		# Try to find player through scene tree as fallback
+		var player_boat = get_tree().current_scene.find_child("Area3D", true, false)
+		if player_boat != null:
+			player_ref = player_boat
+			player_position = player_boat.global_position
+			print("DEBUG: Enemy found player via scene tree search")
+		else:
+			print("DEBUG: Could not find player reference!")
+	
 	# Make sure the boat model is visible - wait until next frame to ensure model is loaded
 	call_deferred("ensure_visibility")
 	
@@ -78,6 +117,7 @@ func ensure_visibility() -> void:
 	# Make sure boat is visible and properly initialized
 	if has_node("ScoutBoat"):
 		$ScoutBoat.visible = true
+		boat_model = $ScoutBoat
 		print("DEBUG: Made ScoutBoat model visible for enemy " + str(enemy_id))
 		
 	# CRITICAL FIX: Check for any unwanted bomb-like children and remove them
@@ -111,46 +151,153 @@ func _physics_process(delta: float) -> void:
 		print("WARNING: Enemy global position is extremely large: " + str(global_position) + ", resetting position")
 		global_position = Vector3(global_position.x, global_position.y, -10.0)
 	
-	# Update player position reference
+	# Update player position reference with safety check
 	if player_ref:
-		player_position = player_ref.global_position
-	else:
-		# Try to find player again if we don't have a reference
+		# Check if reference is still valid
+		if is_instance_valid(player_ref):
+			# Reference is valid, update position
+			player_position = player_ref.global_position
+		else:
+			# Reference is invalid, clear it
+			print("DEBUG: Player reference was invalid, clearing it")
+			player_ref = null
+
+	# Try to find player again if we don't have a reference
+	if not player_ref:
+		# Look for player in Player group
 		var players = get_tree().get_nodes_in_group("Player")
 		if players.size() > 0:
 			player_ref = players[0]
-			player_position = player_ref.global_position
-			print("DEBUG: Enemy found player reference")
+			# Verify this object is valid
+			if is_instance_valid(player_ref):
+				player_position = player_ref.global_position
+				print("DEBUG: Enemy found player reference")
+			else:
+				player_ref = null
 	
 	# Apply speed multiplier from difficulty
 	var adjusted_speed = base_speed * speed_multiplier
 	
-	# Determine state based on distance to target
-	var distance_to_target = global_position.distance_to(target_position)
-	
 	# Check if we're in front of the player - if so, stop at barrier
 	var in_front_of_player = false
-	if player_ref:
+	if player_ref and is_instance_valid(player_ref):
 		in_front_of_player = global_position.z < player_position.z + player_ship_barrier
 	
-	# Debug info
-	if Engine.get_physics_frames() % 120 == 0:
-		print("DEBUG: Enemy distance to target: ", distance_to_target, 
-			", Target: ", target_position, 
-			", Current: ", global_position)
+	# Update bobbing time
+	bobbing_time += delta
 	
-	# No movement - boats stay where they spawn 
-	# Debug position occasionally
-	if Engine.get_physics_frames() % 120 == 0:
-		print("DEBUG: Enemy at position: ", global_position)
+	# Handle approach animation if still approaching target position
+	if is_approaching:
+		# Calculate movement vector toward target using a 2D vector for perfect straight line
+		var direction_2d = Vector2(target_position.x - global_position.x, target_position.z - global_position.z).normalized()
+		var move_distance = approach_speed * delta
 		
-	# Shoot bombs from fixed position
-	shoot_bombs_while_stationary(delta)
+		# Move toward target position in a perfect straight line
+		global_position.x += direction_2d.x * move_distance
+		global_position.z += direction_2d.y * move_distance
 		
-	# Ensure Y position stays at ground level
-	if global_position.y != 0:
-		global_position.y = 0
+		# CRITICAL FIX: Maintain a consistent Y position during movement
+		# This ensures the ship stays at the correct height
+		global_position.y = start_position.y
 		
+		# Apply bobbing and bouncing effect during approach
+		apply_boat_bobbing_effect(delta, true)
+		
+		# Debug approach occasionally
+		if Engine.get_physics_frames() % 60 == 0:
+			var approach_distance = global_position.distance_to(target_position)
+			print("DEBUG: Enemy approaching - distance remaining: ", approach_distance)
+		
+		# Check if we've reached the target position - use 2D distance (ignoring Y)
+		var horizontal_distance = Vector2(
+			target_position.x - global_position.x,
+			target_position.z - global_position.z
+		).length()
+		
+		if horizontal_distance < approach_threshold:
+			is_approaching = false
+			
+			# Set the final position, but keep the Y value from our start position
+			global_position.x = target_position.x
+			global_position.z = target_position.z
+			
+			# IMPORTANT: Keep the Y position consistent
+			global_position.y = start_position.y
+			
+			print("DEBUG: Enemy reached final position: ", global_position)
+	else:
+		# We've reached the target - stay in position and shoot bombs
+		# Still apply gentle bobbing when stopped
+		apply_boat_bobbing_effect(delta, false)
+		
+		# Debug position occasionally
+		if Engine.get_physics_frames() % 120 == 0:
+			print("DEBUG: Enemy at final position: ", global_position)
+		
+		# Only shoot bombs once we've arrived at final position
+		shoot_bombs_while_stationary(delta)
+
+# Apply bobbing and bouncing effect to make the boat feel like it's on water
+func apply_boat_bobbing_effect(delta: float, is_moving: bool) -> void:
+	# Skip if no boat model found
+	if not boat_model:
+		return
+		
+	# Different bobbing parameters based on if we're moving or stationary
+	var actual_bob_frequency = bob_frequency
+	var actual_pitch_multiplier = pitch_multiplier
+	var actual_roll_multiplier = roll_multiplier
+	var actual_bob_height = bob_height_multiplier
+	
+	if is_moving:
+		# More intense bobbing during movement, but still realistic
+		actual_bob_frequency *= 1.2
+		actual_pitch_multiplier *= 1.3  # Less extreme pitch while moving
+		actual_roll_multiplier *= 1.2
+		actual_bob_height *= 1.4
+	else:
+		# Gentle bobbing when stationary
+		actual_bob_frequency *= 0.5  # Slower bobbing when stopped
+		actual_pitch_multiplier *= 0.4
+		actual_roll_multiplier *= 0.5
+		actual_bob_height *= 0.6
+	
+	# Calculate bobbing effect - oscillate up and down
+	var vertical_offset = sin(bobbing_time * actual_bob_frequency) * actual_bob_height
+	
+	# CRITICAL FIX: Use a consistent Y position, only modify for bobbing
+	# Just apply bobbing offset to original position
+	position.y = vertical_offset
+	
+	# Calculate pitch (rotation forward/backward) - realistic speedboat motion
+	# Use cosine with offset to create realistic wave motion
+	var pitch_angle = cos(bobbing_time * actual_bob_frequency) * actual_pitch_multiplier
+	
+	# Calculate roll (rotation side to side)
+	# Use sine with different frequency for more natural motion
+	var roll_angle = sin(bobbing_time * actual_bob_frequency * 0.7) * actual_roll_multiplier
+	
+	# Apply rotation to the boat model - this tilts the boat as it goes over waves
+	if boat_model:
+		# Reset the rotation first
+		boat_model.rotation = Vector3.ZERO
+		
+		# IMPORTANT FIX: Rotate 180 degrees around Y-axis to make boat face forward
+		boat_model.rotate_y(PI)  # 180 degrees = PI radians
+		
+		# If moving, the boat should have its nose up (planing)
+		if is_moving:
+			# REALISTIC PHYSICS: When speedboats move fast, they plane with the nose UP
+			# This is opposite to the previous implementation which had nose down
+			boat_model.rotate_x(planing_angle)
+		
+		# Apply pitch (X rotation) - this makes the boat point up and down as it moves over waves
+		# We add this to the planing angle
+		boat_model.rotate_x(pitch_angle)
+		
+		# Apply roll (Z rotation) - this makes the boat rock side to side
+		boat_model.rotate_z(roll_angle)
+			
 # Function for shooting bombs when the ship is stationary
 func shoot_bombs_while_stationary(delta: float) -> void:
 	# Shoot bombs at player - prioritize designated bombers
@@ -185,19 +332,20 @@ func shoot_bomb() -> void:
 		print("DEBUG: Enemy " + str(enemy_id) + " NOT allowed to shoot bombs - not the current bomber!")
 		return
 		
+	# CRITICAL FIX: Re-find player reference if missing
 	if not player_ref:
-		print("DEBUG: Can't shoot bomb - no player reference")
-		return
+		print("DEBUG: Trying to find player again")
 		
-	# COMMENTED OUT: Code that was removing existing bombs
-	# This was clearing old bombs when creating new ones
-	# var existing_bombs = get_tree().get_nodes_in_group("EnemyBomb")
-	# for bomb in existing_bombs:
-	# 	# Remove ALL bombs that originated from this enemy - prevents accumulation
-	# 	if is_instance_valid(bomb) and bomb.has_method("get_owner_id") and bomb.get_owner_id() == enemy_id:
-	# 		print("DEBUG: Removing existing bomb from enemy " + str(enemy_id))
-	# 		bomb.queue_free()
-	
+		# Look for player in Player group
+		var players = get_tree().get_nodes_in_group("Player")
+		if players.size() > 0:
+			player_ref = players[0]
+			player_position = player_ref.global_position
+			print("DEBUG: Found player at " + str(player_position))
+		else:
+			print("DEBUG: Can not shoot bomb - no player reference")
+			return
+		
 	# Instead, just count existing bombs for debugging
 	var existing_bombs = get_tree().get_nodes_in_group("EnemyBomb")
 	var count = 0
@@ -300,13 +448,6 @@ func take_damage(damage: int) -> void:
 	
 	if health <= 0:
 		print("DEBUG: Enemy defeated! ID: ", enemy_id)
-		
-		# COMMENTED OUT: Code that was removing bombs when enemy is defeated
-		# var existing_bombs = get_tree().get_nodes_in_group("EnemyBomb")
-		# for bomb in existing_bombs:
-		#     if is_instance_valid(bomb) and bomb.has_method("get_owner_id") and bomb.get_owner_id() == enemy_id:
-		#         print("DEBUG: Removing bomb from defeated enemy " + str(enemy_id))
-		#         bomb.queue_free()
 		
 		# Instead, just count and log existing bombs for debugging
 		var existing_bombs = get_tree().get_nodes_in_group("EnemyBomb")

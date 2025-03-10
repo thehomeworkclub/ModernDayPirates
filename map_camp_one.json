@@ -1,0 +1,90 @@
+{ "frames": {
+   "Sprite-0001 0.aseprite": {
+    "frame": { "x": 3, "y": 3, "w": 501, "h": 298 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 37, "y": 38, "w": 501, "h": 298 },
+    "sourceSize": { "w": 550, "h": 336 },
+    "duration": 100
+   },
+   "Sprite-0001 1.aseprite": {
+    "frame": { "x": 504, "y": 3, "w": 501, "h": 298 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 37, "y": 38, "w": 501, "h": 298 },
+    "sourceSize": { "w": 550, "h": 336 },
+    "duration": 100
+   },
+   "Sprite-0001 2.aseprite": {
+    "frame": { "x": 1005, "y": 3, "w": 501, "h": 298 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 37, "y": 38, "w": 501, "h": 298 },
+    "sourceSize": { "w": 550, "h": 336 },
+    "duration": 100
+   },
+   "Sprite-0001 3.aseprite": {
+    "frame": { "x": 1506, "y": 3, "w": 501, "h": 298 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 37, "y": 38, "w": 501, "h": 298 },
+    "sourceSize": { "w": 550, "h": 336 },
+    "duration": 100
+   },
+   "Sprite-0001 4.aseprite": {
+    "frame": { "x": 2007, "y": 3, "w": 501, "h": 298 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 37, "y": 38, "w": 501, "h": 298 },
+    "sourceSize": { "w": 550, "h": 336 },
+    "duration": 100
+   },
+   "Sprite-0001 5.aseprite": {
+    "frame": { "x": 2508, "y": 3, "w": 501, "h": 298 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 37, "y": 38, "w": 501, "h": 298 },
+    "sourceSize": { "w": 550, "h": 336 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.x-dev",
+  "image": "map_camp_1_spritesheet.png",
+  "format": "RGBA8888",
+  "size": { "w": 3012, "h": 304 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "map" },
+   { "name": "fill", "group": "map", "opacity": 255, "blendMode": "normal" },
+   { "name": "outline", "group": "map", "opacity": 255, "blendMode": "normal" },
+   { "name": "Paths" },
+   { "name": "route1", "group": "Paths", "opacity": 255, "blendMode": "normal" },
+   { "name": "infopages" },
+   { "name": "Ship", "group": "infopages" },
+   { "name": "Ship", "group": "Ship", "opacity": 255, "blendMode": "normal" },
+   { "name": "Pin", "group": "Ship", "opacity": 255, "blendMode": "normal" },
+   { "name": "Pin Copy", "group": "Ship", "opacity": 255, "blendMode": "normal" },
+   { "name": "Pin Copy Copy", "group": "Ship", "opacity": 255, "blendMode": "normal" },
+   { "name": "Pin Copy Copy", "group": "Ship", "opacity": 255, "blendMode": "normal" },
+   { "name": "Pin Copy Copy", "group": "Ship", "opacity": 255, "blendMode": "normal" },
+   { "name": "Pin Copy Copy Copy", "group": "Ship", "opacity": 255, "blendMode": "normal" },
+   { "name": "layout", "group": "infopages", "opacity": 255, "blendMode": "normal" },
+   { "name": "buttons", "group": "infopages" },
+   { "name": "start", "group": "buttons", "opacity": 255, "blendMode": "normal" },
+   { "name": "difficulty", "group": "infopages" },
+   { "name": "difficulty", "group": "difficulty", "opacity": 255, "blendMode": "normal" },
+   { "name": "skull_round1", "group": "difficulty", "opacity": 255, "blendMode": "normal" },
+   { "name": "Flag_panel", "group": "infopages" },
+   { "name": "US_flag", "group": "Flag_panel", "opacity": 255, "blendMode": "normal" },
+   { "name": "Panama_flag", "group": "Flag_panel", "opacity": 255, "blendMode": "normal" },
+   { "name": "arrow", "group": "Flag_panel", "opacity": 255, "blendMode": "normal" },
+   { "name": "distance", "group": "Flag_panel", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}
