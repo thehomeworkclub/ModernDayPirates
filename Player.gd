@@ -3,7 +3,8 @@ extends Node3D
 @export var mouse_sensitivity: float = 0.1
 var pitch: float = 0.0
 var mouse_captured: bool = true
-var health: int = 100  # Add health to player
+var max_health: int = 10  # Changed to match UI's health display
+var health: int = max_health  # Set initial health to max
 
 @onready var head = $Head
 @onready var camera = $Head/Camera3D
@@ -15,6 +16,14 @@ func _ready() -> void:
 	# CRITICAL: Add to Player group for targeting
 	add_to_group("Player")
 	
+	# Reset health on spawn/respawn
+	reset_health()
+
+	# Add this to your main scene's _ready() function
+	var ui_canvas = CanvasLayer.new()
+	ui_canvas.name = "UICanvasLayer"
+	add_child(ui_canvas)
+		
 	# Make sure we're not at the origin (0,0,0)
 	if global_position == Vector3.ZERO:
 		# Use the original transform position from the scene
@@ -58,9 +67,43 @@ func capture_mouse() -> void:
 func take_damage(amount: int) -> void:
 	print("DEBUG: Player took " + str(amount) + " damage!")
 	health -= amount
-	
+	var health_bar = create_health_bar()
+	health_bar.add_to_group("HealthBar")
+
 	if health <= 0:
 		print("DEBUG: Player health depleted!")
 		health = 1  # Keep player alive with minimum health
 	else:
 		print("DEBUG: Player health remaining: " + str(health))
+
+# In Player.gd's reset_health function
+func reset_health() -> void:
+	health = max_health
+	print("DEBUG: Player health reset to ", health)
+	
+	# Remove old health bars
+	var old_bars = get_tree().get_nodes_in_group("HealthBar")
+	for bar in old_bars:
+		bar.queue_free()
+	
+	# Create and position new health bar with safety checks
+	var new_health_bar = create_health_bar()
+	new_health_bar.add_to_group("HealthBar")
+	
+	# Get main UI container safely
+	var ui_layer = get_tree().current_scene.find_child("UICanvasLayer", true, false)
+	if ui_layer:
+		ui_layer.add_child(new_health_bar)
+	else:
+		print("WARNING: No UI layer found, adding health bar directly to scene")
+		get_tree().current_scene.add_child(new_health_bar)
+
+func create_health_bar() -> Control:
+	var health_bar = ProgressBar.new()
+	health_bar.name = "PlayerHealthBar"
+	health_bar.min_value = 0
+	health_bar.max_value = max_health
+	health_bar.value = health
+	health_bar.size = Vector2(200, 20)
+	health_bar.position = Vector2(20, 20)
+	return health_bar

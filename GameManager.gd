@@ -78,6 +78,9 @@ func setup_game_scene() -> void:
 	if not get_tree().current_scene.has_node("ShipPositioner"):
 		# Create the ship positioning system
 		create_ship_positioner()
+	
+	# Reset bomber system when game scene is set up (including respawn)
+	reset_bomber_system()
 		
 func create_ship_positioner() -> void:
 	# Check if a TargetPlane already exists in the scene
@@ -289,61 +292,25 @@ func start_wave() -> void:
 	calculate_enemies_per_wave()
 	current_enemies_count = 0
 	enemies_spawned_in_wave = 0  # Reset spawning counter
+	
+	# Reset bomber system at the start of each wave
+	reset_bomber_system()
+	
+	# Set wave state
 	wave_in_progress = true
-	wave_start_time = Time.get_ticks_msec() / 1000.0  # Convert to seconds
+	wave_complete_check_pending = false
+	wave_start_time = Time.get_unix_time_from_system()
 	
-	# CRITICAL FIX: Clean up any leftover target markers that look like bombs
-	# This is important to prevent orange spheres stuck to boats
-	var markers = get_tree().get_nodes_in_group("TargetMarker")
-	for marker in markers:
-		print("DEBUG: Removing leftover target marker: " + marker.name)
-		marker.queue_free()
+	print("DEBUG: Starting wave ", current_wave, " of round ", current_round)
+	print("DEBUG: Wave will have ", enemies_per_wave, " enemies")
 	
-	print("DEBUG: Starting wave " + str(current_wave) + " of round " + str(current_round))
-	print("DEBUG: Wave will have " + str(enemies_per_wave) + " enemies")
-	
-	# Wait a short moment before starting spawner to ensure everything is ready
-	await get_tree().create_timer(0.5).timeout
-	
-	# Tell spawn system to start spawning enemies - search by both group and script
-	var spawner = get_tree().get_nodes_in_group("EnemySpawner")
-	if spawner.size() > 0:
+	# Notify spawner to start the wave
+	var spawners = get_tree().get_nodes_in_group("EnemySpawner")
+	if spawners.size() > 0:
 		print("DEBUG: Found enemy spawner in group, starting wave")
-		spawner[0].start_wave_spawning()
+		spawners[0].start_wave_spawning()
 	else:
-		# Try finding by node type/script
-		spawner = get_tree().get_nodes_with_script(load("res://EnemySpawner.gd"))
-		if spawner.size() > 0:
-			print("DEBUG: Found enemy spawner by script, starting wave")
-			spawner[0].add_to_group("EnemySpawner")  # Add to group for future reference
-			spawner[0].start_wave_spawning()
-		else:
-			# Last resort - try to find by node name
-			spawner = [get_tree().current_scene.find_child("EnemySpawner", true, false)]
-			if spawner[0] != null:
-				print("DEBUG: Found enemy spawner by name, starting wave")
-				spawner[0].add_to_group("EnemySpawner")  # Add to group for future reference
-				spawner[0].start_wave_spawning()
-			else:
-				print("ERROR: No enemy spawner found in the scene!")
-	
-	# Calculate target time for this wave
-	# Each wave gets progressively longer target times
-	var wave_progress = (current_round - 1) * waves_per_round + (current_wave - 1)
-	var target_time_factor = pow(wave_target_time_multiplier, wave_progress)
-	var base_target_time = wave_target_time
-	
-	# Set target time based on difficulty and wave progression
-	match difficulty:
-		"Easy": base_target_time = 45.0
-		"Normal": base_target_time = 55.0
-		"Hard": base_target_time = 75.0
-		"Very Hard": base_target_time = 90.0 
-		"Extreme": base_target_time = 120.0
-	
-	wave_target_time = base_target_time * target_time_factor
-
-
+		print("ERROR: No enemy spawner found in group!")
 
 func register_enemy() -> int:
 	# Increment the enemy counter
@@ -421,7 +388,7 @@ func complete_wave() -> void:
 	wave_in_progress = false
 	
 	# Calculate time-based rewards
-	var elapsed_time = (Time.get_ticks_msec() / 1000.0) - wave_start_time
+	var elapsed_time = (Time.get_unix_time_from_system() - wave_start_time)
 	var time_ratio = wave_target_time / elapsed_time
 	var time_percent = clamp(time_ratio, 0.0, 1.0)
 	
@@ -525,3 +492,8 @@ func campaign_complete() -> void:
 	
 func show_campaign_menu() -> void:
 	get_tree().change_scene_to_file("res://3dcampaignmenu.tscn")
+
+# Reset the bomber system to allow a new enemy to become bomber
+func reset_bomber_system() -> void:
+	current_bomber_id = -1
+	print("DEBUG: Bomber system reset - new bomber will be assigned")

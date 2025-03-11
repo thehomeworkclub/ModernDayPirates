@@ -4,6 +4,7 @@ var damage: int = 5
 var age: float = 0.0
 var owner_id: int = -1
 var target_player = null
+var exploded: bool = false
 
 # Physics variables for high-arc trajectory
 var start_pos: Vector3
@@ -48,6 +49,7 @@ func get_damage() -> int:
 	return damage
 
 func initialize(dir: Vector3, dmg: int, target: Node3D = null):
+	exploded = false  # Reset on initialization
 	print("DEBUG: Initializing bomb at " + str(global_position))
 	damage = dmg
 	start_pos = global_position
@@ -144,20 +146,22 @@ func handle_impact():
 				target_player.take_damage(damage)
 				print("DEBUG: DAMAGE APPLIED - Direct hit!")
 				explode()
-
+				
 func _on_area_entered(area):
-	if area.is_in_group("Bullet"):
-		print("DEBUG: Bomb shot down!")
-		if area.has_method("queue_free"):
-			area.queue_free()
-		explode()
-	elif area.is_in_group("Player") and age > 0.5:
+	if area.is_in_group("Player") and age > 0.5:
+		print("DEBUG: Direct collision with player!")
+		if area.has_method("take_damage") and not exploded:
+			exploded = true
+			area.take_damage(damage)
+			explode()
+	elif area.is_in_group("Bullet") and age > 0.5:
 		print("DEBUG: Direct collision with player!")
 		if area.has_method("take_damage"):
 			area.take_damage(damage)
 		explode()
 
 func explode():
+	exploded = true
 	print("DEBUG: Bomb exploded at " + str(global_position))
 	create_explosion_effect()
 	queue_free()

@@ -3,7 +3,7 @@ extends Area3D
 @export var base_health: int = 3
 @export var base_speed: float = 8.0  # Significantly increased speed
 @export var base_bronze_value: int = 2
-@export var bomb_damage: int = 15     # INCREASED damage to make bomb hits more obvious
+@export var bomb_damage: int = 5     # Changed from 15 to 5 for correct bomb damage
 @export var bomb_cooldown: float = 4.0  # Reduced cooldown to increase bomb frequency
 @export var bomb_chance: float = 0.7    # Increased chance to throw a bomb when cooldown expires
 @export var player_ship_barrier: float = 150.0  # Massively increased distance from player where ships stop
