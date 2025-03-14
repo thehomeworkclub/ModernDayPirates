@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://d35lwipx7q4fy"
+path="res://.godot/imported/mosin_bolt_open.wav-407fbacdfaed815f9463ddd8923f7a3e.sample"
+
+[deps]
+
+source_file="res://assets/guns_hands/VRFPS Kit/Sounds/Mosin Nagant/mosin_bolt_open.wav"
+dest_files=["res://.godot/imported/mosin_bolt_open.wav-407fbacdfaed815f9463ddd8923f7a3e.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

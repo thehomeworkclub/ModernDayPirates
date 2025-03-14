@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://5vmky8aei0nj"
+path="res://.godot/imported/bullet_whiz_1.wav-543e468d3bf65506da9c32633317dd0b.sample"
+
+[deps]
+
+source_file="res://assets/guns_hands/VRFPS Kit/Sounds/Bullet/bullet_whiz_1.wav"
+dest_files=["res://.godot/imported/bullet_whiz_1.wav-543e468d3bf65506da9c32633317dd0b.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

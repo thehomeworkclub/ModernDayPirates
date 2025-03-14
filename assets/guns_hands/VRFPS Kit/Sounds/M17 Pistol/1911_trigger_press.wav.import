@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://cs818ns8estmo"
+path="res://.godot/imported/1911_trigger_press.wav-1492f753deab359153ac47d8521d8c18.sample"
+
+[deps]
+
+source_file="res://assets/guns_hands/VRFPS Kit/Sounds/M17 Pistol/1911_trigger_press.wav"
+dest_files=["res://.godot/imported/1911_trigger_press.wav-1492f753deab359153ac47d8521d8c18.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bkb121pdqn5kk"
+path="res://.godot/imported/mosin_insert_clip.wav-4d9f8c10c3e54a2c011ee2e7f636dc6c.sample"
+
+[deps]
+
+source_file="res://assets/guns_hands/VRFPS Kit/Sounds/Mosin Nagant/mosin_insert_clip.wav"
+dest_files=["res://.godot/imported/mosin_insert_clip.wav-4d9f8c10c3e54a2c011ee2e7f636dc6c.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

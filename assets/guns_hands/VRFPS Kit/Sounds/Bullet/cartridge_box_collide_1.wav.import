@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://dml63tcqju76t"
+path="res://.godot/imported/cartridge_box_collide_1.wav-4c512b3cf7b8acf80621b26e5233a16e.sample"
+
+[deps]
+
+source_file="res://assets/guns_hands/VRFPS Kit/Sounds/Bullet/cartridge_box_collide_1.wav"
+dest_files=["res://.godot/imported/cartridge_box_collide_1.wav-4c512b3cf7b8acf80621b26e5233a16e.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

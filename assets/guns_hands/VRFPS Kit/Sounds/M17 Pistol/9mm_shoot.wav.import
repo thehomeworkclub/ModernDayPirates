@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://dfp53y38re2e2"
+path="res://.godot/imported/9mm_shoot.wav-d4fee51c47c003f2e5e0a4eef4f6e6f4.sample"
+
+[deps]
+
+source_file="res://assets/guns_hands/VRFPS Kit/Sounds/M17 Pistol/9mm_shoot.wav"
+dest_files=["res://.godot/imported/9mm_shoot.wav-d4fee51c47c003f2e5e0a4eef4f6e6f4.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

@@ -1,0 +1,104 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://HandModel.gd" id="1_d8cnv"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_56lrx"]
+size = Vector3(0.08, 0.02, 0.12)
+
+[node name="VRHand" type="Node3D"]
+script = ExtResource("1_d8cnv")
+
+[node name="Palm" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_56lrx")
+
+[node name="Thumb" type="Node3D" parent="."]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, -0.05, 0, -0.05)
+
+[node name="Joint1" type="MeshInstance3D" parent="Thumb"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.03)
+mesh = SubResource("BoxMesh_56lrx")
+skeleton = NodePath("../..")
+scale = Vector3(0.2, 0.5, 0.3)
+
+[node name="Joint2" type="MeshInstance3D" parent="Thumb/Joint1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.03)
+mesh = SubResource("BoxMesh_56lrx")
+scale = Vector3(0.8, 0.8, 0.8)
+
+[node name="Index" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.02, 0, -0.06)
+
+[node name="Joint1" type="MeshInstance3D" parent="Index"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.03)
+mesh = SubResource("BoxMesh_56lrx")
+skeleton = NodePath("../..")
+scale = Vector3(0.15, 0.5, 0.25)
+
+[node name="Joint2" type="MeshInstance3D" parent="Index/Joint1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.03)
+mesh = SubResource("BoxMesh_56lrx")
+scale = Vector3(0.8, 0.8, 0.8)
+
+[node name="Joint3" type="MeshInstance3D" parent="Index/Joint1/Joint2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.03)
+mesh = SubResource("BoxMesh_56lrx")
+scale = Vector3(0.7, 0.7, 0.7)
+
+[node name="Middle" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.06)
+
+[node name="Joint1" type="MeshInstance3D" parent="Middle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.035)
+mesh = SubResource("BoxMesh_56lrx")
+skeleton = NodePath("../..")
+scale = Vector3(0.15, 0.5, 0.3)
+
+[node name="Joint2" type="MeshInstance3D" parent="Middle/Joint1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.035)
+mesh = SubResource("BoxMesh_56lrx")
+scale = Vector3(0.8, 0.8, 0.8)
+
+[node name="Joint3" type="MeshInstance3D" parent="Middle/Joint1/Joint2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.035)
+mesh = SubResource("BoxMesh_56lrx")
+scale = Vector3(0.7, 0.7, 0.7)
+
+[node name="Ring" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.02, 0, -0.06)
+
+[node name="Joint1" type="MeshInstance3D" parent="Ring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.03)
+mesh = SubResource("BoxMesh_56lrx")
+skeleton = NodePath("../..")
+scale = Vector3(0.15, 0.5, 0.25)
+
+[node name="Joint2" type="MeshInstance3D" parent="Ring/Joint1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.03)
+mesh = SubResource("BoxMesh_56lrx")
+scale = Vector3(0.8, 0.8, 0.8)
+
+[node name="Joint3" type="MeshInstance3D" parent="Ring/Joint1/Joint2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.03)
+mesh = SubResource("BoxMesh_56lrx")
+scale = Vector3(0.7, 0.7, 0.7)
+
+[node name="Pinky" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.04, 0, -0.05)
+
+[node name="Joint1" type="MeshInstance3D" parent="Pinky"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.025)
+mesh = SubResource("BoxMesh_56lrx")
+skeleton = NodePath("../..")
+scale = Vector3(0.12, 0.5, 0.2)
+
+[node name="Joint2" type="MeshInstance3D" parent="Pinky/Joint1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.025)
+mesh = SubResource("BoxMesh_56lrx")
+scale = Vector3(0.8, 0.8, 0.8)
+
+[node name="Joint3" type="MeshInstance3D" parent="Pinky/Joint1/Joint2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.025)
+mesh = SubResource("BoxMesh_56lrx")
+scale = Vector3(0.7, 0.7, 0.7)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]

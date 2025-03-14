@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://ceehpw4pyrepn"
+path="res://.godot/imported/wood_collide_1-01-2.wav-72798b90f02417135d91a011de785f9d.sample"
+
+[deps]
+
+source_file="res://assets/guns_hands/VRFPS Kit/Sounds/World/Wood/wood_collide_1-01-2.wav"
+dest_files=["res://.godot/imported/wood_collide_1-01-2.wav-72798b90f02417135d91a011de785f9d.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

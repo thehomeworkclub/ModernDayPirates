@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://xwmbabb6pn3t"
+path="res://.godot/imported/ak_545_shoot_suppressed.wav-62fd917db6d6f8c49df8a1b4149cd55d.sample"
+
+[deps]
+
+source_file="res://assets/guns_hands/VRFPS Kit/Sounds/AKS-74U/ak_545_shoot_suppressed.wav"
+dest_files=["res://.godot/imported/ak_545_shoot_suppressed.wav-62fd917db6d6f8c49df8a1b4149cd55d.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

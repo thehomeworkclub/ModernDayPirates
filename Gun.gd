@@ -7,6 +7,7 @@ extends Node3D
 var gun_type: String = "standard"
 var can_shoot: bool = true
 var shoot_timer: Timer
+var is_vr_gun: bool = false
 
 func _ready() -> void:
 	# Create timer for fire rate
@@ -21,6 +22,11 @@ func _ready() -> void:
 	# Debug check if Muzzle exists
 	if not has_node("Muzzle"):
 		print("ERROR: Muzzle node not found in Gun scene!")
+		
+	# Detect if we're attached to a controller in VR
+	if get_parent() is XRController3D:
+		is_vr_gun = true
+		print("DEBUG: Gun attached to VR controller")
 
 func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("shoot") and can_shoot:
@@ -73,6 +79,11 @@ func shoot() -> void:
 			if bullet:
 				bullet.scale = Vector3(1.5, 1.5, 1.5)
 	
+	# Apply haptic feedback in VR mode
+	if is_vr_gun and get_parent() is XRController3D:
+		var controller = get_parent() as XRController3D
+		controller.trigger_haptic_pulse("haptic", 0.5, 0.2, 0.5, 0.0)
+	
 	# Start cooldown
 	shoot_timer.wait_time = fire_rate
 	shoot_timer.start()
@@ -88,13 +99,19 @@ func create_bullet(local_offset: Vector3) -> Node3D:
 		print("ERROR: Muzzle node not found")
 		return null
 	
-	# Get Head node (Camera's parent)
-	var head = get_parent().get_parent()
-	# Get camera's forward direction (which matches player view)
-	var camera = head.get_node("Camera3D")
-	var forward_dir = -camera.global_transform.basis.z.normalized()
+	var forward_dir: Vector3
 	
-	print("DEBUG: Camera forward direction: ", forward_dir)
+	# Determine aiming direction based on if we're in VR or not
+	if is_vr_gun:
+		# In VR, use the controller's forward direction
+		forward_dir = -global_transform.basis.z.normalized()
+		print("DEBUG: VR Controller forward direction: ", forward_dir)
+	else:
+		# In desktop mode, use the camera's forward direction
+		var head = get_parent().get_parent()
+		var camera = head.get_node("Camera3D")
+		forward_dir = -camera.global_transform.basis.z.normalized()
+		print("DEBUG: Camera forward direction: ", forward_dir)
 	
 	# Create the bullet instance
 	var bullet = bullet_scene.instantiate()
@@ -111,7 +128,7 @@ func create_bullet(local_offset: Vector3) -> Node3D:
 	var final_damage = int(bullet_damage * (1.0 + GameManager.damage_bonus) * CurrencyManager.damage_multiplier)
 	bullet.damage = final_damage
 	
-	# Set bullet direction to camera's forward direction
+	# Set bullet direction 
 	bullet.direction = forward_dir
 	
 	# Add the bullet to the scene

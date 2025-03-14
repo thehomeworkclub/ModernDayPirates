@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://dti3tmq0y0leh"]
+[gd_scene load_steps=20 format=3 uid="uid://dti3tmq0y0leh"]
 
 [ext_resource type="PackedScene" uid="uid://ds2gxiccgqbfe" path="res://Gun.tscn" id="1_tq5c1"]
 [ext_resource type="Script" path="res://BombCleaner.gd" id="1_uchtu"]
@@ -10,8 +10,11 @@
 [ext_resource type="Shader" path="res://ocean.gdshader" id="7_kakas"]
 [ext_resource type="Script" path="res://RoundBoard.gd" id="8_rmocl"]
 [ext_resource type="PackedScene" path="res://TargetPlane.tscn" id="9_q0qot"]
+[ext_resource type="OpenXRActionMap" uid="uid://f4y407lrwktf" path="res://openxr_action_map.tres" id="11_ukw52"]
 
 [sub_resource type="Compositor" id="Compositor_lq8ew"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_k7lr1"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_y1l8n"]
 size = Vector2(250, 250)
@@ -105,6 +108,29 @@ transform = Transform3D(1, 0, 0, 0, 1.05226, 0, 0, 0, 0.894814, 0, 0, 0)
 transform = Transform3D(-0.106698, 0, -0.994291, 0, 0.950334, 0, 1.11117, 0, -0.11924, -0.447631, -0.29922, 0.486637)
 bullet_scene = ExtResource("2_fhhdu")
 
+[node name="XROrigin3D" type="XROrigin3D" parent="Player"]
+current = true
+
+[node name="XRCamera3D" type="XRCamera3D" parent="Player/XROrigin3D"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+fov = 90.5
+
+[node name="XRController3DLeft" type="XRController3D" parent="Player/XROrigin3D"]
+tracker = &"left_hand"
+pose = &"aim"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Player/XROrigin3D/XRController3DLeft"]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.2, 0, 0, -0.1)
+mesh = SubResource("BoxMesh_k7lr1")
+
+[node name="XRController3DRight" type="XRController3D" parent="Player/XROrigin3D"]
+tracker = &"right_hand"
+pose = &"aim"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Player/XROrigin3D/XRController3DRight"]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.2, 0, 0, -0.1)
+mesh = SubResource("BoxMesh_k7lr1")
+
 [node name="EnemySpawner" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
 script = ExtResource("2_xdull")
@@ -155,3 +181,25 @@ material_override = SubResource("StandardMaterial3D_eq1s2")
 
 [node name="BombCleaner" type="Node" parent="."]
 script = ExtResource("1_uchtu")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(-0.102507, -1.29998, 4.23159, 0.0401204, -4.57224, 2.58846e-07, 0.0629053, 0.797751, 6.8956, 4.99865, 7.8486, -20.0002)
+mesh = SubResource("BoxMesh_k7lr1")
+
+[node name="XRInteractionSettings" type="Node" parent="."]
+
+[node name="XRInterface" type="XRInterface" parent="XRInteractionSettings"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
+action_map = ExtResource("11_ukw52")
+script = null
+
+[node name="VRUIHelper" type="Node" parent="."]
+script = ExtResource("res://VRUIHelper.gd")

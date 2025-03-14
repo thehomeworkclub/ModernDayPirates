@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://dj4bvl3eft2to"
+path="res://.godot/imported/ar15_suppressor_detach.wav-28aa8caaef01688f80f4c96d24c444e7.sample"
+
+[deps]
+
+source_file="res://assets/guns_hands/VRFPS Kit/Sounds/HK416/ar15_suppressor_detach.wav"
+dest_files=["res://.godot/imported/ar15_suppressor_detach.wav-28aa8caaef01688f80f4c96d24c444e7.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

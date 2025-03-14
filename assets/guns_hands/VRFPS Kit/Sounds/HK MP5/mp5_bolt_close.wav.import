@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bmaimavaocf6r"
+path="res://.godot/imported/mp5_bolt_close.wav-ade05a8e79f41b23e39d9e2398ce6ad3.sample"
+
+[deps]
+
+source_file="res://assets/guns_hands/VRFPS Kit/Sounds/HK MP5/mp5_bolt_close.wav"
+dest_files=["res://.godot/imported/mp5_bolt_close.wav-ade05a8e79f41b23e39d9e2398ce6ad3.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

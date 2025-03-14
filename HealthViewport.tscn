@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3 uid="uid://dudcx0yfktgrl"]
+
+[ext_resource type="Script" path="res://HealthViewport.gd" id="1_7riqh"]
+[ext_resource type="Texture2D" path="res://art/fullheart.png" id="2_a52y4"]
+
+[node name="HealthViewport" type="SubViewport"]
+disable_3d = true
+transparent_bg = true
+size = Vector2i(500, 100)
+script = ExtResource("1_7riqh")
+
+[node name="HeartContainer" type="HBoxContainer" parent="."]
+offset_right = 500.0
+offset_bottom = 100.0
+theme_override_constants/separation = 10
+
+[node name="Heart1" type="TextureRect" parent="HeartContainer"]
+layout_mode = 2
+texture = ExtResource("2_a52y4")
+stretch_mode = 5
+
+[node name="Heart2" type="TextureRect" parent="HeartContainer"]
+layout_mode = 2
+texture = ExtResource("2_a52y4")
+stretch_mode = 5
+
+[node name="Heart3" type="TextureRect" parent="HeartContainer"]
+layout_mode = 2
+texture = ExtResource("2_a52y4")
+stretch_mode = 5
