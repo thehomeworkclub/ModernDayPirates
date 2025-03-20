@@ -96,9 +96,11 @@ offset_right = -20.0
 offset_bottom = -60.0
 grow_horizontal = 2
 grow_vertical = 2
+current_tab = 0
 
 [node name="Weapons" type="ScrollContainer" parent="Panel/TabContainer"]
 layout_mode = 2
+metadata/_tab_index = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Weapons"]
 layout_mode = 2
@@ -304,6 +306,7 @@ text = "Buy"
 [node name="Team" type="ScrollContainer" parent="Panel/TabContainer"]
 visible = false
 layout_mode = 2
+metadata/_tab_index = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Team"]
 layout_mode = 2
@@ -471,6 +474,7 @@ text = "Upgrade (20 Silver)"
 [node name="Permanent" type="ScrollContainer" parent="Panel/TabContainer"]
 visible = false
 layout_mode = 2
+metadata/_tab_index = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel/TabContainer/Permanent"]
 layout_mode = 2

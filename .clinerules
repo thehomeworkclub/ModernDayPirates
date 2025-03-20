@@ -1,0 +1,104 @@
+# Modern Day Pirates - Project Rules and Patterns
+
+## Code Organization
+
+### VR Scene Structure
+- XROrigin3D node as VR root
+- XRCamera3D for player view
+- XRController3D nodes for input
+- Organized node hierarchy for scene elements
+
+### Naming Conventions
+- Node groups: "button", "clickable"
+- Controller nodes: "XRController3DLeft", "XRController3DRight"
+- Ray names: "RayCastLeft", "RayCastRight"
+- Button identifiers: "Button1", "Button2"
+
+### Constants and Configuration
+- VR position: Vector3(10.954, -7.596, 4.236)
+- Camera height: 1.8
+- Ray length: 10.0
+- Button press distance: 0.03
+- Button press duration: 0.15
+
+## Implementation Patterns
+
+### VR Interaction
+1. Always initialize XR interface before setup
+2. Use ray casting for precise interaction
+3. Maintain separate left/right controller handling
+4. Implement haptic feedback for all interactions
+
+### Button System
+1. Track original positions for animations
+2. Use dictionaries for state management
+3. Implement press/release animations
+4. Provide visual and haptic feedback
+
+### Debug Practices
+1. Use print_verbose for detailed tracking
+2. Monitor controller positions regularly
+3. Track collision detections
+4. Log scene transitions
+
+## File Structure
+```
+root/
+  ├── 3dcampaignmenu.tscn    # Main menu scene
+  ├── 3dcampaignmenu.gd      # Menu logic
+  └── Container/             # Environment assets
+      └── model/
+          └── cargo_container.obj
+```
+
+## Project Intelligence
+
+### Critical Paths
+1. VR Environment Setup
+   ```gdscript
+   var xr_interface = XRServer.find_interface("OpenXR")
+   xr_interface.initialize()
+   get_viewport().use_xr = true
+   ```
+
+2. Button Interaction
+   ```gdscript
+   if collider and collider.is_in_group("button"):
+       press_button(collider.name, controller_side)
+   ```
+
+3. Scene Transition
+   ```gdscript
+   GameManager.set_voyage(voyage_num, voyage["difficulty"])
+   GameManager.start_campaign()
+   ```
+
+### Known Challenges
+1. Performance sensitivity in VR
+2. Precise button interaction timing
+3. Consistent haptic feedback
+4. Frame rate maintenance
+
+### Evolution Points
+1. Button system expanded from basic to animated
+2. Ray casting enhanced with visual feedback
+3. Debug system growing more comprehensive
+4. Performance optimization ongoing
+
+## Tool Usage
+
+### Scene Management
+- Always validate XR setup first
+- Maintain organized node hierarchy
+- Keep performance-critical elements static
+
+### Input Handling
+- Check both controllers independently
+- Validate ray collision results
+- Provide immediate feedback
+
+### Debug Tools
+- Use verbose logging in development
+- Monitor frame rates
+- Track controller positions
+- Validate collision detection
