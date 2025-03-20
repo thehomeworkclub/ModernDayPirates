@@ -30,3 +30,6 @@ specular.tga
 *.tga
 *.wav
 *.exr
+
+Container/model/diffuse.psd
+Container/model/specular.tga
