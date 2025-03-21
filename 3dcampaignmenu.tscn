@@ -100,13 +100,13 @@ metallic = 0.45
 roughness = 0.55
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_vwn40"]
-size = Vector3(0.505371, 0.221985, 0.131119)
+size = Vector3(0.505371, 0.221985, 0.264656)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_mc6th"]
-size = Vector3(3.92773, 1.46973, 0.486069)
+size = Vector3(4.11816, 1.46973, 4.57397)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wsd4y"]
-size = Vector3(0.52243, 0.184998, 0.0578613)
+size = Vector3(0.52243, 0.184998, 0.197754)
 
 [node name="Node3D" type="Node3D"]
 script = ExtResource("3_eqhyj")
@@ -486,7 +486,7 @@ region_rect = Rect2(0, 0, 201, 27)
 transform = Transform3D(6.02784, 0, 0, 0, 6.02784, 0, 0, 0, 1, 16.3659, -8.40402, -7.82046)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ShopButton" groups=["button", "clickable"]]
-transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 1, -0.0144038, 0.0129089, -0.0100327)
+transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 1, 0.00699401, 0.0129089, 0.056736)
 shape = SubResource("BoxShape3D_vwn40")
 
 [node name="Sprite3D" type="Sprite3D" parent="ShopButton" groups=["button", "clickable"]]
@@ -497,7 +497,7 @@ texture = ExtResource("6_v777b")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.0362636, 9.57524, 0, -7.4868)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StartButton" groups=["button", "clickable"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.73758, -8.40285, -8.01814)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8328, -8.40285, -5.9742)
 shape = SubResource("BoxShape3D_mc6th")
 
 [node name="ButtonMesh" type="Sprite3D" parent="StartButton" groups=["button", "clickable"]]
@@ -509,7 +509,7 @@ texture = ExtResource("7_g4i43")
 transform = Transform3D(7.60157, 0, 0, 0, 7.60157, 0, 0, 0, 1, 6.18508, -8.37464, -7.94855)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ExitButton" groups=["button", "clickable"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000595093, 0.00112915, 0.0020752)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.999999, -0.000595093, 0.00112891, 0.0720215)
 shape = SubResource("BoxShape3D_wsd4y")
 
 [node name="Sprite3D" type="Sprite3D" parent="ExitButton" groups=["button", "clickable"]]
