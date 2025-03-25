@@ -1,7 +1,6 @@
-[gd_scene load_steps=12 format=3 uid="uid://baxby7v2hxbd5"]
+[gd_scene load_steps=10 format=3 uid="uid://baxby7v2hxbd5"]
 
 [ext_resource type="Script" path="res://shop1.gd" id="1_drt4w"]
-[ext_resource type="ArrayMesh" uid="uid://doim0agbwg3o4" path="res://Container/model/cargo_container.obj" id="2_2rmb7"]
 [ext_resource type="Texture2D" uid="uid://cw3ty3m6moqyd" path="res://shopart/bronzeshop.png" id="2_bronze"]
 [ext_resource type="Texture2D" uid="uid://y6o0qruy3iei" path="res://shopart/silvershop.png" id="3_silver"]
 [ext_resource type="Texture2D" uid="uid://debk7ty8ewt0b" path="res://shopart/goldshop.png" id="4_gold"]
@@ -30,13 +29,11 @@ height = 0.04
 radial_segments = 8
 rings = 4
 
-[sub_resource type="BoxMesh" id="BoxMesh_sbd7d"]
-
 [node name="ShopRoot" type="Node3D"]
 script = ExtResource("1_drt4w")
 
 [node name="ShopBackgrounds" type="Node3D" parent="."]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 11.312, -2.38101, -9.42711)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.312, -2.381, -9.427)
 
 [node name="BronzeShop" type="Sprite3D" parent="ShopBackgrounds"]
 transform = Transform3D(12.346, 0, 0, 0, 12.346, 0, 0, 0, 1, 0, 0, 0)
@@ -59,92 +56,115 @@ texture_filter = 0
 texture = ExtResource("4_gold")
 
 [node name="ItemBoundingBoxes" type="Node3D" parent="."]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 10.812, -2.38101, -9.32711)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.812, -2.381, -9.327)
 
 [node name="ItemBox1" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
-collision_layer = 2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.323, 0.154, 0.036)
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ItemBoundingBoxes/ItemBox1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.323529, -0.145335, 0.0355898)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.468932, 0, 0)
 shape = SubResource("BoxShape3D_item")
 
+[node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.469, 0, 0.06)
+pixel_size = 0.002
+text = "1"
+
 [node name="ItemBox2" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.3, 0)
-collision_layer = 2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.236, 0.154, 0.036)
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ItemBoundingBoxes/ItemBox2"]
-transform = Transform3D(0.996834, 0, 0, 0, 0.996834, 0, 0, 0, 0.996834, -0.2366, -0.140958, 0.0355898)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.725973, 0, 0)
 shape = SubResource("BoxShape3D_item")
 
+[node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.726, 0, 0.06)
+pixel_size = 0.002
+text = "2"
+
 [node name="ItemBox3" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.3, 0)
-collision_layer = 2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.141, 0.154, 0.036)
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ItemBoundingBoxes/ItemBox3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.141349, -0.133585, 0.0355898)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.986047, 0, 0)
 shape = SubResource("BoxShape3D_item")
 
+[node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.986, 0, 0.06)
+pixel_size = 0.002
+text = "3"
+
 [node name="ItemBox4" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
-collision_layer = 2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.334, -0.168, 0.036)
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ItemBoundingBoxes/ItemBox4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.33399, -0.167523, 0.0355898)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47191, 0.0164931, 0)
 shape = SubResource("BoxShape3D_item")
 
+[node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.472, 0.016, 0.06)
+pixel_size = 0.002
+text = "4"
+
 [node name="ItemBox5" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0, 0)
-collision_layer = 2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.242, -0.168, 0.036)
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ItemBoundingBoxes/ItemBox5"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.241662, -0.175764, 0.0355898)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.734692, 0.0247643, 0)
 shape = SubResource("BoxShape3D_item")
 
+[node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.735, 0.025, 0.06)
+pixel_size = 0.002
+text = "5"
+
 [node name="ItemBox6" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0, 0)
-collision_layer = 2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.131, -0.168, 0.036)
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ItemBoundingBoxes/ItemBox6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.131086, -0.167794, 0.0355898)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.977744, 0.0234766, 0)
 shape = SubResource("BoxShape3D_item")
 
+[node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.978, 0.023, 0.06)
+pixel_size = 0.002
+text = "6"
+
 [node name="TabBoundingBoxes" type="Node3D" parent="."]
-transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 11.312, -1.88101, -9.32711)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.312, -1.881, -9.327)
 
 [node name="BronzeTab" type="StaticBody3D" parent="TabBoundingBoxes" groups=["button"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, 0)
-collision_layer = 2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.377, 0.53, 0.03)
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="TabBoundingBoxes/BronzeTab"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0230334, 0.530336, 0.0303196)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.444012, 0)
 shape = SubResource("BoxShape3D_tab")
 
 [node name="SilverTab" type="StaticBody3D" parent="TabBoundingBoxes" groups=["button"]]
-collision_layer = 2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.011, 0.529, 0.034)
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="TabBoundingBoxes/SilverTab"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0106543, 0.528956, 0.0339493)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0203886, -0.445223, 0)
 shape = SubResource("BoxShape3D_tab")
 
 [node name="GoldTab" type="StaticBody3D" parent="TabBoundingBoxes" groups=["button"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0, 0)
-collision_layer = 2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.526, 0.034)
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="TabBoundingBoxes/GoldTab"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000358224, 0.525644, 0.0339493)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0576105, -0.434111, 0)
 shape = SubResource("BoxShape3D_tab")
 
 [node name="XROrigin3D" type="XROrigin3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.7809, -5.90953, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.312, -2.381, -7.427)
 
 [node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
@@ -166,7 +186,6 @@ mesh = SubResource("SphereMesh_cursor")
 
 [node name="RayCastLeft" type="RayCast3D" parent="XROrigin3D/XRController3DLeft"]
 target_position = Vector3(0, 0, -10)
-collision_mask = 2
 debug_shape_custom_color = Color(0, 0.501961, 1, 0.501961)
 
 [node name="XRController3DRight" type="XRController3D" parent="XROrigin3D"]
@@ -186,208 +205,4 @@ mesh = SubResource("SphereMesh_cursor")
 
 [node name="RayCastRight" type="RayCast3D" parent="XROrigin3D/XRController3DRight"]
 target_position = Vector3(0, 0, -10)
-collision_mask = 2
 debug_shape_custom_color = Color(0, 0.501961, 1, 0.501961)
-
-[node name="CargoContainer" type="MeshInstance3D" parent="."]
-transform = Transform3D(-6.8695e-07, 0, 16.6283, 0, 16.0547, 0, -15.7156, 0, -7.26845e-07, -9.5729, -8.50739, -14.939)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -2.18096, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer2" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.74743, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer3" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.31148, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer4" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.88412, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer5" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.449595, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer6" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.0200012, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer7" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -0.433525, 0, -5.96046e-08)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer8" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -0.869474, 0, -5.96046e-08)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer9" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -1.29683, 0, -5.96046e-08)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer10" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -1.73136, 0, -1.19209e-07)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer11" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -2.16095, 0, -1.19209e-07)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer12" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, 0, 0.478663, 0)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer" type="MeshInstance3D" parent="CargoContainer/CargoContainer12"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -2.18096, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer2" type="MeshInstance3D" parent="CargoContainer/CargoContainer12"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.74743, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer3" type="MeshInstance3D" parent="CargoContainer/CargoContainer12"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.31148, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer4" type="MeshInstance3D" parent="CargoContainer/CargoContainer12"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.88412, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer5" type="MeshInstance3D" parent="CargoContainer/CargoContainer12"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.449595, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer6" type="MeshInstance3D" parent="CargoContainer/CargoContainer12"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.0200012, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer13" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -0.433525, 0.478663, -5.96046e-08)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer14" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -0.869474, 0.478663, -5.96046e-08)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer15" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -1.29683, 0.478663, -5.96046e-08)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer16" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -1.73136, 0.478663, -1.19209e-07)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer17" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -2.16095, 0.478663, -1.19209e-07)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer18" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, 0, 0.953486, 0)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer" type="MeshInstance3D" parent="CargoContainer/CargoContainer18"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -2.18096, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer2" type="MeshInstance3D" parent="CargoContainer/CargoContainer18"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.74743, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer3" type="MeshInstance3D" parent="CargoContainer/CargoContainer18"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.31148, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer4" type="MeshInstance3D" parent="CargoContainer/CargoContainer18"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.88412, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer5" type="MeshInstance3D" parent="CargoContainer/CargoContainer18"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.449595, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer6" type="MeshInstance3D" parent="CargoContainer/CargoContainer18"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.0200012, 0, 2.4974)
-mesh = ExtResource("2_2rmb7")
-
-[node name="CargoContainer19" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -0.433525, 0.953486, -5.96046e-08)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer20" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -0.869474, 0.953486, -5.96046e-08)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer21" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -1.29683, 0.953486, -5.96046e-08)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer22" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -1.73136, 0.953486, -1.19209e-07)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="CargoContainer23" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(1, 0, -3.55271e-15, 0, 1, 0, 0, 0, 1, -2.16095, 0.953486, -1.19209e-07)
-mesh = ExtResource("2_2rmb7")
-skeleton = NodePath("../..")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(-1.67475e-07, 0, -2.60227, 0, -0.0010139, 0, 3.62109, 0, -1.07505e-07, -1.09277, -0.0427682, 1.15972)
-mesh = SubResource("BoxMesh_sbd7d")
-skeleton = NodePath("../..")
-
-[node name="MeshInstance3D12" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(0.324175, -0.00536228, 0.00818995, -0.00799691, 0.00134105, 0.0379478, 0.630467, 0.00247868, -0.00331282, -1.11899, 0.0793288, 0.79592)
-visible = false
-mesh = SubResource("BoxMesh_sbd7d")
-skeleton = NodePath("../..")
-
-[node name="MeshInstance3D13" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(-0.318707, -0.00539652, 0.00785137, -0.00799691, 0.00134105, 0.0379478, 0.632951, -0.00241138, 0.00397821, -1.12459, 0.0793288, 1.65479)
-visible = false
-mesh = SubResource("BoxMesh_sbd7d")
-skeleton = NodePath("../..")
-
-[node name="MeshInstance3D11" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(-1.67475e-07, 0, -2.60227, 0, -0.0010139, 0, 3.62109, 0, -1.07505e-07, -1.09277, 1.39964, 1.15972)
-mesh = SubResource("BoxMesh_sbd7d")
-skeleton = NodePath("../..")
-
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(-1.95233e-07, 0.00100653, 1.15358e-07, 0, 4.30675e-11, -2.58334, 4.22127, 4.15818e-11, 4.76568e-15, -2.37945, 1.25579, 1.15972)
-mesh = SubResource("BoxMesh_sbd7d")
-skeleton = NodePath("../..")
-
-[node name="MeshInstance3D4" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(-1.96664e-07, 0.0010139, 1.16204e-07, 0, 4.33829e-11, -2.60227, 4.2522, 4.18862e-11, 4.80062e-15, 0.200145, 1.25579, 1.15972)
-mesh = SubResource("BoxMesh_sbd7d")
-skeleton = NodePath("../..")
-
-[node name="MeshInstance3D3" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(3.12493, 1.60987e-11, -3.64653e-16, 0, 4.59024e-11, -2.60227, 2.11895e-07, -0.0010139, -1.09825e-07, -0.89436, 1.25579, 3.23141)
-mesh = SubResource("BoxMesh_sbd7d")
-skeleton = NodePath("../..")
-
-[node name="MeshInstance3D5" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(3.12493, 1.60987e-11, -3.64653e-16, 0, 4.59024e-11, -2.60227, 2.11895e-07, -0.0010139, -1.09825e-07, -0.89436, 1.25579, -0.693817)
-mesh = SubResource("BoxMesh_sbd7d")
-skeleton = NodePath("../..")
