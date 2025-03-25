@@ -7,6 +7,22 @@ signal tab_selected(tab_name: String)
 @onready var silver_shop = $ShopBackgrounds/SilverShop
 @onready var gold_shop = $ShopBackgrounds/GoldShop
 
+# Shop configuration
+const STARTING_CURRENCY = 100  # Starting amount for each currency type
+const BASE_PRICE = 1          # Base price for level 1 upgrades
+const CURVE_FACTOR = 1.5      # How steeply prices increase (adjust for different curves)
+const MAX_LEVEL = 10          # Maximum upgrade level
+
+# Currency tracking
+var bronze_currency = STARTING_CURRENCY
+var silver_currency = STARTING_CURRENCY
+var gold_currency = STARTING_CURRENCY
+
+# Currency colors
+var bronze_color = Color(0.87, 0.443, 0.0)
+var silver_color = Color(0.75, 0.75, 0.75)
+var gold_color = Color(1.0, 0.843, 0.0)
+
 # Controller and visualization references
 var right_controller: XRController3D = null
 var left_controller: XRController3D = null 
@@ -20,12 +36,6 @@ var hover_ray_color = Color(0, 1, 0, 0.6)     # Green
 var current_shop = "bronze"
 
 # Bronze Shop Upgrades
-# ItemBox1: Health - Increases player's maximum health
-# ItemBox2: Speed - Increases player's movement speed
-# ItemBox3: Damage - Increases basic weapon damage
-# ItemBox4: Fire Rate - Increases weapon fire rate
-# ItemBox5: Bullet Speed - Increases projectile speed
-# ItemBox6: Special - Unlocks/improves special abilities
 var bronze_levels = {
 	"ItemBox1": 1,  # Health
 	"ItemBox2": 1,  # Speed
@@ -36,12 +46,6 @@ var bronze_levels = {
 }
 
 # Silver Shop Upgrades
-# ItemBox1: Shield - Adds/improves shield protection
-# ItemBox2: Dash - Improves dash ability
-# ItemBox3: Critical - Increases critical hit chance
-# ItemBox4: Range - Increases weapon range
-# ItemBox5: Spread - Decreases weapon spread
-# ItemBox6: Special - Unlocks/improves advanced abilities
 var silver_levels = {
 	"ItemBox1": 1,  # Shield
 	"ItemBox2": 1,  # Dash
@@ -52,12 +56,6 @@ var silver_levels = {
 }
 
 # Gold Shop Upgrades
-# ItemBox1: Regen - Adds/improves health regeneration
-# ItemBox2: Bounce - Adds bounce effect to projectiles
-# ItemBox3: Pierce - Adds piercing effect to projectiles
-# ItemBox4: Multi - Adds multiple projectiles
-# ItemBox5: Homing - Adds homing effect to projectiles
-# ItemBox6: Ultimate - Unlocks/improves ultimate abilities
 var gold_levels = {
 	"ItemBox1": 1,  # Regen
 	"ItemBox2": 1,  # Bounce
@@ -66,8 +64,6 @@ var gold_levels = {
 	"ItemBox5": 1,  # Homing
 	"ItemBox6": 1   # Ultimate
 }
-
-var max_level = 10  # Maximum upgrade level
 
 func _ready():
 	print("\n=== Shop Menu Initializing ===")
@@ -90,6 +86,8 @@ func _ready():
 			
 	# Initialize shop state
 	change_shop("bronze")
+	update_currency_display()
+	update_all_price_labels()
 
 func _on_button_pressed(button_name: String, controller: String):
 	print("\nController Button Event: " + button_name)
@@ -125,7 +123,7 @@ func handle_button_press(button: Node):
 				change_shop("gold")
 		emit_signal("tab_selected", button_name)
 	elif parent_name == "ItemBoundingBoxes":
-		upgrade_item(button_name)
+		try_upgrade_item(button_name)
 		emit_signal("item_selected", button_name)
 
 func get_current_levels():
@@ -138,23 +136,81 @@ func get_current_levels():
 			return gold_levels
 	return bronze_levels  # Default fallback
 
-func upgrade_item(item_name: String):
+func calculate_price(level: int) -> int:
+	# Logarithmic price scaling: BASE_PRICE * (CURVE_FACTOR)^(level-1)
+	# Example progression with default values (BASE_PRICE=1, CURVE_FACTOR=1.5):
+	# Level 1: 1
+	# Level 2: 2
+	# Level 3: 3
+	# Level 4: 4
+	# Level 5: 6
+	# Level 6: 8
+	# Level 7: 12
+	# Level 8: 18
+	# Level 9: 26
+	# Level 10: 39
+	var price = BASE_PRICE * pow(CURVE_FACTOR, level - 1)
+	return roundi(price)  # Round to nearest integer
+
+func try_upgrade_item(item_name: String):
 	var levels = get_current_levels()
-	if levels[item_name] < max_level:
-		levels[item_name] += 1
-		update_item_label(item_name)
-		print("Upgraded " + current_shop + " " + item_name + " to level " + str(levels[item_name]))
+	if levels[item_name] >= MAX_LEVEL:
+		print("Item already at max level")
+		return
+		
+	var price = calculate_price(levels[item_name])
+	
+	match current_shop:
+		"bronze":
+			if bronze_currency >= price:
+				bronze_currency -= price
+				levels[item_name] += 1
+				update_currency_display()
+				update_item_display(item_name)
+				print("Upgraded " + item_name + " to level " + str(levels[item_name]))
+		"silver":
+			if silver_currency >= price:
+				silver_currency -= price
+				levels[item_name] += 1
+				update_currency_display()
+				update_item_display(item_name)
+				print("Upgraded " + item_name + " to level " + str(levels[item_name]))
+		"gold":
+			if gold_currency >= price:
+				gold_currency -= price
+				levels[item_name] += 1
+				update_currency_display()
+				update_item_display(item_name)
+				print("Upgraded " + item_name + " to level " + str(levels[item_name]))
 
-func update_item_label(item_name: String):
+func update_currency_display():
+	$CurrencyDisplay/BronzeCurrency.text = str(bronze_currency)
+	$CurrencyDisplay/SilverCurrency.text = str(silver_currency)
+	$CurrencyDisplay/GoldCurrency.text = str(gold_currency)
+
+func update_item_display(item_name: String):
+	var levels = get_current_levels()
 	var label = get_node("ItemBoundingBoxes/" + item_name + "/Label3D")
-	if label:
-		var levels = get_current_levels()
+	var price_label = get_node("ItemBoundingBoxes/" + item_name + "/PriceLabel")
+	
+	if label and price_label:
 		label.text = str(levels[item_name])
+		if levels[item_name] < MAX_LEVEL:
+			price_label.text = "$" + str(calculate_price(levels[item_name]))
+			match current_shop:
+				"bronze":
+					price_label.modulate = bronze_color
+				"silver":
+					price_label.modulate = silver_color
+				"gold":
+					price_label.modulate = gold_color
+		else:
+			price_label.text = "MAX"
 
-func update_all_item_labels():
+func update_all_price_labels():
 	var levels = get_current_levels()
 	for item_name in levels.keys():
-		update_item_label(item_name)
+		update_item_display(item_name)
 
 func change_shop(shop_type: String):
 	current_shop = shop_type
@@ -174,7 +230,7 @@ func change_shop(shop_type: String):
 			gold_shop.visible = true
 	
 	# Update labels for the new shop
-	update_all_item_labels()
+	update_all_price_labels()
 
 func _physics_process(_delta):
 	update_laser_pointers()

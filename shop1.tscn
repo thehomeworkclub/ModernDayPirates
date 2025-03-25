@@ -55,6 +55,26 @@ pixel_size = 0.001
 texture_filter = 0
 texture = ExtResource("4_gold")
 
+[node name="CurrencyDisplay" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.312, -1.5, -9.427)
+
+[node name="BronzeCurrency" type="Label3D" parent="CurrencyDisplay"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, 0)
+pixel_size = 0.003
+modulate = Color(0.87, 0.443, 0, 1)
+text = "100"
+
+[node name="SilverCurrency" type="Label3D" parent="CurrencyDisplay"]
+pixel_size = 0.003
+modulate = Color(0.75, 0.75, 0.75, 1)
+text = "100"
+
+[node name="GoldCurrency" type="Label3D" parent="CurrencyDisplay"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0, 0)
+pixel_size = 0.003
+modulate = Color(1, 0.843, 0, 1)
+text = "100"
+
 [node name="ItemBoundingBoxes" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.812, -2.381, -9.327)
 
@@ -67,9 +87,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.468932, 0, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.469, 0, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.469, 0.03, 0.06)
 pixel_size = 0.002
 text = "1"
+
+[node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.469, -0.03, 0.06)
+pixel_size = 0.0015
+text = "$10"
 
 [node name="ItemBox2" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.236, 0.154, 0.036)
@@ -80,9 +105,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.725973, 0, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.726, 0, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.726, 0.03, 0.06)
 pixel_size = 0.002
-text = "2"
+text = "1"
+
+[node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.726, -0.03, 0.06)
+pixel_size = 0.0015
+text = "$10"
 
 [node name="ItemBox3" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.141, 0.154, 0.036)
@@ -93,9 +123,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.986047, 0, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.986, 0, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.986, 0.03, 0.06)
 pixel_size = 0.002
-text = "3"
+text = "1"
+
+[node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.986, -0.03, 0.06)
+pixel_size = 0.0015
+text = "$10"
 
 [node name="ItemBox4" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.334, -0.168, 0.036)
@@ -106,9 +141,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47191, 0.0164931, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.472, 0.016, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.472, 0.046, 0.06)
 pixel_size = 0.002
-text = "4"
+text = "1"
+
+[node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.472, -0.014, 0.06)
+pixel_size = 0.0015
+text = "$10"
 
 [node name="ItemBox5" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.242, -0.168, 0.036)
@@ -119,9 +159,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.734692, 0.0247643, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox5"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.735, 0.025, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.735, 0.055, 0.06)
 pixel_size = 0.002
-text = "5"
+text = "1"
+
+[node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.735, -0.005, 0.06)
+pixel_size = 0.0015
+text = "$10"
 
 [node name="ItemBox6" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.131, -0.168, 0.036)
@@ -132,9 +177,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.977744, 0.0234766, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.978, 0.023, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.978, 0.053, 0.06)
 pixel_size = 0.002
-text = "6"
+text = "1"
+
+[node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.978, -0.007, 0.06)
+pixel_size = 0.0015
+text = "$10"
 
 [node name="TabBoundingBoxes" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.312, -1.881, -9.327)
