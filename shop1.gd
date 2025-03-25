@@ -19,14 +19,52 @@ var hover_ray_color = Color(0, 1, 0, 0.6)     # Green
 
 var current_shop = "bronze"
 
-# Upgrade tracking
-var item_levels = {
-	"ItemBox1": 1,
-	"ItemBox2": 1,
-	"ItemBox3": 1,
-	"ItemBox4": 1,
-	"ItemBox5": 1,
-	"ItemBox6": 1
+# Bronze Shop Upgrades
+# ItemBox1: Health - Increases player's maximum health
+# ItemBox2: Speed - Increases player's movement speed
+# ItemBox3: Damage - Increases basic weapon damage
+# ItemBox4: Fire Rate - Increases weapon fire rate
+# ItemBox5: Bullet Speed - Increases projectile speed
+# ItemBox6: Special - Unlocks/improves special abilities
+var bronze_levels = {
+	"ItemBox1": 1,  # Health
+	"ItemBox2": 1,  # Speed
+	"ItemBox3": 1,  # Damage
+	"ItemBox4": 1,  # Fire Rate
+	"ItemBox5": 1,  # Bullet Speed
+	"ItemBox6": 1   # Special
+}
+
+# Silver Shop Upgrades
+# ItemBox1: Shield - Adds/improves shield protection
+# ItemBox2: Dash - Improves dash ability
+# ItemBox3: Critical - Increases critical hit chance
+# ItemBox4: Range - Increases weapon range
+# ItemBox5: Spread - Decreases weapon spread
+# ItemBox6: Special - Unlocks/improves advanced abilities
+var silver_levels = {
+	"ItemBox1": 1,  # Shield
+	"ItemBox2": 1,  # Dash
+	"ItemBox3": 1,  # Critical
+	"ItemBox4": 1,  # Range
+	"ItemBox5": 1,  # Spread
+	"ItemBox6": 1   # Special
+}
+
+# Gold Shop Upgrades
+# ItemBox1: Regen - Adds/improves health regeneration
+# ItemBox2: Bounce - Adds bounce effect to projectiles
+# ItemBox3: Pierce - Adds piercing effect to projectiles
+# ItemBox4: Multi - Adds multiple projectiles
+# ItemBox5: Homing - Adds homing effect to projectiles
+# ItemBox6: Ultimate - Unlocks/improves ultimate abilities
+var gold_levels = {
+	"ItemBox1": 1,  # Regen
+	"ItemBox2": 1,  # Bounce
+	"ItemBox3": 1,  # Pierce
+	"ItemBox4": 1,  # Multi
+	"ItemBox5": 1,  # Homing
+	"ItemBox6": 1   # Ultimate
 }
 
 var max_level = 10  # Maximum upgrade level
@@ -52,9 +90,6 @@ func _ready():
 			
 	# Initialize shop state
 	change_shop("bronze")
-	
-	# Update all item labels
-	update_all_item_labels()
 
 func _on_button_pressed(button_name: String, controller: String):
 	print("\nController Button Event: " + button_name)
@@ -93,19 +128,32 @@ func handle_button_press(button: Node):
 		upgrade_item(button_name)
 		emit_signal("item_selected", button_name)
 
+func get_current_levels():
+	match current_shop:
+		"bronze":
+			return bronze_levels
+		"silver":
+			return silver_levels
+		"gold":
+			return gold_levels
+	return bronze_levels  # Default fallback
+
 func upgrade_item(item_name: String):
-	if item_levels[item_name] < max_level:
-		item_levels[item_name] += 1
+	var levels = get_current_levels()
+	if levels[item_name] < max_level:
+		levels[item_name] += 1
 		update_item_label(item_name)
-		print("Upgraded " + item_name + " to level " + str(item_levels[item_name]))
+		print("Upgraded " + current_shop + " " + item_name + " to level " + str(levels[item_name]))
 
 func update_item_label(item_name: String):
 	var label = get_node("ItemBoundingBoxes/" + item_name + "/Label3D")
 	if label:
-		label.text = str(item_levels[item_name])
+		var levels = get_current_levels()
+		label.text = str(levels[item_name])
 
 func update_all_item_labels():
-	for item_name in item_levels.keys():
+	var levels = get_current_levels()
+	for item_name in levels.keys():
 		update_item_label(item_name)
 
 func change_shop(shop_type: String):
@@ -124,6 +172,9 @@ func change_shop(shop_type: String):
 			silver_shop.visible = true
 		"gold":
 			gold_shop.visible = true
+	
+	# Update labels for the new shop
+	update_all_item_labels()
 
 func _physics_process(_delta):
 	update_laser_pointers()
