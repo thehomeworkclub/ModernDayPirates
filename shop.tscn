@@ -1,0 +1,77 @@
+[gd_scene load_steps=6 format=3 uid="uid://comojcd0ihl0a"]
+
+[ext_resource type="Script" path="res://shop.gd" id="1_0q2ki"]
+[ext_resource type="ArrayMesh" uid="uid://doim0agbwg3o4" path="res://Container/model/cargo_container.obj" id="1_1qjpm"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_laser"]
+transparency = 1
+albedo_color = Color(0, 0.5, 1, 0.6)
+emission_enabled = true
+emission = Color(0, 0.5, 1, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_laser"]
+top_radius = 0.005
+bottom_radius = 0.005
+height = 10.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_cursor"]
+radius = 0.02
+height = 0.04
+radial_segments = 8
+rings = 4
+
+[node name="ShopScene" type="Node3D"]
+script = ExtResource("1_0q2ki")
+
+[node name="XROrigin3D" type="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.954, -7.596, 4.236)
+
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+
+[node name="XRController3DLeft" type="XRController3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 1, -0.3)
+tracker = &"left_hand"
+pose = &"aim"
+
+[node name="LaserBeamLeft" type="MeshInstance3D" parent="XROrigin3D/XRController3DLeft"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -5)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("CylinderMesh_laser")
+
+[node name="LaserDotLeft" type="MeshInstance3D" parent="XROrigin3D/XRController3DLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("SphereMesh_cursor")
+
+[node name="RayCastLeft" type="RayCast3D" parent="XROrigin3D/XRController3DLeft"]
+target_position = Vector3(0, 0, -10)
+collision_mask = 1
+
+[node name="XRController3DRight" type="XRController3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 1, -0.3)
+tracker = &"right_hand"
+pose = &"aim"
+
+[node name="LaserBeamRight" type="MeshInstance3D" parent="XROrigin3D/XRController3DRight"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -5)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("CylinderMesh_laser")
+
+[node name="LaserDotRight" type="MeshInstance3D" parent="XROrigin3D/XRController3DRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("SphereMesh_cursor")
+
+[node name="RayCastRight" type="RayCast3D" parent="XROrigin3D/XRController3DRight"]
+target_position = Vector3(0, 0, -10)
+collision_mask = 1
+
+[node name="CargoContainer" type="MeshInstance3D" parent="."]
+transform = Transform3D(-6.8695e-07, 0, 16.6283, 0, 16.0547, 0, -15.7156, 0, -7.26845e-07, -20.2429, -8.50739, -14.939)
+mesh = ExtResource("1_1qjpm")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 2.03019, 0, 0, 0, 1, 10.9535, -4.59605, 4.23553)
+current = true
