@@ -59,19 +59,29 @@ texture = ExtResource("4_gold")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.312, -1.5, -9.427)
 
 [node name="BronzeCurrency" type="Label3D" parent="CurrencyDisplay"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, 0.1)
+sorting_offset = 10000.0
 pixel_size = 0.003
+outline_size = 12
+outline_modulate = Color(0, 0, 0, 1)
 modulate = Color(0.87, 0.443, 0, 1)
 text = "100"
 
 [node name="SilverCurrency" type="Label3D" parent="CurrencyDisplay"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.1)
+sorting_offset = 10000.0
 pixel_size = 0.003
+outline_size = 12
+outline_modulate = Color(0, 0, 0, 1)
 modulate = Color(0.75, 0.75, 0.75, 1)
 text = "100"
 
 [node name="GoldCurrency" type="Label3D" parent="CurrencyDisplay"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0, 0.1)
+sorting_offset = 10000.0
 pixel_size = 0.003
+outline_size = 12
+outline_modulate = Color(0, 0, 0, 1)
 modulate = Color(1, 0.843, 0, 1)
 text = "100"
 
