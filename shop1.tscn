@@ -206,7 +206,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47191, 0.0164931, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.472, 0.046, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.315165, 0.0356216, -0.0966997)
 pixel_size = 0.002
 text = "1"
 font_size = 48
@@ -227,7 +227,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.734692, 0.0247643, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox5"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.735, 0.055, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.619052, 0.0446217, -0.0966997)
 pixel_size = 0.002
 text = "1"
 font_size = 48
@@ -248,7 +248,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.977744, 0.0234766, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.978, 0.053, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.890169, 0.0426216, -0.0966997)
 pixel_size = 0.002
 text = "1"
 font_size = 48
