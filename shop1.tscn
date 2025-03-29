@@ -1,9 +1,12 @@
-[gd_scene load_steps=12 format=3 uid="uid://baxby7v2hxbd5"]
+[gd_scene load_steps=11 format=3 uid="uid://baxby7v2hxbd5"]
 
 [ext_resource type="Script" path="res://shop1.gd" id="1_drt4w"]
 [ext_resource type="Texture2D" uid="uid://cw3ty3m6moqyd" path="res://shopart/bronzeshop.png" id="2_bronze"]
 [ext_resource type="Texture2D" uid="uid://y6o0qruy3iei" path="res://shopart/silvershop.png" id="3_silver"]
 [ext_resource type="Texture2D" uid="uid://debk7ty8ewt0b" path="res://shopart/goldshop.png" id="4_gold"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_currency"]
+viewport_path = NodePath("CurrencyViewport")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_item"]
 size = Vector3(0.2724, 0.175781, 0.05)
@@ -28,9 +31,6 @@ radius = 0.02
 height = 0.04
 radial_segments = 8
 rings = 4
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_currency"]
-viewport_path = NodePath("CurrencyViewport")
 
 [node name="ShopRoot" type="Node3D"]
 script = ExtResource("1_drt4w")
@@ -59,12 +59,12 @@ texture_filter = 0
 texture = ExtResource("4_gold")
 
 [node name="CurrencyViewport" type="SubViewport" parent="."]
-size = Vector2(1000, 120)
 transparent_bg = true
-render_target_update_mode = 1
 handle_input_locally = false
 msaa_2d = 1
-screen_space_aa = true
+screen_space_aa = 1
+size = Vector2i(1000, 120)
+render_target_update_mode = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="CurrencyViewport"]
 anchors_preset = 15
@@ -78,12 +78,7 @@ theme_override_constants/margin_right = 40
 theme_override_constants/margin_bottom = 10
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CurrencyViewport/MarginContainer"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 theme_override_constants/separation = 100
 alignment = 1
 
@@ -93,10 +88,9 @@ theme_override_colors/font_color = Color(0.87, 0.443, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 16
 theme_override_font_sizes/font_size = 64
-theme_override_font_sizes/font_weight = 800
+text = "100"
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "100"
 
 [node name="Spacer1" type="Control" parent="CurrencyViewport/MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(120, 0)
@@ -108,10 +102,9 @@ theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 16
 theme_override_font_sizes/font_size = 64
-theme_override_font_sizes/font_weight = 800
+text = "100"
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "100"
 
 [node name="Spacer2" type="Control" parent="CurrencyViewport/MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(120, 0)
@@ -123,21 +116,20 @@ theme_override_colors/font_color = Color(1, 0.843, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 16
 theme_override_font_sizes/font_size = 64
-theme_override_font_sizes/font_weight = 800
+text = "100"
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "100"
 
 [node name="CurrencyDisplay" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.312, -1.45, -9.327)
+transform = Transform3D(0.921263, 0, 0, 0, 1, 0, 0, 0, 1, 11.2021, -1.64224, -9.4134)
 sorting_offset = 100.0
+pixel_size = 0.001
 double_sided = false
 no_depth_test = true
 alpha_cut = 1
 texture_filter = 0
 render_priority = 100
 texture = SubResource("ViewportTexture_currency")
-pixel_size = 0.001
 
 [node name="ItemBoundingBoxes" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.812, -2.381, -9.327)
@@ -151,14 +143,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.468932, 0, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.469, 0.03, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.321803, 0.0336633, -0.110113)
 pixel_size = 0.002
 text = "1"
+font_size = 48
+outline_size = 8
 
 [node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.469, -0.03, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.324168, -0.138688, -0.115673)
 pixel_size = 0.0015
 text = "$10"
+outline_size = 8
 
 [node name="ItemBox2" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.236, 0.154, 0.036)
@@ -169,14 +164,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.725973, 0, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.726, 0.03, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.615782, 0.03, -0.118979)
 pixel_size = 0.002
 text = "1"
+font_size = 48
+outline_size = 8
 
 [node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.726, -0.03, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.63135, -0.133558, -0.123119)
 pixel_size = 0.0015
 text = "$10"
+outline_size = 8
 
 [node name="ItemBox3" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.141, 0.154, 0.036)
@@ -187,14 +185,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.986047, 0, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.986, 0.03, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.909732, 0.03, -0.118979)
 pixel_size = 0.002
 text = "1"
+font_size = 48
+outline_size = 8
 
 [node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.986, -0.03, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.929828, -0.133558, -0.115673)
 pixel_size = 0.0015
 text = "$10"
+outline_size = 8
 
 [node name="ItemBox4" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.334, -0.168, 0.036)
@@ -208,11 +209,14 @@ shape = SubResource("BoxShape3D_item")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.472, 0.046, 0.06)
 pixel_size = 0.002
 text = "1"
+font_size = 48
+outline_size = 8
 
 [node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.472, -0.014, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.332172, -0.148911, -0.131023)
 pixel_size = 0.0015
 text = "$10"
+outline_size = 8
 
 [node name="ItemBox5" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.242, -0.168, 0.036)
@@ -226,11 +230,14 @@ shape = SubResource("BoxShape3D_item")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.735, 0.055, 0.06)
 pixel_size = 0.002
 text = "1"
+font_size = 48
+outline_size = 8
 
 [node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox5"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.735, -0.005, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.634504, -0.139911, -0.131023)
 pixel_size = 0.0015
 text = "$10"
+outline_size = 8
 
 [node name="ItemBox6" type="StaticBody3D" parent="ItemBoundingBoxes" groups=["button"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.131, -0.168, 0.036)
@@ -244,11 +251,14 @@ shape = SubResource("BoxShape3D_item")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.978, 0.053, 0.06)
 pixel_size = 0.002
 text = "1"
+font_size = 48
+outline_size = 8
 
 [node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.978, -0.007, 0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.920605, -0.141911, -0.131023)
 pixel_size = 0.0015
 text = "$10"
+outline_size = 8
 
 [node name="TabBoundingBoxes" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.312, -1.881, -9.327)
@@ -295,7 +305,7 @@ mesh = SubResource("CylinderMesh_laser")
 
 [node name="LaserDotLeft" type="MeshInstance3D" parent="XROrigin3D/XRController3DLeft"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
-material_override = SubResource("StandardMaterial3D_laser") 
+material_override = SubResource("StandardMaterial3D_laser")
 mesh = SubResource("SphereMesh_cursor")
 
 [node name="RayCastLeft" type="RayCast3D" parent="XROrigin3D/XRController3DLeft"]
