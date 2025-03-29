@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://baxby7v2hxbd5"]
+[gd_scene load_steps=12 format=3 uid="uid://baxby7v2hxbd5"]
 
 [ext_resource type="Script" path="res://shop1.gd" id="1_drt4w"]
 [ext_resource type="Texture2D" uid="uid://cw3ty3m6moqyd" path="res://shopart/bronzeshop.png" id="2_bronze"]
@@ -29,6 +29,9 @@ height = 0.04
 radial_segments = 8
 rings = 4
 
+[sub_resource type="ViewportTexture" id="ViewportTexture_currency"]
+viewport_path = NodePath("CurrencyViewport")
+
 [node name="ShopRoot" type="Node3D"]
 script = ExtResource("1_drt4w")
 
@@ -55,35 +58,86 @@ pixel_size = 0.001
 texture_filter = 0
 texture = ExtResource("4_gold")
 
-[node name="CurrencyDisplay" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.312, -1.5, -9.427)
+[node name="CurrencyViewport" type="SubViewport" parent="."]
+size = Vector2(1000, 120)
+transparent_bg = true
+render_target_update_mode = 1
+handle_input_locally = false
+msaa_2d = 1
+screen_space_aa = true
 
-[node name="BronzeCurrency" type="Label3D" parent="CurrencyDisplay"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, 0.1)
-sorting_offset = 10000.0
-pixel_size = 0.003
-outline_size = 12
-outline_modulate = Color(0, 0, 0, 1)
-modulate = Color(0.87, 0.443, 0, 1)
+[node name="MarginContainer" type="MarginContainer" parent="CurrencyViewport"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CurrencyViewport/MarginContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 100
+alignment = 1
+
+[node name="BronzeCurrency" type="Label" parent="CurrencyViewport/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.87, 0.443, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 16
+theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_weight = 800
+horizontal_alignment = 1
+vertical_alignment = 1
 text = "100"
 
-[node name="SilverCurrency" type="Label3D" parent="CurrencyDisplay"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.1)
-sorting_offset = 10000.0
-pixel_size = 0.003
-outline_size = 12
-outline_modulate = Color(0, 0, 0, 1)
-modulate = Color(0.75, 0.75, 0.75, 1)
+[node name="Spacer1" type="Control" parent="CurrencyViewport/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+
+[node name="SilverCurrency" type="Label" parent="CurrencyViewport/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 16
+theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_weight = 800
+horizontal_alignment = 1
+vertical_alignment = 1
 text = "100"
 
-[node name="GoldCurrency" type="Label3D" parent="CurrencyDisplay"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0, 0.1)
-sorting_offset = 10000.0
-pixel_size = 0.003
-outline_size = 12
-outline_modulate = Color(0, 0, 0, 1)
-modulate = Color(1, 0.843, 0, 1)
+[node name="Spacer2" type="Control" parent="CurrencyViewport/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+
+[node name="GoldCurrency" type="Label" parent="CurrencyViewport/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.843, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 16
+theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_weight = 800
+horizontal_alignment = 1
+vertical_alignment = 1
 text = "100"
+
+[node name="CurrencyDisplay" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.312, -1.45, -9.327)
+sorting_offset = 100.0
+double_sided = false
+no_depth_test = true
+alpha_cut = 1
+texture_filter = 0
+render_priority = 100
+texture = SubResource("ViewportTexture_currency")
+pixel_size = 0.001
 
 [node name="ItemBoundingBoxes" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.812, -2.381, -9.327)
@@ -241,7 +295,7 @@ mesh = SubResource("CylinderMesh_laser")
 
 [node name="LaserDotLeft" type="MeshInstance3D" parent="XROrigin3D/XRController3DLeft"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
-material_override = SubResource("StandardMaterial3D_laser")
+material_override = SubResource("StandardMaterial3D_laser") 
 mesh = SubResource("SphereMesh_cursor")
 
 [node name="RayCastLeft" type="RayCast3D" parent="XROrigin3D/XRController3DLeft"]
