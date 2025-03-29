@@ -170,15 +170,10 @@ func update_item_display(item_name: String):
 		label.text = str(levels[item_name])
 		if levels[item_name] < MAX_LEVEL:
 			price_label.text = "$" + str(calculate_price(levels[item_name]))
-			match current_shop:
-				"bronze":
-					price_label.modulate = bronze_color
-				"silver":
-					price_label.modulate = silver_color
-				"gold":
-					price_label.modulate = gold_color
+			price_label.modulate = Color(0, 0, 0, 1)  # Keep price label black
 		else:
 			price_label.text = "MAX"
+			price_label.modulate = Color(0, 0, 0, 1)  # Keep MAX text black
 
 func update_all_price_labels():
 	var levels = get_current_levels()

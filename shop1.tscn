@@ -156,6 +156,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.324168, -0.138688, -0.13343
 sorting_offset = 1.0
 pixel_size = 0.0015
 no_depth_test = true
+modulate = Color(0, 0, 0, 1)
 text = "$10"
 outline_size = 8
 
@@ -181,6 +182,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.63135, -0.133558, -0.123119
 sorting_offset = 1.0
 pixel_size = 0.0015
 no_depth_test = true
+modulate = Color(0, 0, 0, 1)
 text = "$10"
 outline_size = 8
 
@@ -206,6 +208,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.929828, -0.133558, -0.13390
 sorting_offset = 1.0
 pixel_size = 0.0015
 no_depth_test = true
+modulate = Color(0, 0, 0, 1)
 text = "$10"
 outline_size = 8
 
@@ -231,6 +234,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.332172, -0.148911, -0.13102
 sorting_offset = 1.0
 pixel_size = 0.0015
 no_depth_test = true
+modulate = Color(0, 0, 0, 1)
 text = "$10"
 outline_size = 8
 
@@ -256,6 +260,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.634504, -0.139911, -0.13102
 sorting_offset = 1.0
 pixel_size = 0.0015
 no_depth_test = true
+modulate = Color(0, 0, 0, 1)
 text = "$10"
 outline_size = 8
 
@@ -281,6 +286,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.920605, -0.141911, -0.13102
 sorting_offset = 1.0
 pixel_size = 0.0015
 no_depth_test = true
+modulate = Color(0, 0, 0, 1)
 text = "$10"
 outline_size = 8
 
