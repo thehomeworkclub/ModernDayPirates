@@ -131,29 +131,35 @@ func try_upgrade_item(item_name: String):
 
 	var price = calculate_price(levels[item_name])
 	var currency_manager = get_node("/root/CurrencyManager")
+	var purchased = false
 
 	match current_shop:
 		"bronze":
-			if currency_manager.purchase(price, 0, 0):
-				levels[item_name] += 1
-				update_currency_display()
-				update_item_display(item_name)
+			purchased = currency_manager.purchase(price, 0, 0)
 		"silver":
-			if currency_manager.purchase(0, price, 0):
-				levels[item_name] += 1
-				update_currency_display()
-				update_item_display(item_name)
+			purchased = currency_manager.purchase(0, price, 0)
 		"gold":
-			if currency_manager.purchase(0, 0, price):
-				levels[item_name] += 1
-				update_currency_display()
-				update_item_display(item_name)
+			purchased = currency_manager.purchase(0, 0, price)
+	
+	if purchased:
+		levels[item_name] += 1
+		update_item_display(item_name)
+		update_currency_display()
 
 func update_currency_display():
 	var currency_manager = get_node("/root/CurrencyManager")
-	bronze_currency.text = str(currency_manager.get_bronze())
-	silver_currency.text = str(currency_manager.get_silver())
-	gold_currency.text = str(currency_manager.get_gold())
+	var bronze = currency_manager.get_bronze()
+	var silver = currency_manager.get_silver()
+	var gold = currency_manager.get_gold()
+	
+	# Update the viewport labels
+	if bronze_currency and silver_currency and gold_currency:
+		bronze_currency.text = str(bronze)
+		silver_currency.text = str(silver)
+		gold_currency.text = str(gold)
+		
+		# Force viewport update
+		$CurrencyViewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 func update_item_display(item_name: String):
 	var levels = get_current_levels()

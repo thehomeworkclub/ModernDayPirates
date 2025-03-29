@@ -64,7 +64,7 @@ handle_input_locally = false
 msaa_2d = 1
 screen_space_aa = 1
 size = Vector2i(1000, 120)
-render_target_update_mode = 1
+render_target_update_mode = 4
 
 [node name="MarginContainer" type="MarginContainer" parent="CurrencyViewport"]
 anchors_preset = 15
@@ -143,15 +143,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.468932, 0, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.321803, 0.0336633, -0.110113)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.304686, 0.0336633, -0.138762)
+sorting_offset = 1.0
 pixel_size = 0.002
+no_depth_test = true
 text = "1"
 font_size = 48
 outline_size = 8
 
 [node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.324168, -0.138688, -0.115673)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.324168, -0.138688, -0.133437)
+sorting_offset = 1.0
 pixel_size = 0.0015
+no_depth_test = true
 text = "$10"
 outline_size = 8
 
@@ -164,15 +168,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.725973, 0, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.615782, 0.03, -0.118979)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.615782, 0.03, -0.147629)
+sorting_offset = 1.0
 pixel_size = 0.002
+no_depth_test = true
 text = "1"
 font_size = 48
 outline_size = 8
 
 [node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.63135, -0.133558, -0.123119)
+sorting_offset = 1.0
 pixel_size = 0.0015
+no_depth_test = true
 text = "$10"
 outline_size = 8
 
@@ -185,15 +193,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.986047, 0, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.909732, 0.03, -0.118979)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.909732, 0.03, -0.147629)
+sorting_offset = 1.0
 pixel_size = 0.002
+no_depth_test = true
 text = "1"
 font_size = 48
 outline_size = 8
 
 [node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.929828, -0.133558, -0.115673)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.929828, -0.133558, -0.133908)
+sorting_offset = 1.0
 pixel_size = 0.0015
+no_depth_test = true
 text = "$10"
 outline_size = 8
 
@@ -206,15 +218,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47191, 0.0164931, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.315165, 0.0356216, -0.0966997)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.315165, 0.0356216, -0.13169)
+sorting_offset = 1.0
 pixel_size = 0.002
+no_depth_test = true
 text = "1"
 font_size = 48
 outline_size = 8
 
 [node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox4"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.332172, -0.148911, -0.131023)
+sorting_offset = 1.0
 pixel_size = 0.0015
+no_depth_test = true
 text = "$10"
 outline_size = 8
 
@@ -227,15 +243,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.734692, 0.0247643, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox5"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.619052, 0.0446217, -0.0966997)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.619052, 0.0446217, -0.13169)
+sorting_offset = 1.0
 pixel_size = 0.002
+no_depth_test = true
 text = "1"
 font_size = 48
 outline_size = 8
 
 [node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox5"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.634504, -0.139911, -0.131023)
+sorting_offset = 1.0
 pixel_size = 0.0015
+no_depth_test = true
 text = "$10"
 outline_size = 8
 
@@ -248,15 +268,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.977744, 0.0234766, 0)
 shape = SubResource("BoxShape3D_item")
 
 [node name="Label3D" type="Label3D" parent="ItemBoundingBoxes/ItemBox6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.890169, 0.0426216, -0.0966997)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.903404, 0.0426216, -0.13169)
+sorting_offset = 1.0
 pixel_size = 0.002
+no_depth_test = true
 text = "1"
 font_size = 48
 outline_size = 8
 
 [node name="PriceLabel" type="Label3D" parent="ItemBoundingBoxes/ItemBox6"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.920605, -0.141911, -0.131023)
+sorting_offset = 1.0
 pixel_size = 0.0015
+no_depth_test = true
 text = "$10"
 outline_size = 8
 

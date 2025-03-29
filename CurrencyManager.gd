@@ -15,6 +15,12 @@ var damage_multiplier: float = 1.0
 var health_regen_multiplier: float = 1.0
 var max_health_multiplier: float = 1.0
 
+func _ready():
+    # Initialize with test currency values
+    bronze = 100
+    silver = 100
+    gold = 100
+
 # Getter functions
 func get_silver() -> int:
     return silver
