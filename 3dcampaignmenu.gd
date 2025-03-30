@@ -95,10 +95,10 @@ func _ready() -> void:
 		if texture:
 			campaign_sprites[i] = texture
 			print("Loaded campaign " + str(i) + " sprite sheet")
-			
+	
 	if not _vr_setup_complete:
 		setup_vr_environment()
-		
+	
 	print("Setting up sprites and references...")
 	difficulty_sprite = $DifficultyRange
 	flag_sprite = $Flags
@@ -106,78 +106,9 @@ func _ready() -> void:
 		print("Found difficulty range sprite")
 	if flag_sprite:
 		print("Found flag sprite")
-		
-	print("\n=== Setting up VR Controllers ===")
-	right_controller = $XROrigin3D/XRController3DRight
-	left_controller = $XROrigin3D/XRController3DLeft
 	
-	if right_controller:
-		print("Found right controller: " + str(right_controller.name))
-		right_controller.button_pressed.connect(_on_right_controller_button_pressed)
-		print("Connected right controller button signal")
-		
-		right_ray = right_controller.get_node("RayCastRight")
-		if right_ray:
-			print("Found right raycast, setting length: " + str(ray_length))
-			right_ray.target_position = Vector3(0, 0, -ray_length)
-			right_ray.collision_mask = 1  # Ensure ray can see buttons
-			print("Right ray collision mask: " + str(right_ray.collision_mask))
-			
-		right_laser_dot = right_controller.get_node("LaserDotRight")
-		if right_laser_dot:
-			print("Found right laser dot")
-		else:
-			print("ERROR: LaserDotRight not found!")
-			
-		# Initialize right laser material
-		var right_laser = right_controller.get_node("LaserBeamRight")
-		if right_laser:
-			var material = StandardMaterial3D.new()
-			material.flags_transparent = true
-			material.albedo_color = normal_ray_color
-			material.emission_enabled = true
-			material.emission = normal_ray_color
-			material.emission_energy = 2.0
-			right_laser.material_override = material
-			print("Initialized right laser material")
-	else:
-		print("ERROR: Right controller not found!")
-		
-	if left_controller:
-		print("Found left controller: " + str(left_controller.name))
-		left_controller.button_pressed.connect(_on_left_controller_button_pressed)
-		print("Connected left controller button signal")
-		
-		left_ray = left_controller.get_node("RayCastLeft")
-		if left_ray:
-			print("Found left raycast, setting length: " + str(ray_length))
-			left_ray.target_position = Vector3(0, 0, -ray_length)
-			left_ray.collision_mask = 1  # Ensure ray can see buttons
-			print("Left ray collision mask: " + str(left_ray.collision_mask))
-			
-		left_laser_dot = left_controller.get_node("LaserDotLeft")
-		if left_laser_dot:
-			print("Found left laser dot")
-		else:
-			print("ERROR: LaserDotLeft not found!")
-			
-		# Initialize left laser material
-		var left_laser = left_controller.get_node("LaserBeamLeft")
-		if left_laser:
-			var material = StandardMaterial3D.new()
-			material.flags_transparent = true
-			material.albedo_color = normal_ray_color
-			material.emission_enabled = true
-			material.emission = normal_ray_color
-			material.emission_energy = 2.0
-			left_laser.material_override = material
-			print("Initialized left laser material")
-	else:
-		print("ERROR: Left controller not found!")
-		
-	print("\n=== Setting up Interactive Buttons ===")
+	setup_vr_controllers()
 	setup_interactive_buttons()
-	
 	update_campaign_map()
 	update_indicators()
 	
@@ -186,283 +117,79 @@ func _ready() -> void:
 	print("\n=== Setup Complete ===")
 	print("VR Debug: XR Interface Active = " + str(XRServer.primary_interface != null))
 
-func _process(delta: float) -> void:
-	debug_timer += delta
-	update_laser_pointers()
-	update_button_hover_states()
-	update_button_animations(delta)
+func setup_vr_controllers():
+	print("\n=== Setting up VR Controllers ===")
+	right_controller = $XROrigin3D/XRController3DRight
+	left_controller = $XROrigin3D/XRController3DLeft
 	
-	if debug_timer >= debug_update_interval:
-		debug_timer = 0.0
-		if right_ray and right_ray.is_colliding():
-			var collider = right_ray.get_collider()
-			print("Right ray collision point: " + str(right_ray.get_collision_point()))
-			print("Right ray collision normal: " + str(right_ray.get_collision_normal()))
-			if collider:
-				print("Right ray hit: " + collider.name)
-		if left_ray and left_ray.is_colliding():
-			var collider = left_ray.get_collider()
-			print("Left ray collision point: " + str(left_ray.get_collision_point()))
-			print("Left ray collision normal: " + str(left_ray.get_collision_normal()))
-			if collider:
-				print("Left ray hit: " + collider.name)
+	if right_controller:
+		print("Found right controller: " + str(right_controller.name))
+		right_controller.button_pressed.connect(_on_right_controller_button_pressed)
+		setup_controller(right_controller, "right")
+	
+	if left_controller:
+		print("Found left controller: " + str(left_controller.name))
+		left_controller.button_pressed.connect(_on_left_controller_button_pressed)
+		setup_controller(left_controller, "left")
+
+func setup_controller(controller: XRController3D, side: String):
+	var ray = controller.get_node("RayCast" + side.capitalize())
+	if ray:
+		print("Found " + side + " raycast, setting length: " + str(ray_length))
+		ray.target_position = Vector3(0, 0, -ray_length)
+		ray.collision_mask = 1
+		if side == "right":
+			right_ray = ray
+		else:
+			left_ray = ray
+	
+	var laser_dot = controller.get_node("LaserDot" + side.capitalize())
+	if laser_dot:
+		print("Found " + side + " laser dot")
+		if side == "right":
+			right_laser_dot = laser_dot
+		else:
+			left_laser_dot = laser_dot
+	
+	var laser = controller.get_node("LaserBeam" + side.capitalize())
+	if laser:
+		setup_laser_material(laser)
+	else:
+		print("ERROR: " + side + " laser not found!")
+
+func setup_laser_material(laser: MeshInstance3D):
+	var material = StandardMaterial3D.new()
+	material.flags_transparent = true
+	material.albedo_color = normal_ray_color
+	material.emission_enabled = true
+	material.emission = normal_ray_color
+	material.emission_energy = 2.0
+	laser.material_override = material
+	print("Initialized laser material")
 
 func _on_right_controller_button_pressed(button_name: String):
-	print("\nRight Controller Button Event: " + button_name)
-	if is_changing_scene:
+	if is_changing_scene or button_name != "trigger_click":
 		return
-		
-	if button_name == "trigger_click":
-		print("Right trigger clicked")
-		if right_ray and right_ray.is_colliding():
-			var collider = right_ray.get_collider()
-			print("Right ray hit: " + str(collider.name if collider else "None"))
-			if collider and collider.is_in_group("button"):
-				print("Pressing button: " + collider.name)
-				press_button(collider.name, "right")
-
-func _on_left_controller_button_pressed(button_name: String):
-	print("\nLeft Controller Button Event: " + button_name)
-	if is_changing_scene:
-		return
-		
-	if button_name == "trigger_click":
-		print("Left trigger clicked")
-		if left_ray and left_ray.is_colliding():
-			var collider = left_ray.get_collider()
-			print("Left ray hit: " + str(collider.name if collider else "None"))
-			if collider and collider.is_in_group("button"):
-				print("Pressing button: " + collider.name)
-				press_button(collider.name, "left")
-
-func update_laser_pointers():
-	# Update right controller laser
-	if right_ray and right_laser_dot:
-		var right_laser = right_controller.get_node("LaserBeamRight")
-		if right_laser:
-			var material = right_laser.material_override
-			if material:
-				if right_ray.is_colliding():
-					var collision_point = right_ray.get_collision_point()
-					var collider = right_ray.get_collider()
-					
-					right_laser_dot.global_position = collision_point
-					right_laser_dot.visible = true
-					
-					if collider and collider.is_in_group("button"):
-						material.albedo_color = hover_ray_color
-						material.emission = hover_ray_color
-					else:
-						material.albedo_color = normal_ray_color
-						material.emission = normal_ray_color
-				else:
-					material.albedo_color = normal_ray_color
-					material.emission = normal_ray_color
-					right_laser_dot.visible = false
-					
-	# Update left controller laser
-	if left_ray and left_laser_dot:
-		var left_laser = left_controller.get_node("LaserBeamLeft")
-		if left_laser:
-			var material = left_laser.material_override
-			if material:
-				if left_ray.is_colliding():
-					var collision_point = left_ray.get_collision_point()
-					var collider = left_ray.get_collider()
-					
-					left_laser_dot.global_position = collision_point
-					left_laser_dot.visible = true
-					
-					if collider and collider.is_in_group("button"):
-						material.albedo_color = hover_ray_color
-						material.emission = hover_ray_color
-					else:
-						material.albedo_color = normal_ray_color
-						material.emission = normal_ray_color
-				else:
-					material.albedo_color = normal_ray_color
-					material.emission = normal_ray_color
-					left_laser_dot.visible = false
-
-func update_button_hover_states():
-	# Clear previous hover states
-	hovering_buttons.clear()
 	
-	# Check right controller
 	if right_ray and right_ray.is_colliding():
 		var collider = right_ray.get_collider()
 		if collider and collider.is_in_group("button"):
-			hovering_buttons[collider.name] = "right"
-			print_verbose("Right hovering: " + collider.name)
-			print_verbose("Collision point: " + str(right_ray.get_collision_point()))
-			
-	# Check left controller
+			press_button(collider.name, "right")
+
+func _on_left_controller_button_pressed(button_name: String):
+	if is_changing_scene or button_name != "trigger_click":
+		return
+	
 	if left_ray and left_ray.is_colliding():
 		var collider = left_ray.get_collider()
 		if collider and collider.is_in_group("button"):
-			hovering_buttons[collider.name] = "left"
-			print_verbose("Left hovering: " + collider.name)
-			print_verbose("Collision point: " + str(left_ray.get_collision_point()))
-
-func setup_interactive_buttons():
-	print("\n=== Setting up Interactive Buttons ===")
-	
-	# Disable clickable area collision if it exists
-	var clickable_area = $MapDisplay/ClickableArea if has_node("MapDisplay/ClickableArea") else null
-	if clickable_area and clickable_area.has_node("CollisionShape3D"):
-		var collision = clickable_area.get_node("CollisionShape3D")
-		collision.disabled = true
-		print("Disabled map clickable area collision")
-		
-	print("\nRegistering button nodes...")
-	if shop_button and start_button and exit_button:
-		var button_nodes = {
-			"ShopButton": shop_button,
-			"StartButton": start_button,
-			"ExitButton": exit_button
-		}
-		
-		for button_name in button_nodes:
-			var button = button_nodes[button_name]
-			print("\nProcessing button: " + button_name)
-			
-			# Add to button group
-			if not button.is_in_group("button"):
-				button.add_to_group("button")
-				print("Added to button group")
-			
-			# Get and verify the button mesh or sprite
-			var button_mesh = button.get_node("ButtonMesh")
-			if not button_mesh:
-				button_mesh = button.get_node("Sprite3D")
-				
-			if button_mesh:
-				print("Found button visual node")
-				buttons[button_name] = button_mesh
-				button_original_positions[button_name] = button_mesh.position
-				
-				# Get mesh size for collision shape
-				var mesh_aabb = button_mesh.get_aabb()
-				print("Button mesh AABB size: " + str(mesh_aabb.size))
-				
-				# Setup collision
-				var collision = button.get_node("CollisionShape3D")
-				if collision:
-					print("Setting up collision")
-					collision.disabled = false
-					button.collision_layer = 1
-					button.collision_mask = 1
-					
-					# Adjust collision shape if needed
-					var shape = collision.shape
-					if shape:
-						if shape is BoxShape3D and mesh_aabb.size.y > shape.size.y:
-							shape.size.y = mesh_aabb.size.y
-						elif shape is CylinderShape3D and mesh_aabb.size.y > shape.height:
-							shape.height = mesh_aabb.size.y
-			else:
-				print("ERROR: No ButtonMesh found for " + button_name)
-	else:
-		print("ERROR: Missing required button nodes")
-
-func press_button(button_name: String, controller: String):
-	print("\nButton Press Handler:")
-	print("Button: " + button_name + " | Controller: " + controller)
-	
-	if button_name in buttons:
-		print("Valid button found: " + button_name)
-		
-		# Start button press animation
-		active_buttons[button_name] = {
-			"timer": 0.0,
-			"pressing": true,
-			"controller": controller
-		}
-		print("Started button animation")
-		
-		# Apply haptic feedback
-		if controller == "right" and right_controller:
-			print("Right controller haptic")
-			right_controller.trigger_haptic_pulse("haptic", 0.8, 0.15, 0.7, 0.0)
-		elif controller == "left" and left_controller:
-			print("Left controller haptic")
-			left_controller.trigger_haptic_pulse("haptic", 0.8, 0.15, 0.7, 0.0)
-		
-		# Handle button actions
-		if button_name == "ShopButton":
-			print("Shop button pressed - Opening shop")
-			is_changing_scene = true
-			get_tree().change_scene_to_file("res://shop1.tscn")
-		elif button_name == "StartButton":
-			print("Start button pressed - Starting voyage")
-			_on_voyage_selected(current_campaign)
-		elif button_name == "ExitButton":
-			print("Exit button pressed - Forcing quit")
-			OS.kill(OS.get_process_id())
-		else:
-			print("ERROR: Unknown button: " + button_name)
-	else:
-		print("ERROR: Invalid button name: " + button_name)
-
-func update_button_animations(delta):
-	var buttons_to_remove = []
-	for button_name in active_buttons.keys():
-		var button_info = active_buttons[button_name]
-		button_info.timer += delta
-		
-		if button_info.timer <= button_press_duration:
-			var t = button_info.timer / button_press_duration
-			var button_mesh = buttons[button_name]
-			var original_pos = button_original_positions[button_name]
-			
-			if button_info.pressing:
-				var target_pos = original_pos - Vector3(0, button_press_distance, 0)
-				button_mesh.position = original_pos.lerp(target_pos, t)
-			else:
-				var current_pos = button_mesh.position
-				var target_pos = original_pos
-				button_mesh.position = current_pos.lerp(target_pos, t)
-		else:
-			if not button_info.pressing:
-				buttons_to_remove.append(button_name)
-				buttons[button_name].position = button_original_positions[button_name]
-			else:
-				button_info.pressing = false
-				button_info.timer = 0
-	
-	for button_name in buttons_to_remove:
-		active_buttons.erase(button_name)
-
-func setup_vr_environment() -> void:
-	print("\n=== Setting up VR Environment ===")
-	var xr_interface = XRServer.find_interface("OpenXR")
-	if xr_interface:
-		print("Found OpenXR interface, initializing...")
-		xr_interface.initialize()
-		get_viewport().use_xr = true
-		_vr_setup_complete = true
-		
-		var origin = $XROrigin3D if has_node("XROrigin3D") else null
-		if origin:
-			print("Found XR Origin, setting position: " + str(vr_position))
-			origin.position = vr_position
-			if origin.has_node("XRCamera3D"):
-				var camera = origin.get_node("XRCamera3D")
-				print("Setting camera height: " + str(vr_camera_height))
-				camera.position.y = vr_camera_height
-				camera.look_at(vr_look_at)
-			else:
-				print("ERROR: XRCamera3D not found!")
-		else:
-			print("ERROR: XROrigin3D not found!")
-	else:
-		print("ERROR: OpenXR interface not found!")
+			press_button(collider.name, "left")
 
 func _on_voyage_selected(voyage_num: int) -> void:
 	if is_changing_scene:
 		print("Scene already changing, ignoring selection")
 		return
-		
+	
 	print("\n=== Starting Voyage " + str(voyage_num) + " ===")
 	is_changing_scene = true
 	
@@ -476,103 +203,241 @@ func _on_voyage_selected(voyage_num: int) -> void:
 	print("Loading voyage settings:")
 	print("Name: " + voyage["name"])
 	print("Difficulty: " + voyage["difficulty"])
-	print("Enemy Spawn Rate: " + str(voyage["enemy_spawn_rate"]))
-	print("Enemy Speed: " + str(voyage["enemy_speed"]))
-	print("Enemy Health: " + str(voyage["enemy_health"]))
 	
 	# Configure game settings
+	print("Setting voyage with difficulty: ", voyage["difficulty"])
 	GameManager.set_voyage(voyage_num, voyage["difficulty"])
-	GameManager.enemy_spawn_rate = voyage["enemy_spawn_rate"]
-	GameManager.enemy_speed = voyage["enemy_speed"]
-	GameManager.enemy_health = voyage["enemy_health"]
 	
 	print("Starting campaign...")
 	GameManager.start_campaign()
 
-func update_indicators() -> void:
-	print("\n=== Updating Campaign Indicators ===")
-	if difficulty_sprite and flag_sprite:
-		# Calculate frame sizes
-		var difficulty_texture = difficulty_sprite.texture
-		var difficulty_frame_width = difficulty_texture.get_width() / 5
-		var difficulty_frame_height = difficulty_texture.get_height()
-		print("Difficulty frame size: " + str(difficulty_frame_width) + "x" + str(difficulty_frame_height))
+func update_laser_pointers():
+	update_laser(right_ray, right_laser_dot, "right")
+	update_laser(left_ray, left_laser_dot, "left")
+
+func update_laser(ray: RayCast3D, laser_dot: MeshInstance3D, side: String):
+	if not (ray and laser_dot):
+		return
+	
+	var laser = get_node("XROrigin3D/XRController3D" + side.capitalize() + "/LaserBeam" + side.capitalize())
+	if laser and laser.material_override:
+		var material = laser.material_override
+		if ray.is_colliding():
+			var collision_point = ray.get_collision_point()
+			var collider = ray.get_collider()
+			
+			laser_dot.global_position = collision_point
+			laser_dot.visible = true
+			
+			material.albedo_color = hover_ray_color if collider and collider.is_in_group("button") else normal_ray_color
+			material.emission = material.albedo_color
+		else:
+			material.albedo_color = normal_ray_color
+			material.emission = normal_ray_color
+			laser_dot.visible = false
+
+func update_button_hover_states():
+	hovering_buttons.clear()
+	
+	check_ray_hover(right_ray, "right")
+	check_ray_hover(left_ray, "left")
+
+func check_ray_hover(ray: RayCast3D, side: String):
+	if ray and ray.is_colliding():
+		var collider = ray.get_collider()
+		if collider and collider.is_in_group("button"):
+			hovering_buttons[collider.name] = side
+
+func setup_interactive_buttons():
+	print("\n=== Setting up Interactive Buttons ===")
+	
+	# Disable clickable area collision if it exists
+	var clickable_area = $MapDisplay/ClickableArea if has_node("MapDisplay/ClickableArea") else null
+	if clickable_area and clickable_area.has_node("CollisionShape3D"):
+		clickable_area.get_node("CollisionShape3D").disabled = true
+	
+	if shop_button and start_button and exit_button:
+		var button_nodes = {
+			"ShopButton": shop_button,
+			"StartButton": start_button,
+			"ExitButton": exit_button
+		}
 		
-		var flag_texture = flag_sprite.texture
-		var flag_frame_width = flag_texture.get_width() / 5
-		var flag_frame_height = flag_texture.get_height()
-		print("Flag frame size: " + str(flag_frame_width) + "x" + str(flag_frame_height))
+		for button_name in button_nodes:
+			setup_button(button_nodes[button_name], button_name)
+
+func setup_button(button: Node3D, button_name: String):
+	if not button.is_in_group("button"):
+		button.add_to_group("button")
+	
+	var button_mesh = button.get_node("ButtonMesh")
+	if not button_mesh:
+		button_mesh = button.get_node("Sprite3D")
+	
+	if button_mesh:
+		buttons[button_name] = button_mesh
+		button_original_positions[button_name] = button_mesh.position
 		
-		# Update indicators
-		difficulty_sprite.region_enabled = true
-		difficulty_sprite.region_rect = Rect2(
-			(current_campaign - 1) * difficulty_frame_width,
-			0,
-			difficulty_frame_width,
-			difficulty_frame_height
-		)
-		print("Set difficulty region: " + str(difficulty_sprite.region_rect))
+		var collision = button.get_node("CollisionShape3D")
+		if collision:
+			collision.disabled = false
+			button.collision_layer = 1
+			button.collision_mask = 1
+
+func press_button(button_name: String, controller: String):
+	if not button_name in buttons:
+		return
+	
+	active_buttons[button_name] = {
+		"timer": 0.0,
+		"pressing": true,
+		"controller": controller
+	}
+	
+	# Apply haptic feedback
+	var controller_node = get_node("XROrigin3D/XRController3D" + controller.capitalize())
+	if controller_node:
+		controller_node.trigger_haptic_pulse("haptic", 0.8, 0.15, 0.7, 0.0)
+	
+	# Handle button actions
+	match button_name:
+		"ShopButton":
+			is_changing_scene = true
+			get_tree().change_scene_to_file("res://shop1.tscn")
+		"StartButton":
+			_on_voyage_selected(current_campaign)
+		"ExitButton":
+			OS.kill(OS.get_process_id())
+
+func update_button_animations(delta: float):
+	var buttons_to_remove = []
+	
+	for button_name in active_buttons:
+		var button_info = active_buttons[button_name]
+		button_info.timer += delta
 		
-		flag_sprite.region_enabled = true
-		flag_sprite.region_rect = Rect2(
-			(current_campaign - 1) * flag_frame_width,
-			0,
-			flag_frame_width,
-			flag_frame_height
-		)
-		print("Set flag region: " + str(flag_sprite.region_rect))
+		if button_info.timer <= button_press_duration:
+			animate_button(button_name, button_info)
+		else:
+			if not button_info.pressing:
+				buttons_to_remove.append(button_name)
+				reset_button_position(button_name)
+			else:
+				button_info.pressing = false
+				button_info.timer = 0
+	
+	for button_name in buttons_to_remove:
+		active_buttons.erase(button_name)
+
+func animate_button(button_name: String, button_info: Dictionary):
+	var t = button_info.timer / button_press_duration
+	var button_mesh = buttons[button_name]
+	var original_pos = button_original_positions[button_name]
+	
+	if button_info.pressing:
+		var target_pos = original_pos - Vector3(0, button_press_distance, 0)
+		button_mesh.position = original_pos.lerp(target_pos, t)
 	else:
-		print("ERROR: Missing sprite references!")
-		if not difficulty_sprite:
-			print("Difficulty sprite not found!")
-		if not flag_sprite:
-			print("Flag sprite not found!")
+		var current_pos = button_mesh.position
+		button_mesh.position = current_pos.lerp(original_pos, t)
+
+func reset_button_position(button_name: String):
+	buttons[button_name].position = button_original_positions[button_name]
+
+func setup_vr_environment() -> void:
+	print("\n=== Setting up VR Environment ===")
+	var xr_interface = XRServer.find_interface("OpenXR")
+	if xr_interface:
+		xr_interface.initialize()
+		get_viewport().use_xr = true
+		_vr_setup_complete = true
+		
+		var origin = $XROrigin3D
+		if origin:
+			origin.position = vr_position
+			var camera = origin.get_node("XRCamera3D")
+			if camera:
+				camera.position.y = vr_camera_height
+				camera.look_at(vr_look_at)
+
+func update_indicators() -> void:
+	if not (difficulty_sprite and flag_sprite):
+		return
+	
+	var difficulty_texture = difficulty_sprite.texture
+	var difficulty_frame_width = difficulty_texture.get_width() / 5
+	
+	var flag_texture = flag_sprite.texture
+	var flag_frame_width = flag_texture.get_width() / 5
+	
+	update_sprite_region(difficulty_sprite, difficulty_frame_width)
+	update_sprite_region(flag_sprite, flag_frame_width)
+
+func update_sprite_region(sprite: Sprite3D, frame_width: float):
+	sprite.region_enabled = true
+	sprite.region_rect = Rect2(
+		(current_campaign - 1) * frame_width,
+		0,
+		frame_width,
+		sprite.texture.get_height()
+	)
 
 func set_campaign(campaign_num: int) -> void:
 	if campaign_num < 1 or campaign_num > 5:
-		print("ERROR: Invalid campaign number: " + str(campaign_num))
 		return
-		
-	print("\n=== Switching to Campaign " + str(campaign_num) + " ===")
-	current_campaign = campaign_num
 	
-	# Update visuals
+	current_campaign = campaign_num
 	update_campaign_map()
 	update_indicators()
 
 func update_campaign_map() -> void:
-	print("\n=== Updating Campaign Map ===")
-	if current_campaign in campaign_sprites:
-		var sprite_node = $MapDisplay/AnimatedSprite3D
-		if sprite_node:
-			var texture = campaign_sprites[current_campaign]
-			print("Loading campaign " + str(current_campaign) + " texture")
-			
-			# Set up animation frames
-			var frames = SpriteFrames.new()
-			frames.remove_animation("default")
-			frames.add_animation("default")
-			frames.set_animation_loop("default", true)
-			frames.set_animation_speed("default", 5.0)
-			
-			# Calculate frame dimensions
-			var frame_width = texture.get_width() / 6  # 6 frames per animation
-			var frame_height = texture.get_height()
-			print("Frame size: " + str(frame_width) + "x" + str(frame_height))
-			
-			# Add frames to animation
-			for i in range(6):
-				var atlas = AtlasTexture.new()
-				atlas.atlas = texture
-				atlas.region = Rect2(i * frame_width, 0, frame_width, frame_height)
-				frames.add_frame("default", atlas)
-				print("Added frame " + str(i + 1))
-				
-			# Update and play animation
-			sprite_node.sprite_frames = frames
-			sprite_node.play()
-			print("Started map animation")
-		else:
-			print("ERROR: AnimatedSprite3D not found in MapDisplay!")
-	else:
-		print("ERROR: Campaign " + str(current_campaign) + " sprite not found!")
+	if not current_campaign in campaign_sprites:
+		return
+	
+	var sprite_node = $MapDisplay/AnimatedSprite3D
+	if not sprite_node:
+		return
+	
+	var texture = campaign_sprites[current_campaign]
+	var frames = create_sprite_frames(texture)
+	
+	sprite_node.sprite_frames = frames
+	sprite_node.play()
+
+func create_sprite_frames(texture: Texture2D) -> SpriteFrames:
+	var frames = SpriteFrames.new()
+	frames.remove_animation("default")
+	frames.add_animation("default")
+	frames.set_animation_loop("default", true)
+	frames.set_animation_speed("default", 5.0)
+	
+	var frame_width = texture.get_width() / 6
+	
+	for i in range(6):
+		var atlas = AtlasTexture.new()
+		atlas.atlas = texture
+		atlas.region = Rect2(i * frame_width, 0, frame_width, texture.get_height())
+		frames.add_frame("default", atlas)
+	
+	return frames
+
+func _process(delta: float) -> void:
+	debug_timer += delta
+	update_laser_pointers()
+	update_button_hover_states()
+	update_button_animations(delta)
+	
+	if debug_timer >= debug_update_interval:
+		debug_timer = 0.0
+		debug_update()
+
+func debug_update():
+	if right_ray and right_ray.is_colliding():
+		var collider = right_ray.get_collider()
+		if collider:
+			print("Right ray hit: " + collider.name)
+	
+	if left_ray and left_ray.is_colliding():
+		var collider = left_ray.get_collider()
+		if collider:
+			print("Left ray hit: " + collider.name)

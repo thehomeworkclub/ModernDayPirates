@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dudcx0yfktgrl"]
 
 [ext_resource type="Script" path="res://HealthViewport.gd" id="1_7riqh"]
-[ext_resource type="Texture2D" path="res://art/fullheart.png" id="2_a52y4"]
+[ext_resource type="Texture2D" uid="uid://qo3uqinr3h5t" path="res://art/fullheart.png" id="2_a52y4"]
 
 [node name="HealthViewport" type="SubViewport"]
 disable_3d = true

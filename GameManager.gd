@@ -1,503 +1,318 @@
 extends Node
 
-signal wave_started
-signal wave_completed
-signal round_completed
-signal game_ready
-signal campaign_completed
-signal enemies_changed(count: int)
 signal vr_mode_changed(enabled: bool)
+signal equipment_changed(equipment_type: String, new_value: String)
+signal gun_registered(gun_node: Node)
+signal gun_unregistered(gun_node: Node)
+signal wave_completed
+signal enemies_changed(count: int)
 
-# Flag to track which ship is currently the assigned bomber
-var current_bomber_id: int = -1
-
-# Basic wave configuration
-@export var difficulty: String = "Easy"
-var current_wave: int = 1
-var current_round: int = 1
-var total_rounds: int = 3
-var waves_per_round: int = 3
-
-# Wave metrics
-var enemies_per_wave_base: int = 8      # Base number of enemies per wave
-var enemies_per_wave_max: int = 20      # Maximum enemies per wave
-var enemies_per_wave: int = 8           # Actual enemies for current wave
-var wave_difficulty_multiplier: float = 1.0  # Multiplier for wave difficulty
-var spawn_interval_multiplier: float = 1.0   # Multiplier for enemy spawn intervals
-var current_enemies_count: int = 0
-var enemies_spawned_in_wave: int = 0    # How many enemies have been spawned in current wave
-var wave_in_progress: bool = false
-var next_enemy_id: int = 0     # Used to give each enemy a unique ID
-
-# Time metrics
-var wave_start_time: float = 0.0
-var wave_target_time: float = 45.0  # Time to complete wave for max gold
-var wave_target_time_multiplier: float = 1.2  # Increases target time for each wave
-
-# Campaign/voyage properties
-var current_voyage: int = 1
-var voyage_name: String = "Calm Waters"
-
-# Difficulty adjustments - these are modified in set_difficulty()
-var enemy_spawn_rate: float = 4.0  # seconds
-var enemy_speed: float = 1.0       # multiplier 
-var enemy_health: float = 1.0      # multiplier
-
-# Game state
+# Wave management
 var game_started: bool = false
-var shop_open: bool = false
-var wave_complete_check_pending: bool = false  # NEW: Track pending completion checks
-var vr_mode_enabled: bool = false  # For VR mode tracking
+var enemies_per_wave: int = 5
+var enemy_spawn_rate: float = 1.0
+var wave_difficulty_multiplier: float = 1.0
+var enemy_speed: float = 1.0
+var enemy_health: float = 1.0
+var enemies_spawned_in_wave: int = 0
+var current_enemies_count: int = 0
 
-# Player upgrades
-var gun_type: String = "standard"  # standard, double, spread, etc.
-var damage_bonus: float = 0.0      # Percentage bonus to damage
-var health_regen: float = 2.0      # Health regenerated per wave completion
-var max_health_bonus: float = 0.0  # Bonus to max health
-var coin_bonus: float = 0.0        # Bonus to coin collection
+# Game state tracking
+var current_voyage_num = 0
+var current_voyage_difficulty = 0
 
-# Game references
-var player = null
+# Player equipment and stats
+var gun_type = "basic"  # Default gun type
+var player_health = 100
+var player_damage_multiplier = 1.0
+var player_speed = 1.0
+
+# Scene references
 var player_boat = null
+var player = null
 var enemy_spawner = null
+var vr_mode_enabled = false
 
-# Don't preload the scene - we'll load it at runtime instead
-var main_scene_packed = null  # Will be loaded when needed
+# Gun registration and management
+var registered_guns = []
+
+# Valid equipment types
+const VALID_GUN_TYPES = ["basic", "medium", "heavy"]
+
+# Convert difficulty strings to numerical values
+const DIFFICULTY_VALUES = {
+	"Easy": 1,
+	"Normal": 2,
+	"Hard": 3,
+	"Very Hard": 4,
+	"Extreme": 5
+}
 
 func _ready() -> void:
-	# Initialize bomber tracker
-	current_bomber_id = -1
-	
-	# Get current scene name
-	var current_scene_name = get_tree().current_scene.name if get_tree().current_scene else ""
-	print("Current scene: " + current_scene_name)
-	
-	# If game hasn't been started from campaign menu, show it
-	if not game_started and current_scene_name != "CampaignMenu" and current_scene_name != "Node3D" and current_scene_name != "3DCampaignMenu" and current_scene_name != "ShopScene":
-		call_deferred("show_campaign_menu")
-	
-	# Set up the main game scene if needed
-	if current_scene_name == "Node3D":
-		# Always use VR mode - no dialog
-		vr_mode_enabled = true
-		emit_signal("vr_mode_changed", true)
-		
-		# Wait a moment to ensure player is fully initialized first
-		await get_tree().create_timer(0.1).timeout
-		call_deferred("setup_game_scene")
+	print("Initializing GameManager...")
+	initialize_game_state()
 
-func _process(_delta: float) -> void:
-	# Check if we need to verify wave completion (with safety check)
-	if wave_complete_check_pending and wave_in_progress:
-		wave_complete_check_pending = false
-		check_wave_completion()
+func update_enemy_count(count: int) -> void:
+    if current_enemies_count != count:
+        current_enemies_count = count
+        emit_signal("enemies_changed", current_enemies_count)
 
-func setup_game_scene() -> void:
-	print("Setting up game scene components")
+func complete_wave() -> void:
+    print("Wave completed")
+    current_enemies_count = 0
+    emit_signal("enemies_changed", current_enemies_count)
+    emit_signal("wave_completed")
+
+func initialize_game_state() -> void:
+    # Reset wave-related variables
+    enemies_spawned_in_wave = 0
+    current_enemies_count = 0
+    emit_signal("enemies_changed", current_enemies_count)
+    wave_difficulty_multiplier = 1.0 + (current_voyage_difficulty * 0.2)
+    enemy_spawn_rate = 1.0 + (current_voyage_difficulty * 0.1)
+    enemy_speed = 1.0 + (current_voyage_difficulty * 0.15)
+    enemy_health = 1.0 + (current_voyage_difficulty * 0.2)
+    enemies_per_wave = 5 + (2 * current_voyage_difficulty)
+	print("Setting up initial game state")
+	verify_equipment()
 	
-	# Try to find and initialize key game components
-	player_boat = get_tree().get_first_node_in_group("player_boat")
-	if player_boat:
-		print("Found player boat: ", player_boat.name)
-	else:
-		print("WARNING: No player boat found in the scene! Will search again after scene is fully loaded")
-		# Schedule a retry after a short delay to give scene time to initialize
-		get_tree().create_timer(0.5).timeout.connect(_retry_find_components)
-	
-	# Find and assign the player node
-	player = get_tree().get_first_node_in_group("player")
+	# Find player and initialize equipment
+	player = get_tree().get_first_node_in_group("Player")
 	if player:
-		print("Found player: ", player.name)
+		print("Found player node")
+		# Check for guns in player's equipment
+		var gun_pivot = player.get_node_or_null("Head/GunPivot/Gun")
+		if gun_pivot:
+			print("Found gun in player's equipment")
+			register_gun(gun_pivot)
 	else:
-		print("WARNING: No player found in the scene! Will retry later")
-	
-	# Find and assign the enemy spawner
-	enemy_spawner = get_tree().get_first_node_in_group("enemy_spawner")
-	if enemy_spawner:
-		print("Found enemy spawner: ", enemy_spawner.name)
+		print("WARNING: Player node not found")
+
+	# Look for any guns in the scene
+	print("Looking for guns to register...")
+	var guns = get_tree().get_nodes_in_group("gun")
+	for gun in guns:
+		register_gun(gun)
+
+	if registered_guns.size() > 0:
+		print("Total guns registered: ", registered_guns.size())
 	else:
-		print("WARNING: No enemy spawner found in the scene! Will retry later")
-	
-	# Create the ship positioner if it doesn't exist
-	if get_tree().current_scene and not get_tree().current_scene.has_node("ShipPositioner"):
-		create_ship_positioner()
-	
-	# Reset bomber system when game scene is set up
-	reset_bomber_system()
-	
-	# Set initial game state
-	wave_in_progress = false
-	
-	# Apply any modifiers from the selected voyage
-	update_modifiers()
-	
-	print("Game scene setup complete!")
-	
-	# We'll setup the wave after we retry finding components
-	call_deferred("_check_can_start_wave")
-	
-	# Emit signal to notify that game is ready
-	emit_signal("game_ready")
+		print("WARNING: No guns found in scene")
 
-func _retry_find_components() -> void:
-	print("Retrying to find game components...")
-	
-	# Find player boat if not already found
-	if not player_boat:
-		player_boat = get_tree().get_first_node_in_group("player_boat")
-		if not player_boat:
-			player_boat = get_tree().get_first_node_in_group("PlayerBoat")
-	
-	# Find player if not already found
-	if not player:
-		player = get_tree().get_first_node_in_group("player")
-		if not player:
-			player = get_tree().get_first_node_in_group("Player")
-	
-	# Find enemy spawner if not already found
-	if not enemy_spawner:
-		enemy_spawner = get_tree().get_first_node_in_group("enemy_spawner")
-		if not enemy_spawner:
-			enemy_spawner = get_tree().get_first_node_in_group("EnemySpawner")
-			if not enemy_spawner:
-				enemy_spawner = get_tree().current_scene.find_child("EnemySpawner", true, false)
-	
-	# Now check if we can start the wave
-	_check_can_start_wave()
-
-func _check_can_start_wave() -> void:
-	print("Checking if wave can be started...")
-	if enemy_spawner:
-		print("Enemy spawner found, setting up wave")
-		call_deferred("setup_wave")
+func verify_equipment() -> void:
+	if gun_type == "":
+		gun_type = "basic"
+		print("No gun type set, defaulting to: basic")
 	else:
-		print("Cannot setup wave yet - enemy spawner not found")
-		# Schedule another retry
-		get_tree().create_timer(1.0).timeout.connect(_retry_find_components)
+		print("Current gun type: ", gun_type)
 
-func update_modifiers() -> void:
-	print("Applying game modifiers (difficulty: %s)" % difficulty)
-	
-	# Set wave difficulty multiplier based on selected difficulty
-	match difficulty.to_lower():
-		"easy":
-			wave_difficulty_multiplier = 0.7
-			spawn_interval_multiplier = 1.5
-		"medium", "normal":
-			wave_difficulty_multiplier = 1.0
-			spawn_interval_multiplier = 1.0
-		"hard":
-			wave_difficulty_multiplier = 1.5
-			spawn_interval_multiplier = 0.7
-		_:
-			wave_difficulty_multiplier = 1.0
-			spawn_interval_multiplier = 1.0
-	
-	print("Wave difficulty multiplier: %f" % wave_difficulty_multiplier)
-	print("Spawn interval multiplier: %f" % spawn_interval_multiplier)
+func is_valid_gun(gun_node: Node) -> bool:
+	if not is_instance_valid(gun_node):
+		print("Gun node is invalid")
+		return false
+	if not gun_node.has_method("set_gun_type"):
+		print("Gun node missing set_gun_type method: ", gun_node.name)
+		return false
+	return true
 
-func create_ship_positioner() -> void:
-	# Check if a TargetPlane already exists in the scene
-	var target_plane = get_tree().current_scene.get_node_or_null("TargetPlane")
-	
-	# If no TargetPlane exists, create one from the packed scene
-	if not target_plane:
-		var target_plane_scene = load("res://TargetPlane.tscn")
-		if target_plane_scene:
-			target_plane = target_plane_scene.instantiate()
-			
-			# Position it in front of the player's boat
-			var boats = get_tree().get_nodes_in_group("Player")
-			if boats.size() > 0:
-				var player_boat = boats[0]
-				if player_boat.global_position == Vector3.ZERO:
-					var player_node = get_tree().current_scene.get_node_or_null("Player")
-					if player_node:
-						target_plane.global_position = Vector3(0, 0.1, player_node.transform.origin.z + 20.0)
-					else:
-						target_plane.global_position = Vector3(0, 0.1, -10.0)
-				else:
-					target_plane.global_position = Vector3(0, 0.1, player_boat.global_position.z + 20.0)
-			
-			# Add to scene and hide
-			get_tree().current_scene.add_child(target_plane)
-			target_plane.visible = false
-	
-	# Create the ship positioner
-	var positioner_script = load("res://ShipPositioner.gd")
-	var positioner = Node3D.new()
-	positioner.name = "ShipPositioner"
-	
-	if positioner_script:
-		positioner.set_script(positioner_script)
-		get_tree().current_scene.add_child(positioner)
-		print("DEBUG: Created ship positioner")
-	else:
-		print("ERROR: Could not load ShipPositioner.gd script")
+func set_gun_type(type: String) -> void:
+	if not type in VALID_GUN_TYPES:
+		print("ERROR: Invalid gun type: ", type)
+		return
+		
+	if gun_type != type:
+		gun_type = type
+		emit_signal("equipment_changed", "gun", type)
+		print("Changed gun type to: ", type)
+		update_all_guns()
+		
+func get_gun_type() -> String:
+	return gun_type
 
-func set_difficulty(d: String) -> void:
-	difficulty = d
-	
-	# Adjust parameters based on difficulty
-	match d:
-		"Easy":
-			total_rounds = 1
-			waves_per_round = 3
-			enemies_per_wave_base = 3
-			wave_target_time = 45.0
-			enemy_spawn_rate = 5.0
-			enemy_speed = 0.8
-			enemy_health = 0.8
-		"Normal":
-			total_rounds = 1
-			waves_per_round = 3
-			enemies_per_wave_base = 12
-			wave_target_time = 55.0
-			enemy_spawn_rate = 4.0
-			enemy_speed = 1.0
-			enemy_health = 1.0
-		"Hard":
-			total_rounds = 2
-			waves_per_round = 3
-			enemies_per_wave_base = 15
-			wave_target_time = 75.0
-			enemy_spawn_rate = 3.5
-			enemy_speed = 1.2
-			enemy_health = 1.2
-		"Very Hard":
-			total_rounds = 2
-			waves_per_round = 3
-			enemies_per_wave_base = 17
-			wave_target_time = 90.0
-			enemy_spawn_rate = 3.0
-			enemy_speed = 1.4
-			enemy_health = 1.5
-		"Extreme":
-			total_rounds = 3
-			waves_per_round = 3
-			enemies_per_wave_base = 20
-			wave_target_time = 120.0
-			enemy_spawn_rate = 2.5
-			enemy_speed = 1.6
-			enemy_health = 2.0
-	
-	# Calculate enemies per wave based on difficulty
-	calculate_enemies_per_wave()
+func register_gun(gun_node: Node) -> void:
+	if not is_valid_gun(gun_node):
+		return
+		
+	if not gun_node in registered_guns:
+		print("Registering new gun: ", gun_node.name)
+		registered_guns.append(gun_node)
+		initialize_gun(gun_node)
+		emit_signal("gun_registered", gun_node)
+		
+		# Connect to tree_exited to handle cleanup
+		if not gun_node.tree_exiting.is_connected(unregister_gun):
+			gun_node.tree_exiting.connect(func(): unregister_gun(gun_node))
 
-func calculate_enemies_per_wave() -> void:
-	var difficulty_factor = 0.0
-	
-	match difficulty:
-		"Easy": difficulty_factor = 0.0
-		"Normal": difficulty_factor = 0.25
-		"Hard": difficulty_factor = 0.5
-		"Very Hard": difficulty_factor = 0.75
-		"Extreme": difficulty_factor = 1.0
-	
-	# Calculate enemies per wave based on progress and difficulty
-	var base = enemies_per_wave_base
-	var max_enemies = enemies_per_wave_max
-	var progress_factor = (current_round - 1) * waves_per_round + (current_wave - 1)
-	var total_waves = total_rounds * waves_per_round
-	var progress_scale = float(progress_factor) / total_waves
-	
-	# Ensure we're getting 10-20 enemies per wave
-	enemies_per_wave = int(base + (max_enemies - base) * (progress_scale + difficulty_factor))
-	enemies_per_wave = max(10, min(enemies_per_wave, 20))
-	
-	# Calculate wave difficulty multiplier
-	wave_difficulty_multiplier = 1.0 + (0.05 * progress_factor)
+func unregister_gun(gun_node: Node) -> void:
+	if gun_node in registered_guns:
+		print("Unregistering gun: ", gun_node.name)
+		registered_guns.erase(gun_node)
+		emit_signal("gun_unregistered", gun_node)
 
-func set_voyage(voyage_num: int, diff: String) -> void:
-	current_voyage = voyage_num
-	set_difficulty(diff)
-	
-	# Set voyage name
-	match voyage_num:
-		1: voyage_name = "Calm Waters"
-		2: voyage_name = "Rough Seas"
-		3: voyage_name = "Storm Warning"
-		4: voyage_name = "Hurricane"
-		5: voyage_name = "Maelstrom"
-		_: voyage_name = "Custom Voyage"
+func initialize_gun(gun_node: Node) -> void:
+	if gun_node:
+		print("Initializing gun node with type: ", gun_type)
+		if gun_node.has_method("set_gun_type"):
+			gun_node.set_gun_type(gun_type)
+			if not gun_node.is_in_group("gun"):
+				gun_node.add_to_group("gun")
+		else:
+			print("ERROR: Gun node does not have set_gun_type method")
+
+func update_all_guns() -> void:
+	print("Updating all registered guns to type: ", gun_type)
+	for gun in registered_guns:
+		if is_instance_valid(gun):
+			initialize_gun(gun)
+		else:
+			registered_guns.erase(gun)
+
+func set_voyage(voyage_num: int, difficulty: String) -> void:
+	current_voyage_num = voyage_num
+	current_voyage_difficulty = DIFFICULTY_VALUES.get(difficulty, 1)  # Default to Easy (1) if string not found
+	print("Set voyage: ", voyage_num, " with difficulty: ", difficulty, " (Level ", current_voyage_difficulty, ")")
 
 func start_campaign() -> void:
-	print("GameManager: Starting campaign")
-	
-	# Reset game state
-	current_round = 1
-	current_wave = 1
-	game_started = true
-	wave_in_progress = false
-	
-	# Reset enemy tracking
-	enemies_per_wave = calculate_enemies_for_wave()
-	current_enemies_count = 0
-	next_enemy_id = 0
-	
-	# Handle scene transition
-	var current_scene_name = get_tree().current_scene.name
-	if current_scene_name == "3DCampaignMenu" or current_scene_name == "CampaignMenu":
-		call_deferred("_load_main_scene_directly")
+	print("Starting campaign voyage: ", current_voyage_num, " difficulty: ", current_voyage_difficulty)
+	_load_main_scene_directly()
+
+func setup_game_scene():
+	print("Setting up game scene for voyage ", current_voyage_num, " with difficulty ", current_voyage_difficulty)
+
+	# Configure enemy spawner with difficulty settings
+	if enemy_spawner:
+		# Adjust spawn rates and enemy attributes based on difficulty
+		enemy_spawner.base_spawn_interval = 5.0 / (1 + current_voyage_difficulty * 0.2)
+		print("Enemy spawn interval set to: ", enemy_spawner.base_spawn_interval)
+
+	# Scale player boat stats based on upgrades/progression
+	if player_boat:
+		print("Player boat configured for voyage ", current_voyage_num)
+
+	print("Game scene setup complete")
+
+func setup_wave():
+	print("Setting up wave with difficulty level: ", current_voyage_difficulty)
+
+	if enemy_spawner:
+		# Start enemy spawning
+		enemy_spawner.active = true
+
+		# Configure wave parameters based on difficulty
+		var wave_enemies = 5 + (current_voyage_difficulty * 2)  # More enemies at higher difficulties
+		enemy_spawner.enemies_per_wave = wave_enemies
+
+		# Scale enemy health/damage with difficulty
+		enemy_spawner.enemy_health_multiplier = 1.0 + (current_voyage_difficulty * 0.1)
+		enemy_spawner.enemy_damage_multiplier = 1.0 + (current_voyage_difficulty * 0.15)
+
+		print("Wave configured with:")
+		print("- Enemies per wave: ", wave_enemies)
+		print("- Enemy health multiplier: ", enemy_spawner.enemy_health_multiplier)
+		print("- Enemy damage multiplier: ", enemy_spawner.enemy_damage_multiplier)
 	else:
-		setup_wave()
+		print("ERROR: Cannot setup wave - enemy spawner not found!")
 
 func _load_main_scene_directly() -> void:
 	print("LOADING MAIN SCENE DIRECTLY")
-	
-	# Ensure XR is still enabled
+	registered_guns.clear()  # Clear any existing registrations
+	initialize_game_state()  # Ensure equipment is properly initialized
+
+	# Store XR state before scene change
 	var xr_interface = XRServer.find_interface("OpenXR")
+	var was_vr_enabled = false
 	if xr_interface and xr_interface.is_initialized():
-		get_viewport().use_xr = true
-		vr_mode_enabled = true
-		emit_signal("vr_mode_changed", true)
-	
+		was_vr_enabled = true
+		print("Storing VR state before scene change")
+
 	# Change scene
+	print("Changing to Main scene...")
 	var err = get_tree().change_scene_to_file("res://Main.tscn")
 	if err == OK:
-		# Wait for scene to load
-		await get_tree().create_timer(0.5).timeout
-		
-		# Re-enable VR and setup game
-		if xr_interface and xr_interface.is_initialized():
+		print("Main scene loaded, waiting for initialization...")
+		# Wait longer for scene to be fully ready
+		await get_tree().process_frame
+		await get_tree().create_timer(1.0).timeout
+
+		print("Re-enabling VR...")
+		# Re-enable VR if it was enabled
+		if was_vr_enabled and xr_interface and xr_interface.is_initialized():
 			get_viewport().use_xr = true
 			vr_mode_enabled = true
 			emit_signal("vr_mode_changed", true)
-		
-		setup_game_scene()
-		setup_wave()
+			print("VR mode re-enabled")
 
-func start_wave() -> void:
-	# Calculate wave parameters
-	calculate_enemies_per_wave()
-	current_enemies_count = 0
-	enemies_spawned_in_wave = 0
-	
-	# Reset bomber system
-	reset_bomber_system()
-	
-	# Set wave state
-	wave_in_progress = true
-	wave_complete_check_pending = false
-	wave_start_time = Time.get_unix_time_from_system()
-	
-	print("Starting wave %d of round %d with %d enemies" % [current_wave, current_round, enemies_per_wave])
-	
-	# Start spawning
-	var spawners = get_tree().get_nodes_in_group("EnemySpawner")
-	if spawners.size() > 0:
-		spawners[0].start_wave_spawning()
+		# Wait for XR to initialize
+		await get_tree().create_timer(0.5).timeout
 
-func check_wave_completion() -> void:
-	var spawners = get_tree().get_nodes_in_group("enemy_spawner")
-	if spawners.size() > 0:
-		spawners[0].check_wave_completion()
+		# Find and position VR origin
+		var xr_origin = get_tree().get_first_node_in_group("Player")
+		if xr_origin:
+			print("Found XR Origin, positioning...")
+			# Position XR origin near the boat's expected position
+			var origin_pos = Vector3(8.38106, 7.24827, -16.5409)
+			xr_origin.global_transform.origin = origin_pos
+			print("XR Origin position set to: ", xr_origin.global_position)
 
-func complete_wave() -> void:
-	wave_in_progress = false
-	
-	# Calculate rewards
-	var elapsed_time = (Time.get_unix_time_from_system() - wave_start_time)
-	var time_ratio = wave_target_time / elapsed_time
-	var time_percent = clamp(time_ratio, 0.0, 1.0)
-	
-	var silver_reward = 10 + (5 * current_wave)
-	var gold_reward = 2 + current_wave
-	
-	# Award currency
-	CurrencyManager.add_silver(silver_reward)
-	CurrencyManager.add_gold(gold_reward, time_percent)
-	
-	# Apply healing
-	var player_boat = get_tree().get_nodes_in_group("Player")
-	if player_boat.size() > 0 and player_boat[0].has_method("heal"):
-		var heal_amount = health_regen * CurrencyManager.health_regen_multiplier
-		player_boat[0].heal(heal_amount)
-	
-	emit_signal("wave_completed")
-	show_shop()
+		# Wait for everything to be properly positioned
+		await get_tree().create_timer(0.5).timeout
 
-func show_shop() -> void:
-	shop_open = true
-	
-	# Pause enemy spawning
-	var spawner = get_tree().get_nodes_in_group("EnemySpawner")
-	if spawner.size() > 0:
-		spawner[0].pause_spawning()
-	
-	# Show shop UI
-	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-	get_tree().paused = true
-	
-	var shop_scene = load("res://shop1.tscn")
-	var shop_instance = shop_scene.instantiate()
-	get_tree().current_scene.add_child(shop_instance)
+		print("Setting up game scene...")
 
-func close_shop() -> void:
-	shop_open = false
-	get_tree().paused = false
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	next_wave()
+		# Find boat and ensure it's in correct position
+		player_boat = get_tree().get_first_node_in_group("player_boat")
+		if not player_boat:
+			print("Searching for Area3D node as player boat...")
+			var area3d = get_tree().current_scene.find_child("Area3D", true, false)
+			if area3d:
+				print("Found Area3D node, setting up as player boat")
+				area3d.add_to_group("player_boat")
+				player_boat = area3d
 
-func next_wave() -> void:
-	current_wave += 1
-	if current_wave > waves_per_round:
-		next_round()
+		if player_boat:
+			print("Found player boat, setting up transform...")
+			# Set the exact transform from the scene
+			player_boat.transform.origin = Vector3(8.38106, 0, -36.1083)
+			player_boat.scale = Vector3(-2.64326, 2.62623, -1.91512)
+			print("Player boat transform set:")
+			print("- Position: ", player_boat.global_position)
+			print("- Scale: ", player_boat.scale)
+		else:
+			print("ERROR: Could not find or create player boat!")
+
+		# Setup game scene and wait for completion
+		await setup_game_scene()
+
+		# Final check for components with increased retry count
+		var retry_count = 0
+		while (not player_boat or not player or not enemy_spawner) and retry_count < 10:
+			print("Waiting for components... Attempt %d" % retry_count)
+			await get_tree().create_timer(0.5).timeout
+
+			if not player_boat:
+				player_boat = get_tree().get_first_node_in_group("player_boat")
+			if not player:
+				player = get_tree().get_first_node_in_group("Player")
+			if not enemy_spawner:
+				enemy_spawner = get_tree().get_first_node_in_group("enemy_spawner")
+			retry_count += 1
+
+		print("Component status (Attempt %d):" % retry_count)
+		if player_boat:
+			print("- Player boat found at: ", player_boat.global_position)
+		if player:
+			print("- Player found at: ", player.global_position)
+		if enemy_spawner:
+			print("- Enemy spawner found at: ", enemy_spawner.global_position)
+
+		if player_boat and player and enemy_spawner:
+			print("All components found, starting wave...")
+			setup_wave()
+		else:
+			print("ERROR: Failed to find all required components!")
+			print("Final component status:")
+			print("- Player boat: ", player_boat != null)
+			print("- Player: ", player != null)
+			print("- Enemy spawner: ", enemy_spawner != null)
 	else:
-		start_wave()
-
-func next_round() -> void:
-	emit_signal("round_completed")
-	current_round += 1
-	current_wave = 1
-	
-	if current_round > total_rounds:
-		campaign_complete()
-	else:
-		show_round_complete_screen()
-
-func show_round_complete_screen() -> void:
-	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-	get_tree().paused = true
-	
-	var round_complete_scene = load("res://RoundCompleteMenu.tscn")
-	if round_complete_scene:
-		var round_complete_instance = round_complete_scene.instantiate()
-		get_tree().current_scene.add_child(round_complete_instance)
-	else:
-		continue_to_next_round()
-
-func continue_to_next_round() -> void:
-	get_tree().paused = false
-	start_wave()
-
-func campaign_complete() -> void:
-	emit_signal("campaign_completed")
-	get_tree().change_scene_to_file("res://3dcampaignmenu.tscn")
-
-func show_campaign_menu() -> void:
-	get_tree().change_scene_to_file("res://3dcampaignmenu.tscn")
-
-func reset_bomber_system() -> void:
-	current_bomber_id = -1
-
-func calculate_enemies_for_wave() -> int:
-	var enemy_count = enemies_per_wave_base
-	enemy_count += (current_wave - 1) * 2
-	enemy_count += (current_round - 1) * 5
-	enemy_count = int(enemy_count * wave_difficulty_multiplier)
-	enemy_count = min(enemy_count, enemies_per_wave_max)
-	return enemy_count
-
-func setup_wave() -> void:
-	print("Setting up wave %d of round %d" % [current_wave, current_round])
-	
-	enemies_per_wave = calculate_enemies_for_wave()
-	enemies_spawned_in_wave = 0
-	current_enemies_count = 0
-	
-	if wave_in_progress:
-		wave_in_progress = false
-	
-	emit_signal("enemies_changed", current_enemies_count)
-	call_deferred("start_wave")
+		print("ERROR: Failed to load Main scene! Error code: ", err)

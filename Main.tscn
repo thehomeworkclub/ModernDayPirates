@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://dti3tmq0y0leh"]
+[gd_scene load_steps=23 format=3 uid="uid://dti3tmq0y0leh"]
 
 [ext_resource type="PackedScene" uid="uid://ds2gxiccgqbfe" path="res://Gun.tscn" id="1_tq5c1"]
 [ext_resource type="Script" path="res://BombCleaner.gd" id="1_uchtu"]
@@ -10,9 +10,25 @@
 [ext_resource type="Shader" path="res://ocean.gdshader" id="7_kakas"]
 [ext_resource type="Script" path="res://RoundBoard.gd" id="8_rmocl"]
 [ext_resource type="PackedScene" path="res://TargetPlane.tscn" id="9_q0qot"]
-[ext_resource type="OpenXRActionMap" uid="uid://f4y407lrwktf" path="res://openxr_action_map.tres" id="11_ukw52"]
+[ext_resource type="Texture2D" uid="uid://cx2hxedpue6tf" path="res://campaignart/start.png" id="11_st4k3"]
 
-[sub_resource type="Compositor" id="Compositor_lq8ew"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_laser"]
+transparency = 1
+albedo_color = Color(0, 0.5, 1, 0.6)
+emission_enabled = true
+emission = Color(0, 0.5, 1, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_laser"]
+top_radius = 0.005
+bottom_radius = 0.005
+height = 10.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_cursor"]
+radius = 0.02
+height = 0.04
+radial_segments = 8
+rings = 4
 
 [sub_resource type="BoxMesh" id="BoxMesh_k7lr1"]
 
@@ -84,11 +100,13 @@ emission_enabled = true
 emission = Color(0, 0.5, 1, 0.5)
 emission_energy_multiplier = 0.3
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_mc6th"]
+size = Vector3(4.11816, 1.46973, 4.57397)
+
 [node name="Node3D" type="Node3D"]
 transform = Transform3D(4.7837, 0, 0, 0, 4.7837, 0, 0, 0, 4.7837, 0, 0, 0)
-script = ExtResource("1_uchtu")
 
-[node name="Player" type="Node3D" parent="."]
+[node name="Player" type="Node3D" parent="." groups=["Player"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.24827, -16.5409)
 script = ExtResource("1_vw7ct")
 
@@ -96,7 +114,6 @@ script = ExtResource("1_vw7ct")
 
 [node name="Camera3D" type="Camera3D" parent="Player/Head"]
 transform = Transform3D(-1, 0, -7.82271e-08, 0, 1, 0, 7.82271e-08, 0, -1, -0.176, 0, 0)
-compositor = SubResource("Compositor_lq8ew")
 fov = 90.5
 near = 0.002
 far = 928.24
@@ -119,6 +136,21 @@ fov = 90.5
 tracker = &"left_hand"
 pose = &"aim"
 
+[node name="LaserBeamLeft" type="MeshInstance3D" parent="Player/XROrigin3D/XRController3DLeft"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -5)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("CylinderMesh_laser")
+
+[node name="LaserDotLeft" type="MeshInstance3D" parent="Player/XROrigin3D/XRController3DLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("SphereMesh_cursor")
+
+[node name="RayCastLeft" type="RayCast3D" parent="Player/XROrigin3D/XRController3DLeft"]
+target_position = Vector3(0, 0, -10)
+collision_mask = 7
+debug_shape_custom_color = Color(0, 0.501961, 1, 0.501961)
+
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Player/XROrigin3D/XRController3DLeft"]
 transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.2, 0, 0, -0.1)
 mesh = SubResource("BoxMesh_k7lr1")
@@ -127,17 +159,32 @@ mesh = SubResource("BoxMesh_k7lr1")
 tracker = &"right_hand"
 pose = &"aim"
 
+[node name="LaserBeamRight" type="MeshInstance3D" parent="Player/XROrigin3D/XRController3DRight"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -5)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("CylinderMesh_laser")
+
+[node name="LaserDotRight" type="MeshInstance3D" parent="Player/XROrigin3D/XRController3DRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("SphereMesh_cursor")
+
+[node name="RayCastRight" type="RayCast3D" parent="Player/XROrigin3D/XRController3DRight"]
+target_position = Vector3(0, 0, -10)
+collision_mask = 7
+debug_shape_custom_color = Color(0, 0.501961, 1, 0.501961)
+
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Player/XROrigin3D/XRController3DRight"]
 transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.2, 0, 0, -0.1)
 mesh = SubResource("BoxMesh_k7lr1")
 
-[node name="EnemySpawner" type="Node3D" parent="."]
+[node name="EnemySpawner" type="Node3D" parent="." groups=["EnemySpawner"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
 script = ExtResource("2_xdull")
 enemy_scene = ExtResource("4_lkhmh")
 ship_spawn_height = 0.0
 
-[node name="Area3D" parent="." instance=ExtResource("6_0bb58")]
+[node name="Area3D" parent="." groups=["player_boat"] instance=ExtResource("6_0bb58")]
 transform = Transform3D(-2.64326, 0, -1.67425e-07, 0, 2.62623, 0, 2.31081e-07, 0, -1.91512, 8.38106, 0, -36.1083)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
@@ -183,23 +230,17 @@ material_override = SubResource("StandardMaterial3D_eq1s2")
 script = ExtResource("1_uchtu")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-0.102507, -1.29998, 4.23159, 0.0401204, -4.57224, 2.58846e-07, 0.0629053, 0.797751, 6.8956, 4.99865, 7.8486, -20.0002)
+transform = Transform3D(-0.102507, -1.29998, 4.23159, 0.0401204, -4.57224, 2.58846e-07, 0.0629053, 0.797751, 6.8956, 4.99865, 7.8486, -20.757)
 mesh = SubResource("BoxMesh_k7lr1")
 
-[node name="XRInteractionSettings" type="Node" parent="."]
+[node name="StartButton" type="StaticBody3D" parent="." groups=["button"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.0362636, 9.57524, 0, -7.4868)
 
-[node name="XRInterface" type="XRInterface" parent="XRInteractionSettings"]
-_import_path = NodePath("")
-unique_name_in_owner = false
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-physics_interpolation_mode = 0
-auto_translate_mode = 0
-editor_description = ""
-action_map = ExtResource("11_ukw52")
-script = null
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StartButton"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8328, -8.40285, -5.9742)
+shape = SubResource("BoxShape3D_mc6th")
 
-[node name="VRUIHelper" type="Node" parent="."]
-script = ExtResource("res://VRUIHelper.gd")
+[node name="ButtonMesh" type="Sprite3D" parent="StartButton"]
+transform = Transform3D(8.41128, 0, 0, 0, 8.41128, 0, 0, 0, 1, 1.76678, -8.42518, -8.11508)
+texture_filter = 0
+texture = ExtResource("11_st4k3")
