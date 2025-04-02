@@ -53,26 +53,26 @@ func _ready() -> void:
 	initialize_game_state()
 
 func update_enemy_count(count: int) -> void:
-    if current_enemies_count != count:
-        current_enemies_count = count
-        emit_signal("enemies_changed", current_enemies_count)
+	if current_enemies_count != count:
+		current_enemies_count = count
+		emit_signal("enemies_changed", current_enemies_count)
 
 func complete_wave() -> void:
-    print("Wave completed")
-    current_enemies_count = 0
-    emit_signal("enemies_changed", current_enemies_count)
-    emit_signal("wave_completed")
+	print("Wave completed")
+	current_enemies_count = 0
+	emit_signal("enemies_changed", current_enemies_count)
+	emit_signal("wave_completed")
 
 func initialize_game_state() -> void:
-    # Reset wave-related variables
-    enemies_spawned_in_wave = 0
-    current_enemies_count = 0
-    emit_signal("enemies_changed", current_enemies_count)
-    wave_difficulty_multiplier = 1.0 + (current_voyage_difficulty * 0.2)
-    enemy_spawn_rate = 1.0 + (current_voyage_difficulty * 0.1)
-    enemy_speed = 1.0 + (current_voyage_difficulty * 0.15)
-    enemy_health = 1.0 + (current_voyage_difficulty * 0.2)
-    enemies_per_wave = 5 + (2 * current_voyage_difficulty)
+	# Reset wave-related variables
+	enemies_spawned_in_wave = 0
+	current_enemies_count = 0
+	emit_signal("enemies_changed", current_enemies_count)
+	wave_difficulty_multiplier = 1.0 + (current_voyage_difficulty * 0.2)
+	enemy_spawn_rate = 1.0 + (current_voyage_difficulty * 0.1)
+	enemy_speed = 1.0 + (current_voyage_difficulty * 0.15)
+	enemy_health = 1.0 + (current_voyage_difficulty * 0.2)
+	enemies_per_wave = 5 + (2 * current_voyage_difficulty)
 	print("Setting up initial game state")
 	verify_equipment()
 	

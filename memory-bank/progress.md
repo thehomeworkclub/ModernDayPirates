@@ -21,12 +21,21 @@
 - ✓ Scene transitions
 
 ## In Progress
-- Shop functionality
-- Campaign gameplay implementation
-- Enemy spawning system
+- Integration of new game levels from temp-game/
+- Adaptation of character controls for VR
+- Enemy system integration
+- Wave-based spawning system implementation
 
 ## To Do
-- Weapon system
+- Adapt player character for VR interaction
+- Integrate enemy AI systems:
+  - Melee enemy behavior
+  - Ranged enemy attacks
+  - Boss fight mechanics
+  - Summoner abilities
+- Implement wave spawning in VR space
+- Connect level progression with campaign menu
+- Weapon system integration
 - Ship damage mechanics
 - Save/load system
 - Leader boards
@@ -43,10 +52,11 @@
 - Detailed debug logging for troubleshooting
 
 ## Next Steps
-1. Implement shop functionality
-2. Develop core gameplay mechanics
-3. Create enemy AI and spawning system
-4. Design and implement weapon systems
+1. Convert standard character controls to VR
+2. Adapt enemy systems for VR combat
+3. Implement wave spawning mechanics
+4. Connect level progression with menu system
+5. Integrate shop with gameplay systems
 
 ## Known Issues
 - None currently reported for menu system

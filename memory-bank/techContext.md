@@ -8,6 +8,65 @@
 
 ## Core Systems
 
+### Level System
+```
+Level1
+├── Player (scene instance)
+├── Enemies
+│   ├── MeleeEnemy
+│   ├── RangedEnemy
+│   ├── Boss
+│   └── Summoner
+└── WaveSpawner
+    └── SpawnPoints
+```
+
+### Enemy Framework
+```gdscript
+class_name Enemy
+extends Node3D
+
+var hp
+var damage
+var speed
+func take_damage(amount)
+func _physics_process(delta)
+```
+
+### Global Variables
+```
+GlobalVars
+├── spawn_melee()
+├── Level1Vars
+├── Level2Vars
+├── Level3Vars
+├── Level4Vars
+└── Level5Vars
+```
+
+### Player System
+```gdscript
+CharacterBody3D
+├── hp
+├── velocity
+├── speed
+├── jump_velocity
+└── hitimmunity
+```
+
+### VR Interaction
+=======>>>>>>> REPLACE
+
+# Technical Context & Architecture
+
+## VR Framework
+- OpenXR implementation via Godot 4.x
+- XRServer for interface management
+- XROrigin3D for spatial reference
+- XRController3D for input handling
+
+## Core Systems
+
 ### VR Interaction
 ```
 XROrigin3D
@@ -121,16 +180,23 @@ load("res://path/to/texture.png")
 - Layer/mask setup
 - Disabled when unused
 
-## Future Integration Points
-1. Shop System
+## Integration Points
+1. Level Integration
+- VR movement adaptation
+- Enemy VR interaction
+- Wave system in VR space
+- Level state management
+
+2. Gameplay Systems
+- Character VR controls
+- Enemy AI in VR
+- Wave spawning
+- Combat mechanics
+
+3. Shop System
 - Menu integration
 - Resource management
 - State persistence
-
-2. Gameplay Systems
-- Scene transitions
-- State management
-- Resource handling
 
 ## Technical Debt Management
 1. Current Status

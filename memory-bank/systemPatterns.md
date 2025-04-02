@@ -1,4 +1,29 @@
-# Shop Interface Layout
+# System Patterns
+
+## Level Architecture
+
+### Wave Spawning Pattern
+- Center-based spawn system using wave_center position
+- Global variable configuration for enemy counts and types
+- Separate spawn patterns per level
+- Boss wave triggers after standard waves
+
+### Enemy Hierarchy
+- Base Enemy class for common functionality
+- Specialized enemy types:
+  - Melee: Close-range combat
+  - Ranged: Distance attacks
+  - Boss: Special mechanics
+  - Summoner: Creates additional enemies
+
+### Player Mechanics
+- Health system with immunity frames
+- Movement speed constant: 5.0
+- Jump velocity: 4.5
+- Collision-based damage system
+- Group-based identification ("player")
+
+## Shop Interface Layout
 
 ## Currency Display
 - Location: Top of shop interface at y=-1.45

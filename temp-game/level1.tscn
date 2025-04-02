@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://bupxq4opruejf"]
 
 [ext_resource type="Script" path="res://level_1_script.gd" id="1_lb3mq"]
-[ext_resource type="PackedScene" uid="uid://dq7qhe6k0quxb" path="res://Cargo Ships III/Meshes/Dry_Cargo_Ship.fbx" id="2_jwk7d"]
+[ext_resource type="PackedScene" uid="uid://dckpmqi18w2o1" path="res://Cargo Ships III/Meshes/Dry_Cargo_Ship.fbx" id="2_jwk7d"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qlkg0"]
 sky_top_color = Color(0.488971, 0.819536, 0.873177, 1)
