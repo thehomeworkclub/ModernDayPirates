@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://c1o1aqfbdcmxk"]
 
 [ext_resource type="Script" path="res://PlayerHUD.gd" id="1_bsn5u"]
-[ext_resource type="Texture2D" uid="uid://c5hnomm7xo0ux" path="res://art/fullheart.png" id="2_vxf0h"]
+[ext_resource type="Texture2D" uid="uid://qo3uqinr3h5t" path="res://art/fullheart.png" id="2_vxf0h"]
 
 [node name="PlayerHUD" type="CanvasLayer"]
 layer = 100
