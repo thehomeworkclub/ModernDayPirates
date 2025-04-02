@@ -1,0 +1,14 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dqhqxewl3ml1w"]
+
+[resource]
+transparency = 2
+alpha_scissor_threshold = 0.0
+alpha_antialiasing_mode = 1
+alpha_antialiasing_edge = 0.3
+albedo_color = Color(1, 0.34902, 0.239216, 1)
+roughness = 0.0
+emission_enabled = true
+emission = Color(0.875382, 0, 0.101879, 1)
+emission_energy_multiplier = 2.08
+anisotropy = -1.0
+grow_amount = -0.696

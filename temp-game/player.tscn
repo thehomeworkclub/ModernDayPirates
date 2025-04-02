@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://xy7fp3q1qdrl"]
+
+[ext_resource type="Script" path="res://character_body_3d.gd" id="1_qg1ow"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_0wyub"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_lh25h"]
+
+[node name="Player" type="Node3D"]
+
+[node name="PlayerBody" type="CharacterBody3D" parent="."]
+transform = Transform3D(-0.371864, 0, 0.00522501, 0, 0.371901, 0, -0.00522501, 0, -0.371864, 0, 0, 0)
+script = ExtResource("1_qg1ow")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlayerBody"]
+mesh = SubResource("CylinderMesh_0wyub")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00188734, 0.0178357, 0.0113785)
+shape = SubResource("CylinderShape3D_lh25h")
+
+[node name="Camera3D" type="Camera3D" parent="PlayerBody"]
+transform = Transform3D(2.68889, 0, 0, 0, 2.41319, 1.18602, 0, -1.18602, 2.41319, 0.0496522, 5.97411, 7.36816)

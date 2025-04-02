@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://bq8mwwe5l8wdq"]
+
+[ext_resource type="Script" path="res://enemies/ranged enemy/ranged enemy.gd" id="1_sog34"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_bfb02"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_6w03i"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_smbmt"]
+
+[node name="Node3D" type="Node3D"]
+transform = Transform3D(-4.37103e-08, 0, 0.999974, 0, 0.999974, 0, -0.999974, 0, -4.37103e-08, 0, 0, 0)
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="."]
+script = ExtResource("1_sog34")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CharacterBody3D"]
+mesh = SubResource("CylinderMesh_bfb02")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
+shape = SubResource("CylinderShape3D_6w03i")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="CharacterBody3D"]
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 0.482136, 0, 0, 0, 0.788389, 0.2371, 0.565438, 0)
+mesh = SubResource("BoxMesh_smbmt")
+
+[node name="Timer" type="Timer" parent="."]
+autostart = true
