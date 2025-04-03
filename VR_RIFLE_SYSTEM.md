@@ -117,10 +117,9 @@ The rifle system integrates with the VR system through:
 The rifles implement a physical reloading system designed for use with a VR gunstock:
 
 ### Magazine States
-The magazine can be in one of three states:
+The magazine can be in one of two states:
 1. **ATTACHED_TO_GUN**: Magazine is attached to the rifle
-2. **ATTACHED_TO_HAND**: Magazine is removed and held by left controller
-3. **BEING_INSERTED**: Magazine is being inserted back into the rifle
+2. **DETACHED**: Magazine is removed and held by the left controller
 
 ### Reloading Process
 1. **Detaching the Magazine**:
@@ -145,6 +144,9 @@ The magazine can be in one of three states:
 - Calculates perpendicular distance between controllers to detect removal
 - Uses proximity detection to determine when magazine is being reinserted
 - Provides appropriate haptic feedback for each stage of the process
+- Features generous detection margins (doubled) for easier VR gunstock handling:
+  - Detachment threshold: 0.3 meters perpendicular distance
+  - Reattachment detection radius: 0.2 meters from magazine well
 
 ## Balancing Tips
 

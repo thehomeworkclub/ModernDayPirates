@@ -14,11 +14,11 @@ var gun_offset = Vector3(0, 0, 0)  # Centered on controller position
 var available_guns = {
 	"m16a1": preload("res://M16A1Gun.tscn"),
 	"ak74": preload("res://AK74Gun.tscn"),
-	# Additional guns will be added here as they're implemented
-	# "scar": preload("res://SCARLGun.tscn"),
-	# "hk416": preload("res://HK416Gun.tscn"),
-	# "mp5": preload("res://MP5Gun.tscn"),
-	# "mosin": preload("res://MosinNagantGun.tscn")
+	"scarl": preload("res://SCARLGun.tscn"),
+	"hk416": preload("res://HK416Gun.tscn"),
+	"mp5": preload("res://MP5Gun.tscn"),
+	"mosin": preload("res://MosinNagantGun.tscn"),
+	"model1897": preload("res://Model1897Gun.tscn")
 }
 var current_gun_index = 0
 
@@ -71,6 +71,10 @@ func _process(delta):
 		# Check for gun switching input if enabled
 		if enable_gun_switching:
 			handle_gun_switching()
+			
+	# Handle keyboard gun switching for debugging
+	if enable_gun_switching:
+		handle_keyboard_gun_switching()
 
 func hide_menu_visuals():
 	# Hide laser pointers in level scenes since we're using guns instead
@@ -145,6 +149,24 @@ func switch_to_next_gun():
 	
 	# Switch to the next gun
 	switch_gun(next_gun_name)
+	
+# Handle keyboard input for gun switching (debugging)
+func handle_keyboard_gun_switching():
+	# Number keys 1-7 for switching guns
+	if Input.is_key_pressed(KEY_1):
+		switch_gun("m16a1")
+	elif Input.is_key_pressed(KEY_2):
+		switch_gun("ak74")
+	elif Input.is_key_pressed(KEY_3):
+		switch_gun("scarl")
+	elif Input.is_key_pressed(KEY_4):
+		switch_gun("hk416")
+	elif Input.is_key_pressed(KEY_5):
+		switch_gun("mp5")
+	elif Input.is_key_pressed(KEY_6):
+		switch_gun("mosin")
+	elif Input.is_key_pressed(KEY_7):
+		switch_gun("model1897")
 
 func switch_gun(gun_name: String):
 	# Check if the gun exists in our available guns
