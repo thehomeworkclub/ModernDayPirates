@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://c1r8jkghr2nkd"]
+
+[ext_resource type="Script" path="res://VRGunController.gd" id="1_gun_script"]
+[ext_resource type="PackedScene" uid="uid://b4n6han5eh8w0" path="res://M16A1Gun.tscn" id="2_gun"]
+
+[sub_resource type="GDScript" id="GDScript_test"]
+script/source = "extends Node3D
+
+func _ready():
+	print(\"Gun health display test scene\")
+	print(\"Press 9 to test taking damage\")
+"
+
+[node name="GunHealthTest" type="Node3D"]
+script = SubResource("GDScript_test")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 2, 0)
+
+[node name="VRGunController" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+script = ExtResource("1_gun_script")
+gun_scene = ExtResource("2_gun")

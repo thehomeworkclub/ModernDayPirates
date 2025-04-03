@@ -3,6 +3,9 @@ extends Node3D
 @onready var melee_enemy = preload("res://enemies/melee enemy/MeleeEnemy.tscn")
 @onready var boss_spawn = $bossspawn
 @onready var wave_center = $wave_center.global_position
+# Health display is now attached to the gun, so we'll access it through the VRGunController
+@onready var vr_gun_controller = $XROrigin3D/VRGunController
+@onready var health_display = null  # Will be initialized in _ready()
 
 var boss_enemy = null
 @onready var xr_origin = $XROrigin3D
@@ -12,6 +15,10 @@ var boss_enemy = null
 
 # VR optimization level (LOW=0, MEDIUM=1, HIGH=2)
 var vr_optimization_level = 2  # Set to HIGH for better performance
+
+# Player health properties (now managed by HealthHUD)
+var max_player_health = 10
+var current_player_health = 10
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -30,6 +37,13 @@ func _ready():
 	else:
 		print("ERROR: XROrigin3D not found")
 		return
+		
+	# Get the health display from the gun controller
+	if vr_gun_controller and vr_gun_controller.health_display:
+		health_display = vr_gun_controller.health_display
+		print_verbose("Gun health display referenced")
+	else:
+		print("INFO: Health display will be initialized when gun is created")
 		
 	# Apply performance optimizations for VR
 	optimize_for_vr()
@@ -134,6 +148,24 @@ func find_all_mesh_instances(node: Node) -> Array:
 		result.append_array(find_all_mesh_instances(child))
 		
 	return result
+
+# Player damage/health functions
+func damage_player(amount):
+	if health_display:
+		health_display.take_damage(amount)
+		print("Player took " + str(amount) + " damage")
+		
+		# Check for death
+		if health_display.current_health <= 0:
+			print("Player died!")
+			# Handle death - could restart level, show game over, etc.
+			# For now just reset health to demonstrate system
+			heal_player(max_player_health)
+	
+func heal_player(amount):
+	if health_display:
+		health_display.heal(amount)
+		print("Player healed " + str(amount) + " health")
 
 func boss_wave():
 	if ResourceLoader.exists("res://enemies/bosses/melee boss/boss.tscn"):

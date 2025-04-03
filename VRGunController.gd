@@ -25,6 +25,7 @@ var current_gun_index = 0
 # System references
 @onready var vr_origin = get_parent()
 @onready var camera = vr_origin.get_node_or_null("Head/XRCamera3D")
+@onready var health_display = null
 
 # Stabilization properties
 @export var smoothing_speed: float = 10.0  # Higher for more responsive movement
@@ -47,6 +48,9 @@ func _ready():
 			current_gun.bullet_scene = bullet_scene
 			
 		gun_instance = current_gun
+		
+		# Add health display to gun
+		add_health_display_to_gun()
 	
 	# If we already have a GunInstance child, reference it
 	elif gun_instance == null and has_node("GunInstance"):
@@ -57,6 +61,22 @@ func _ready():
 	hide_menu_visuals()
 	
 	print_verbose("VR Gun Controller initialized")
+
+# Add health display to the current gun
+func add_health_display_to_gun():
+	if gun_instance != null:
+		# Remove existing health display if any
+		if health_display != null:
+			health_display.queue_free()
+		
+		# Create new health display
+		health_display = Node3D.new()
+		health_display.name = "HealthDisplay"
+		health_display.script = load("res://GunHealthDisplay.gd")
+		
+		# Add to gun instance
+		gun_instance.add_child(health_display)
+		print_verbose("Health display added to gun")
 
 func _process(delta):
 	# Only update position and check for input if controller is available
@@ -176,6 +196,18 @@ func switch_gun(gun_name: String):
 	
 	print_verbose("Switching to gun: " + gun_name)
 	
+	# Clean up any detached magazines on the left controller
+	if left_controller:
+		var hand_magazine = left_controller.get_node_or_null("HandMagazine")
+		if hand_magazine:
+			print_verbose("Cleaning up detached magazine")
+			hand_magazine.queue_free()
+	
+	# Save health value if we have a health display
+	var current_health_value = 10  # Default
+	if health_display != null:
+		current_health_value = health_display.current_health
+	
 	# Remove the current gun instance
 	if current_gun:
 		current_gun.queue_free()
@@ -192,6 +224,14 @@ func switch_gun(gun_name: String):
 		current_gun.bullet_scene = bullet_scene
 	
 	gun_instance = current_gun
+	
+	# Add health display to new gun
+	add_health_display_to_gun()
+	
+	# Restore health value if we had one
+	if health_display != null:
+		health_display.current_health = current_health_value
+		health_display.update_hearts()
 	
 	# Provide haptic feedback for gun switch
 	if right_controller:

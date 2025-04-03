@@ -2,7 +2,7 @@
 
 ## Completed Features
 
-### VR Rifle System
+### VR Weapons System
 - ✓ Implemented base rifle framework with inheritance pattern
 - ✓ Created physical reloading system with magazine detachment/reattachment
 - ✓ Developed M16A1 rifle with proper magazine positioning
@@ -14,6 +14,15 @@
 - ✓ Fixed detachment/reattachment issues with improved state management
 - ✓ Optimized detection thresholds for better VR gunstock compatibility
 - ✓ Documented rifle system thoroughly in VR_RIFLE_SYSTEM.md
+- ✓ Implemented 5 additional weapons with unique characteristics:
+  - ✓ SCAR-L (Tactical rifle with balanced stats)
+  - ✓ HK416 (High-precision rifle with better accuracy)
+  - ✓ MP5 (Submachine gun with faster fire rate but lower damage)
+  - ✓ Mosin Nagant (Bolt-action rifle with high damage but slow fire rate)
+  - ✓ Model 1897 (Shotgun with pellet spread and 2-shell magazine)
+- ✓ Added weapon switching via keyboard number keys (1-7)
+- ✓ Fixed ghost magazine issue when switching weapons
+- ✓ Added proper textured models for all weapons with correct UIDs
 
 ### 3D Campaign Menu
 - ✓ Implemented VR laser pointer interaction system
@@ -34,22 +43,16 @@
 - ✓ Scene transitions
 
 ## In Progress
-- Rifle system expansion with 5 additional rifles (inheritance-based)
 - Integration of new game levels from temp-game/
 - Enemy system integration
 - Wave-based spawning system implementation
+- Weapon selection interface for VR (currently keyboard-only for debugging)
 
 ### Asset Integration
 - ✓ Imported cargo ship meshes and textures from temp-game/Cargo_Ships/
 - ✓ Imported rifle models from assets/guns_hands/VRFPS_Kit/Models/Weapons/
 
 ## To Do
-- Create 5 additional rifle implementations with specific attributes:
-  - SCAR-L (Tactical rifle with balanced stats)
-  - HK416 (High-precision rifle with better accuracy)
-  - MP5 (Submachine gun with faster fire rate but lower damage)
-  - Mosin Nagant (Bolt-action rifle with high damage but slow fire rate)
-  - One more rifle type to be determined
 - Adapt player character for VR interaction
 - Integrate enemy AI systems:
   - Melee enemy behavior
@@ -75,14 +78,16 @@
 - Detailed debug logging for troubleshooting
 - Reliable physical reloading system for VR gunstock usage
 - Optimized detection thresholds for VR motion
+- Implemented diverse weapon types with consistent reloading mechanics
+- Fixed ghost object issues with proper cleanup during weapon switching
 
 ## Next Steps
-1. Create the 5 additional rifle implementations
-2. Ensure proper magazine positioning for each new gun
-3. Balance weapon attributes (damage, fire rate, accuracy, recoil)
+1. Implement VR controller-based weapon selection interface
+2. Add visual indicator for current selected weapon
+3. Create weapon rack for in-game selection
 4. Adapt enemy systems for VR combat
 5. Implement wave spawning mechanics
 6. Connect rifle system with enemy damage system
 
 ## Known Issues
-- None currently reported for menu or rifle systems
+- None currently reported for menu or weapons systems

@@ -1,9 +1,18 @@
 # Active Development Context
 
 ## Current Focus
-We have successfully implemented a VR rifle system with physical reloading mechanics optimized for use with a gunstock. The system allows for realistic magazine removal and insertion using physical hand movements. Currently, two rifle models (M16A1 and AK-74) are implemented with proper magazines, muzzle flashes, and recoil animations.
+We have successfully implemented a comprehensive VR weapons system with physical reloading mechanics optimized for use with a gunstock. The system allows for realistic magazine removal and insertion using physical hand movements. Seven different weapon models are now implemented with proper magazines, muzzle flashes, and recoil animations.
 
-Next goal: Expand the rifle system to include 5 additional rifle types using the same physical reloading framework.
+The completed weapon arsenal includes:
+1. M16A1 (Assault rifle - default)
+2. AK-74 (Assault rifle)
+3. SCAR-L (Tactical rifle with balanced stats)
+4. HK416 (High-precision rifle with better accuracy)
+5. MP5 (Submachine gun with faster fire rate but lower damage)
+6. Mosin Nagant (Bolt-action rifle with high damage but slow fire rate)
+7. Model 1897 (Shotgun with pellet spread and 2-shell magazine)
+
+Each weapon has unique handling characteristics, animations, and mechanics while maintaining a consistent reloading system.
 
 Key implementation details:
 - Base rifle functionality in BaseRifleGun.gd for inheritance
@@ -41,7 +50,18 @@ VR performance considerations remain important, especially as we add more weapon
    - Texture size limit: 1024px
 
 ## Recently Completed
-1. VR Rifle System
+1. VR Weapons System Expansion
+   - Added 5 new weapon types with diverse characteristics:
+     - SCAR-L: Tactical rifle with balanced stats (damage: 3, accuracy: 0.92)
+     - HK416: High-precision rifle (damage: 3, accuracy: 0.95, low recoil: 0.15)
+     - MP5: Submachine gun (damage: 1, fast fire rate: 0.08, lower accuracy: 0.85)
+     - Mosin Nagant: Bolt-action rifle (high damage: 8, excellent accuracy: 0.98, 5-round magazine)
+     - Model 1897: Shotgun (fires 8 pellets per shot, spread pattern, 2-shell magazine)
+   - Implemented weapon switching via keyboard number keys (1-7) for debugging
+   - Fixed ghost magazine issue when switching weapons
+   - Added proper textured models for all weapons with appropriate UIDs
+
+2. VR Rifle System Core
    - Physical reloading with magazine detachment/reattachment
    - Realistic weapon models and magazines
    - Single bullet firing system that overrides base gun system
@@ -49,26 +69,29 @@ VR performance considerations remain important, especially as we add more weapon
    - Haptic feedback on both controllers
    - Recoil animations
    - Support for automatic and semi-automatic firing modes
+   - Bolt-action mechanism for Mosin Nagant
+   - Pellet spread system for shotgun
 
-2. Core System Integration
+3. Core System Integration
    - XR controller integration for interaction
    - Ray casting for precise VR interaction
    - Animation system for visual feedback
    - Haptic feedback for tactile confirmation
 
 ## Next Steps
-1. Rifle System Expansion:
-   - Add 5 more rifle types using the same framework
-   - Ensure proper magazine model positioning for each gun
-   - Balance weapon attributes (damage, fire rate, recoil, etc.)
-   - Create bullet models for each caliber
-   - Implement unique recoil patterns
-
-2. Gameplay Integration:
+1. Gameplay Integration:
    - Connect rifle system with enemy damage system
    - Implement ammo pickup/management
    - Balance gameplay around different weapon types
+   - Add visual effects for different weapon types (unique muzzle flashes, etc.)
+   - Implement weapon unlocking/progression system
    - Add haptic feedback variation for different weapons
+
+2. Quality of Life Improvements:
+   - Implement weapon selection via VR controllers (not just keyboard)
+   - Add visual indicator for current selected weapon
+   - Create weapon rack for in-game selection
+   - Refine magazine positioning for optimal usability
 
 ## Active Considerations
 - Maintain consistent interaction patterns across all rifle types

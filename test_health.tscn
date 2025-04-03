@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://TestHealth.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://cvcj3iy1nvk2g" path="res://HealthHUD.tscn" id="2_health"]
+
+[node name="TestHealth" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(640, 360)
+
+[node name="HealthHUD" parent="." instance=ExtResource("2_health")]
+
+[node name="Instructions" type="Label" parent="."]
+offset_left = 341.0
+offset_top = 224.0
+offset_right = 896.0
+offset_bottom = 276.0
+text = "Press the 9 key to test taking damage.
+Hearts should appear in the top-left corner and update with damage."
+horizontal_alignment = 1

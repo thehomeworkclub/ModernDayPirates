@@ -1,99 +1,106 @@
 extends Node3D
 
-# Health tracking
-var current_health = 5
-var max_health = 10
+# Load heart textures
+var full_heart_texture = null
+var empty_heart_texture = null
 
-# Heart sprites
+# Health settings
+var max_health = 10
+var current_health = 10
+var heart_spacing = 0.15  # Space between hearts
+var heart_scale = 0.1     # Size of each heart sprite
+
+# References to heart sprites
 var heart_sprites = []
 
-# Heart textures
-var full_heart_texture
-var empty_heart_texture
-
-# Display settings
-@export var heart_spacing = 0.4
-@export var heart_size = 0.05
-@export var world_position = Vector3(5, 2, -15)  # Position in the 3D world
-
 func _ready():
-	# Set name and group for easy reference
-	name = "HealthDisplay3D"
-	add_to_group("InfoBoard")  # Use same group for compatibility
-	
 	# Load textures
 	full_heart_texture = load("res://art/fullheart.png")
+	if full_heart_texture == null:
+		push_error("Failed to load fullheart.png")
+		return
+		
 	empty_heart_texture = load("res://art/emptyheart.png")
+	if empty_heart_texture == null:
+		push_error("Failed to load emptyheart.png")
+		return
 	
-	# Position this node in the world
-	global_position = world_position
+	# Create heart container
+	call_deferred("create_hearts")
 	
-	# Debug info
-	print("DEBUG: HealthDisplay3D positioned at ", global_position)
-	
-	# Initial health display
-	create_hearts(current_health, max_health)
-
-func create_hearts(current_health: int, max_health: int):
-	# Clear any existing hearts
-	for sprite in heart_sprites:
-		if is_instance_valid(sprite):
-			sprite.queue_free()
-	heart_sprites.clear()
-	
-	# Calculate starting position (centered)
-	var total_width = heart_spacing * (max_health - 1)
-	var start_x = -total_width / 2
-	
-	# Create heart sprites
-	for i in range(max_health):
-		var sprite = Sprite3D.new()
-		sprite.name = "Heart_" + str(i)
-		
-		# Set texture based on health
-		if i < current_health:
-			sprite.texture = full_heart_texture
-		else:
-			sprite.texture = empty_heart_texture
-		
-		# Position heart
-		var x_pos = start_x + (heart_spacing * i)
-		sprite.position = Vector3(x_pos, 0, 0)
-		
-		# Configure appearance
-		sprite.pixel_size = heart_size
-		sprite.billboard = true  # Always face camera
-		sprite.no_depth_test = true  # Ensure visibility through objects
-		
-		# Make it bright and visible
-		var material = StandardMaterial3D.new()
-		material.emission_enabled = true
-		material.emission = Color(1, 1, 1, 1)
-		material.emission_energy_multiplier = 1.5
-		material.flags_unshaded = true
-		sprite.material_override = material
-		
-		# Add to scene
-		add_child(sprite)
-		heart_sprites.append(sprite)
-		
-		print("DEBUG: Created heart at position ", sprite.global_position)
-	
-	print("DEBUG: Created ", heart_sprites.size(), " hearts in 3D space")
-
-# Called by player when health changes
-func on_player_health_changed(current_health: int, max_health: int):
-	print("DEBUG: HealthDisplay3D received health update: ", current_health, "/", max_health)
-	self.current_health = current_health
-	self.max_health = max_health
-	create_hearts(current_health, max_health)
+	# Create a timer for damage cooldown
+	var timer = Timer.new()
+	timer.name = "DamageTimer"
+	timer.wait_time = 0.5
+	timer.one_shot = true
+	add_child(timer)
 
 func _process(delta):
-	# Make sure hearts always face the camera
-	var cam = get_viewport().get_camera_3d()
-	if cam:
-		# Rotate the entire display to face the camera, but only on Y axis
-		var direction = cam.global_position - global_position
-		direction.y = 0  # Keep upright
-		if direction.length() > 0.01:
-			look_at(global_position + direction, Vector3.UP)
+	# Check for damage input (key 9)
+	if Input.is_key_pressed(KEY_9):
+		# Add a small delay to prevent multiple hits in one press
+		if has_node("DamageTimer") and !$DamageTimer.is_stopped():
+			return
+			
+		take_damage(1)
+		if has_node("DamageTimer"):
+			$DamageTimer.start()
+
+func create_hearts():
+	# Safety check
+	if full_heart_texture == null or empty_heart_texture == null:
+		push_error("Cannot create hearts: textures not loaded")
+		return
+		
+	# Remove any existing hearts
+	for heart in heart_sprites:
+		if is_instance_valid(heart):
+			heart.queue_free()
+	
+	heart_sprites = []
+	
+	# Create 10 hearts in a row
+	for i in range(max_health):
+		var heart = Sprite3D.new()
+		heart.texture = full_heart_texture
+		heart.pixel_size = 0.005  # Increase for better visibility
+		heart.scale = Vector3(heart_scale, heart_scale, heart_scale)
+		
+		# Position hearts side by side with a bit more spacing
+		# Start from negative position so hearts are centered
+		heart.transform.origin.x = (i - max_health/2.0) * heart_spacing
+		
+		# Make sure hearts are visible and well-lit
+		heart.shaded = false
+		heart.billboard = BaseMaterial3D.BILLBOARD_ENABLED  # Always face camera
+		heart.double_sided = true
+		heart.no_depth_test = true
+		heart.fixed_size = true
+		
+		add_child(heart)
+		heart_sprites.append(heart)
+	
+	call_deferred("update_hearts")
+
+func take_damage(amount):
+	current_health = max(0, current_health - amount)
+	update_hearts()
+	print("Player took damage! Health: " + str(current_health) + "/" + str(max_health))
+
+func heal(amount):
+	current_health = min(max_health, current_health + amount)
+	update_hearts()
+	print("Player healed! Health: " + str(current_health) + "/" + str(max_health))
+
+func update_hearts():
+	# Safety check
+	if full_heart_texture == null or empty_heart_texture == null:
+		return
+		
+	# Update the heart textures based on current health
+	for i in range(heart_sprites.size()):
+		if is_instance_valid(heart_sprites[i]):
+			if i < current_health:
+				heart_sprites[i].texture = full_heart_texture
+			else:
+				heart_sprites[i].texture = empty_heart_texture
