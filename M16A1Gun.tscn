@@ -1,18 +1,18 @@
-[gd_scene load_steps=4 format=3 uid="uid://cdynakp3m7gwj"]
+[gd_scene load_steps=4 format=3 uid="uid://b4n6han5eh8w0"]
 
 [ext_resource type="Script" path="res://M16A1Gun.gd" id="1_m16a1"]
 [ext_resource type="PackedScene" uid="uid://bmpimc7okdghl" path="res://Bullet.tscn" id="2_bullet"]
-[ext_resource type="PackedScene" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/M16A1.fbx" id="3_m16a1_model"]
+[ext_resource type="PackedScene" uid="uid://cv04sq6duhy0s" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/M16A1.fbx" id="3_m16a1_model"]
 
 [node name="M16A1Gun" type="Node3D"]
 script = ExtResource("1_m16a1")
 bullet_scene = ExtResource("2_bullet")
 
 [node name="Model" type="Node3D" parent="."]
-transform = Transform3D(0.07, 0, 0, 0, 0.07, 0, 0, 0, 0.07, 0, 0, 0)
+transform = Transform3D(0.07, 0, 0, 0, 0.07, 0, 0, 0, 0.07, 0, 0, -0.2)
 
 [node name="M16A1Model" parent="Model" instance=ExtResource("3_m16a1_model")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+transform = Transform3D(-3, 0, -4.52987e-07, 0, 3, 0, 4.52987e-07, 0, -3, 0, 0, 0)
 
 [node name="Muzzle" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.9)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.7)

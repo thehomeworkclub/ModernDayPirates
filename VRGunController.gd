@@ -10,7 +10,7 @@ extends Node3D
 @export var bullet_scene: PackedScene
 @export var enable_gun_switching: bool = false  # Whether to allow switching between guns
 var current_gun = null
-var gun_offset = Vector3(0, -0.05, -0.2)  # Offset from controller position
+var gun_offset = Vector3(0, 0, 0)  # Centered on controller position
 var available_guns = {
 	"m16a1": preload("res://M16A1Gun.tscn"),
 	"ak74": preload("res://AK74Gun.tscn"),
@@ -27,8 +27,8 @@ var current_gun_index = 0
 @onready var camera = vr_origin.get_node_or_null("Head/XRCamera3D")
 
 # Stabilization properties
-@export var smoothing_speed: float = 5.0  # Lower for better performance
-@export_range(0.0, 1.0) var controller_smoothing: float = 0.1  # Lower = more stable aim
+@export var smoothing_speed: float = 10.0  # Higher for more responsive movement
+@export_range(0.0, 1.0) var controller_smoothing: float = 0.0  # Zero for precise 1:1 mapping
 
 # Performance settings
 @export var disable_physics_when_distant: bool = true
@@ -100,24 +100,23 @@ func hide_menu_visuals():
 
 func update_gun_position(delta):
 	if right_controller and gun_instance:
-		# Check if controller movement exceeds threshold to reduce unnecessary updates
-		# This significantly improves performance by reducing transform calculations
+		# Get the controller's transform
 		var right_transform = right_controller.global_transform
 		
-		# Apply gun offset from the right controller with reduced precision calculations
-		var target_position = right_transform.origin + right_transform.basis * gun_offset
+		# For a 1:1 mapping, directly apply the controller's transform to the gun
+		# This makes the controller feel like it IS the gun
+		gun_instance.global_transform = right_transform
 		
-		# Use simplified lerp with reduced frequency for better performance
-		gun_instance.global_position = gun_instance.global_position.lerp(
-			target_position, 
-			delta * smoothing_speed
-		)
+		# If we need to make small adjustments to orientation, we can do it here
+		# but we want to maintain the direct mapping feeling
 		
-		# Use simplified rotation calculation - less accurate but much faster
-		var aim_direction = -right_transform.basis.z.normalized()
-		
-		# Skip blending for better performance in HIGH optimization mode
-		gun_instance.look_at(gun_instance.global_position + aim_direction, Vector3.UP)
+		# Apply minimal smoothing only if needed for stability
+		if controller_smoothing > 0:
+			var prev_position = gun_instance.global_position
+			gun_instance.global_position = prev_position.lerp(
+				right_transform.origin, 
+				delta * smoothing_speed
+			)
 
 func handle_gun_switching():
 	# Check for gun switching input

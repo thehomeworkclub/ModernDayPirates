@@ -45,7 +45,7 @@ ambient_light_sky_contribution = 0.5
 script = ExtResource("1_script")
 
 [node name="XROrigin3D" type="XROrigin3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.45716, 16.3239, 85.035)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.45716, 16.3239, 52.6422)
 current = true
 
 [node name="Head" type="Node3D" parent="XROrigin3D"]
