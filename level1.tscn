@@ -1,7 +1,6 @@
-[gd_scene load_steps=12 format=3 uid="uid://bvrnxw8xf5syb"]
+[gd_scene load_steps=11 format=3 uid="uid://bvrnxw8xf5syb"]
 
 [ext_resource type="Script" path="res://level_1_script.gd" id="1_script"]
-[ext_resource type="PackedScene" uid="uid://ds2gxiccgqbfe" path="res://Gun.tscn" id="2_gun"]
 [ext_resource type="PackedScene" uid="uid://eum51m82whp" path="res://cargo_ships/meshes/Dry_Cargo_Ship.fbx" id="3_nbyqe"]
 [ext_resource type="Script" path="res://VRGunController.gd" id="3_vrguns"]
 
@@ -57,7 +56,7 @@ fov = 90.5
 
 [node name="VRGunController" type="Node3D" parent="XROrigin3D"]
 script = ExtResource("3_vrguns")
-gun_scene = ExtResource("2_gun")
+enable_gun_switching = true
 
 [node name="XRController3DRight" type="XRController3D" parent="XROrigin3D"]
 tracker = &"right_hand"

@@ -6,10 +6,21 @@ extends Node3D
 @onready var gun_instance = $GunInstance if has_node("GunInstance") else null
 
 # Gun properties
-@export var gun_scene: PackedScene  # Set this in the editor instead of preloading
+@export var gun_scene: PackedScene = preload("res://M16A1Gun.tscn")  # Default to M16A1
 @export var bullet_scene: PackedScene
+@export var enable_gun_switching: bool = false  # Whether to allow switching between guns
 var current_gun = null
 var gun_offset = Vector3(0, -0.05, -0.2)  # Offset from controller position
+var available_guns = {
+	"m16a1": preload("res://M16A1Gun.tscn"),
+	"ak74": preload("res://AK74Gun.tscn"),
+	# Additional guns will be added here as they're implemented
+	# "scar": preload("res://SCARLGun.tscn"),
+	# "hk416": preload("res://HK416Gun.tscn"),
+	# "mp5": preload("res://MP5Gun.tscn"),
+	# "mosin": preload("res://MosinNagantGun.tscn")
+}
+var current_gun_index = 0
 
 # System references
 @onready var vr_origin = get_parent()
@@ -56,6 +67,10 @@ func _process(delta):
 		# Handle shooting with trigger only if controller input is available
 		if right_controller.get_float("trigger") > 0.8 and current_gun and current_gun.has_method("shoot") and current_gun.can_shoot:
 			current_gun.shoot()
+		
+		# Check for gun switching input if enabled
+		if enable_gun_switching:
+			handle_gun_switching()
 
 func hide_menu_visuals():
 	# Hide laser pointers in level scenes since we're using guns instead
@@ -103,3 +118,60 @@ func update_gun_position(delta):
 		
 		# Skip blending for better performance in HIGH optimization mode
 		gun_instance.look_at(gun_instance.global_position + aim_direction, Vector3.UP)
+
+func handle_gun_switching():
+	# Check for gun switching input
+	# This uses the "primary" button on the right controller (usually X on Oculus)
+	if right_controller.is_button_pressed("primary") and not right_controller.is_button_pressed("secondary"):
+		switch_to_next_gun()
+	
+	# Option to switch to specific gun using secondary + primary as modifier
+	if right_controller.is_button_pressed("secondary") and right_controller.is_button_pressed("primary"):
+		# You could implement specific gun selection here
+		pass
+
+func switch_to_next_gun():
+	# Check if we have more than one gun available
+	if available_guns.size() <= 1:
+		return
+	
+	# Get the gun keys (names) as an array
+	var gun_names = available_guns.keys()
+	
+	# Increment the index, cycling back to 0 if we reach the end
+	current_gun_index = (current_gun_index + 1) % gun_names.size()
+	
+	# Get the new gun name
+	var next_gun_name = gun_names[current_gun_index]
+	
+	# Switch to the next gun
+	switch_gun(next_gun_name)
+
+func switch_gun(gun_name: String):
+	# Check if the gun exists in our available guns
+	if not available_guns.has(gun_name):
+		print_verbose("Gun not found: " + gun_name)
+		return
+	
+	print_verbose("Switching to gun: " + gun_name)
+	
+	# Remove the current gun instance
+	if current_gun:
+		current_gun.queue_free()
+	
+	# Create the new gun instance
+	var new_gun_scene = available_guns[gun_name]
+	current_gun = new_gun_scene.instantiate()
+	add_child(current_gun)
+	current_gun.name = "GunInstance"
+	current_gun.is_vr_gun = true
+	
+	# Set the bullet scene if it was provided
+	if bullet_scene and current_gun.has_method("set_bullet_scene"):
+		current_gun.bullet_scene = bullet_scene
+	
+	gun_instance = current_gun
+	
+	# Provide haptic feedback for gun switch
+	if right_controller:
+		right_controller.trigger_haptic_pulse("haptic", 0.2, 0.1, 0.5, 0.0)
