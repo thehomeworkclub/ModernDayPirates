@@ -1,0 +1,213 @@
+[gd_scene load_steps=12 format=3 uid="uid://b4wtqojyvgqhk"]
+
+[ext_resource type="Script" path="res://VRGunController.gd" id="1_gun_controller"]
+[ext_resource type="PackedScene" uid="uid://dwgjyeqt83q8v" path="res://VRGunModel.tscn" id="2_gun_model"]
+
+[sub_resource type="GDScript" id="GDScript_level_template"]
+script/source = "extends Node3D
+
+# This is a template for level scenes that includes VR gun support
+# Copy this scene to create new levels
+
+@onready var xr_origin = $XROrigin3D
+@onready var world_env = $WorldEnvironment
+@onready var directional_light = $DirectionalLight3D
+
+# VR optimization level (LOW=0, MEDIUM=1, HIGH=2)
+var vr_optimization_level = 1  # Default to medium
+
+func _ready():
+	# Initialize VR
+	var xr_interface = XRServer.find_interface(\"OpenXR\")
+	if xr_interface:
+		xr_interface.initialize()
+		get_viewport().use_xr = true
+
+	# Set up VR 
+	if xr_origin:
+		print_verbose(\"Using editor-defined VR origin position: \" + str(xr_origin.position))
+		xr_origin.add_to_group(\"player\")
+	else:
+		print(\"ERROR: XROrigin3D not found\")
+		return
+		
+	# Apply performance optimizations for VR
+	optimize_for_vr()
+	
+func optimize_for_vr():
+	print(\"Applying VR performance optimizations...\")
+	
+	# Optimize environment settings
+	if world_env and world_env.environment:
+		var env = world_env.environment
+		# Disable most expensive rendering features
+		env.sdfgi_enabled = false
+		env.ssil_enabled = false
+		env.volumetric_fog_enabled = false
+		# Reduce quality of other features
+		env.ssao_enabled = vr_optimization_level < 2  # Disable in HIGH mode
+		env.ssao_detail = 0  # Lower quality SSAO
+		env.glow_enabled = vr_optimization_level < 2  # Disable in HIGH mode
+		env.glow_intensity = 1.0  # Reduce glow intensity
+		print(\"Optimized environment settings\")
+		
+	# Optimize directional light
+	if directional_light:
+		# Reduce shadow quality for better performance
+		directional_light.shadow_enabled = vr_optimization_level < 2  # Disable in HIGH mode
+		directional_light.shadow_bias = 0.05
+		directional_light.shadow_normal_bias = 2.0
+		directional_light.directional_shadow_max_distance = 100.0
+		directional_light.directional_shadow_split_1 = 0.1
+		directional_light.directional_shadow_split_2 = 0.2
+		directional_light.directional_shadow_split_3 = 0.5
+		print(\"Optimized directional light\")
+		
+	# Set physics tick rate to improve performance
+	Engine.physics_ticks_per_second = 60
+	
+	# Set target FPS for VR
+	Engine.max_fps = 90
+"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_laser"]
+transparency = 1
+albedo_color = Color(0, 0.5, 1, 0.6)
+emission_enabled = true
+emission = Color(0, 0.5, 1, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_laser"]
+top_radius = 0.005
+bottom_radius = 0.005
+height = 10.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_cursor"]
+radius = 0.02
+height = 0.04
+radial_segments = 8
+rings = 4
+
+[sub_resource type="BoxMesh" id="BoxMesh_k7lr1"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_52vrd"]
+sky_top_color = Color(0.753002, 0.908772, 1, 1)
+sky_horizon_color = Color(0.946513, 0.58414, 0.463084, 1)
+sky_curve = 0.279909
+sky_energy_multiplier = 0.8
+sun_angle_max = 52.22
+sun_curve = 0.289781
+
+[sub_resource type="Sky" id="Sky_b2uq0"]
+sky_material = SubResource("ProceduralSkyMaterial_52vrd")
+
+[sub_resource type="Environment" id="Environment_c51ac"]
+background_mode = 2
+sky = SubResource("Sky_b2uq0")
+ambient_light_color = Color(0.963174, 0.54642, 0.117375, 1)
+ambient_light_sky_contribution = 0.36
+ambient_light_energy = 2.95
+reflected_light_source = 2
+ssao_enabled = true
+ssao_radius = 0.99
+ssao_intensity = 5.87
+ssao_power = 0.806844
+ssao_sharpness = 1.0
+ssao_light_affect = 0.3
+ssil_enabled = true
+ssil_radius = 3.15
+ssil_intensity = 1.89
+ssil_sharpness = 1.0
+sdfgi_enabled = true
+sdfgi_bounce_feedback = 1.99
+sdfgi_cascades = 8
+sdfgi_min_cell_size = 0.0488281
+sdfgi_y_scale = 2
+sdfgi_energy = 0.9
+glow_enabled = true
+glow_intensity = 5.15
+glow_strength = 0.55
+fog_enabled = true
+fog_light_color = Color(0.906175, 0.661771, 0.536168, 1)
+fog_light_energy = 0.8
+fog_sun_scatter = 0.1
+fog_density = 0.001
+fog_sky_affect = 0.0
+fog_height = -258.69
+fog_height_density = 0.0665
+adjustment_enabled = true
+
+[node name="LevelTemplate" type="Node3D"]
+script = SubResource("GDScript_level_template")
+
+[node name="XROrigin3D" type="XROrigin3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+current = true
+
+[node name="Head" type="Node3D" parent="XROrigin3D"]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D/Head"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+fov = 90.5
+
+[node name="VRGunController" type="Node3D" parent="XROrigin3D"]
+script = ExtResource("1_gun_controller")
+
+[node name="XRController3DLeft" type="XRController3D" parent="XROrigin3D"]
+tracker = &"left_hand"
+pose = &"aim"
+
+[node name="LaserBeamLeft" type="MeshInstance3D" parent="XROrigin3D/XRController3DLeft"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -5)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("CylinderMesh_laser")
+
+[node name="LaserDotLeft" type="MeshInstance3D" parent="XROrigin3D/XRController3DLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("SphereMesh_cursor")
+
+[node name="RayCastLeft" type="RayCast3D" parent="XROrigin3D/XRController3DLeft"]
+target_position = Vector3(0, 0, -10)
+collision_mask = 7
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/XRController3DLeft"]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.2, 0, 0, -0.1)
+mesh = SubResource("BoxMesh_k7lr1")
+
+[node name="XRController3DRight" type="XRController3D" parent="XROrigin3D"]
+tracker = &"right_hand"
+pose = &"aim"
+
+[node name="LaserBeamRight" type="MeshInstance3D" parent="XROrigin3D/XRController3DRight"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -5)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("CylinderMesh_laser")
+
+[node name="LaserDotRight" type="MeshInstance3D" parent="XROrigin3D/XRController3DRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("SphereMesh_cursor")
+
+[node name="RayCastRight" type="RayCast3D" parent="XROrigin3D/XRController3DRight"]
+target_position = Vector3(0, 0, -10)
+collision_mask = 7
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/XRController3DRight"]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.2, 0, 0, -0.1)
+mesh = SubResource("BoxMesh_k7lr1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_c51ac")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 10, 0)
+shadow_enabled = true
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="EnemySpawn" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+
+[node name="WaveCenter" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)

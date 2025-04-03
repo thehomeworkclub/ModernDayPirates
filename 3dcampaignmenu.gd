@@ -81,8 +81,9 @@ var hovering_buttons = {}
 
 # Debug variables
 var debug_timer = 0.0
-var debug_update_interval = 1.0
+var debug_update_interval = 5.0  # Reduced debug frequency to every 5 seconds
 var is_changing_scene = false
+var enable_debug = false  # Disable debug by default
 
 func _ready() -> void:
 	print("\n=== 3D Campaign Menu Initializing ===")
@@ -432,12 +433,16 @@ func _process(delta: float) -> void:
 		debug_update()
 
 func debug_update():
+	if not enable_debug:
+		return
+		
+	# Only print debug info if explicitly enabled
 	if right_ray and right_ray.is_colliding():
 		var collider = right_ray.get_collider()
 		if collider:
-			print("Right ray hit: " + collider.name)
+			print_verbose("Right ray hit: " + collider.name)
 
 	if left_ray and left_ray.is_colliding():
 		var collider = left_ray.get_collider()
 		if collider:
-			print("Left ray hit: " + collider.name)
+			print_verbose("Left ray hit: " + collider.name)

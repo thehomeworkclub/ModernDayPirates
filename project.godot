@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+VRPerformanceBoost="*res://vr_performance_boost.gd"
 GameManager="*res://GameManager.gd"
 CurrencyManager="*res://CurrencyManager.gd"
 CollisionManager="*res://CollisionManager.gd"
@@ -109,16 +110,19 @@ strafe_right={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
-lights_and_shadows/directional_shadow/size=10000
-lights_and_shadows/directional_shadow/soft_shadow_filter_quality=5
-lights_and_shadows/positional_shadow/soft_shadow_filter_quality=5
+lights_and_shadows/directional_shadow/size=2048
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=1
+lights_and_shadows/positional_shadow/soft_shadow_filter_quality=1
 textures/default_filters/use_nearest_mipmap_filter=true
-lights_and_shadows/positional_shadow/atlas_quadrant_0_subdiv=3
-lights_and_shadows/positional_shadow/atlas_quadrant_1_subdiv=3
-lights_and_shadows/positional_shadow/atlas_quadrant_2_subdiv=4
-lights_and_shadows/positional_shadow/atlas_quadrant_3_subdiv=5
+lights_and_shadows/positional_shadow/atlas_quadrant_0_subdiv=1
+lights_and_shadows/positional_shadow/atlas_quadrant_1_subdiv=1
+lights_and_shadows/positional_shadow/atlas_quadrant_2_subdiv=1
+lights_and_shadows/positional_shadow/atlas_quadrant_3_subdiv=1
+anti_aliasing/quality/msaa_3d=0
 
 [xr]
 
 openxr/enabled=true
 shaders/enabled=true
+openxr/foveation_level=3
+openxr/foveation_dynamic=true

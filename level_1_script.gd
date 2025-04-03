@@ -11,7 +11,7 @@ var boss_enemy = null
 @onready var ship = $Dry_Cargo_Ship
 
 # VR optimization level (LOW=0, MEDIUM=1, HIGH=2)
-var vr_optimization_level = 1  # Default to medium
+var vr_optimization_level = 2  # Set to HIGH for better performance
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -48,52 +48,80 @@ func optimize_for_vr():
 		# Disable most expensive rendering features
 		env.sdfgi_enabled = false
 		env.ssil_enabled = false
+		env.ssao_enabled = false
+		env.glow_enabled = false
 		env.volumetric_fog_enabled = false
+		
 		# Reduce quality of other features
-		env.ssao_enabled = vr_optimization_level < 2  # Disable in HIGH mode
-		env.ssao_detail = 0  # Lower quality SSAO
-		env.glow_enabled = vr_optimization_level < 2  # Disable in HIGH mode
-		env.glow_intensity = 1.0  # Reduce glow intensity
-		print("Optimized environment settings")
+		if vr_optimization_level < 2:  # Only enable these in lower optimization modes
+			env.ssao_enabled = true
+			env.ssao_detail = 0  # Lower quality SSAO
+			env.glow_enabled = true
+			env.glow_intensity = 0.8  # Reduce glow intensity
+		
+		# Further reduce quality for all levels
+		env.ambient_light_energy = 1.5  # Reduce light calculation complexity
+		env.reflected_light_source = 0  # Disable reflections
+		env.fog_enabled = false  # Disable fog for performance
+		
+		print("Optimized environment settings for VR optimization level: " + str(vr_optimization_level))
 		
 	# Optimize directional light
 	if directional_light:
-		# Reduce shadow quality for better performance
-		directional_light.shadow_enabled = vr_optimization_level < 2  # Disable in HIGH mode
-		directional_light.shadow_bias = 0.05
-		directional_light.shadow_normal_bias = 2.0
-		directional_light.directional_shadow_max_distance = 100.0
-		directional_light.directional_shadow_split_1 = 0.1
-		directional_light.directional_shadow_split_2 = 0.2
-		directional_light.directional_shadow_split_3 = 0.5
-		print("Optimized directional light")
+		# Disable shadows in HIGH mode, severely limit in other modes
+		directional_light.shadow_enabled = vr_optimization_level < 2
 		
-	# Optimize ship mesh
-	if ship:
-		# Find all MeshInstance3D nodes in the ship
-		var mesh_instances = find_all_mesh_instances(ship)
-		for mesh_instance in mesh_instances:
-			# Disable global illumination for better performance
-			mesh_instance.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+		if directional_light.shadow_enabled:
+			directional_light.shadow_bias = 0.1  # Increase bias to reduce artifacts with lower quality
+			directional_light.shadow_normal_bias = 4.0  # Higher normal bias for better performance
+			directional_light.directional_shadow_max_distance = 50.0  # Dramatically reduce shadow distance
+			directional_light.shadow_blur = 1.0  # Increase blur for softer shadows (less detail)
 			
-			# Set shadow casting based on optimization level
-			if vr_optimization_level == 2:  # HIGH
-				mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			else:
-				mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-				
-			# Set LOD bias to render lower detail meshes sooner
-			mesh_instance.lod_bias = 2.0 + vr_optimization_level
-		
-		print("Optimized ship mesh with " + str(mesh_instances.size()) + " mesh instances")
-		
-	# Set physics tick rate to improve performance
-	Engine.physics_ticks_per_second = 60
+		# Reduce light energy for better performance
+		directional_light.light_energy = 0.8
+		directional_light.light_indirect_energy = 0.0  # Disable indirect lighting
+		print("Optimized directional light")
 	
-	# Set target FPS for VR
-	Engine.max_fps = 90
+	# Optimize all meshes
+	var all_meshes = find_all_mesh_instances(self)
+	var mesh_count = 0
 	
-	print("VR performance optimizations applied")
+	for mesh_instance in all_meshes:
+		# Disable global illumination for better performance
+		mesh_instance.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+		
+		# Disable shadow casting in HIGH mode
+		mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		
+		# Set LOD bias to render lower detail meshes sooner
+		mesh_instance.lod_bias = 4.0  # Aggressive LOD adjustment
+		
+		# Additional optimizations
+		if mesh_instance.material_override:
+			# Force low quality shading
+			mesh_instance.material_override.shading_mode = BaseMaterial3D.SHADING_MODE_PER_VERTEX
+			
+		mesh_count += 1
+	
+	print("Optimized " + str(mesh_count) + " mesh instances across entire scene")
+	
+	# Optimize ship specifically if exists
+	if ship:
+		# Ship might be a Node3D and not a GeometryInstance3D
+		# Find all mesh instances in the ship and optimize them instead
+		var ship_meshes = find_all_mesh_instances(ship)
+		print("Applied additional optimizations to " + str(ship_meshes.size()) + " ship meshes")
+		
+	# Engine optimizations
+	Engine.physics_ticks_per_second = 45  # Reduce physics calculations
+	Engine.max_fps = 72  # Reduce target FPS for better stability
+	
+	# Rendering settings
+	get_viewport().screen_space_aa = Viewport.SCREEN_SPACE_AA_DISABLED  # Disable anti-aliasing
+	get_viewport().use_debanding = false  # Disable debanding
+	get_viewport().msaa_3d = Viewport.MSAA_DISABLED  # Disable MSAA
+	
+	print("Applied aggressive VR performance optimizations")
 
 # Helper function to find all MeshInstance3D nodes in a node hierarchy
 func find_all_mesh_instances(node: Node) -> Array:
