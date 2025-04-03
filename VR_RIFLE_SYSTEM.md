@@ -126,7 +126,24 @@ When creating new rifles, consider these balancing principles:
 - Bullet instances are created at the Muzzle position
 - Direction is determined by the controller orientation
 - Accuracy affects random spread applied to bullets
-- Recoil will be implemented as visual feedback and aim adjustment
+- Recoil is implemented as both visual animation and haptic feedback
+
+### Recoil Animation System
+- Each gun has a custom recoil animation:
+  - **Visual Recoil**: Gun model moves back and tilts upward
+  - **Animation Parameters**: 
+    - M16A1: Moderate recoil with 0.1 rad rotation
+    - AK-74: Stronger recoil with 0.15 rad rotation
+  - **Duration**: 0.2 seconds (fast recovery)
+  - **Easing**: Initial quick movement followed by smooth return
+
+### Haptic Feedback
+- Both controllers receive haptic feedback when firing
+- Feedback properties scale with the gun's recoil value:
+  - **Right Controller**: Strong primary feedback
+  - **Left Controller**: Weaker supporting feedback
+  - **Intensity**: 0.5-1.0 based on recoil property
+  - **Duration**: 0.1-0.3 seconds based on recoil property
 
 ### Performance Considerations
 - Gun models use LOD (Level of Detail) for better VR performance
@@ -135,5 +152,5 @@ When creating new rifles, consider these balancing principles:
 
 ### Known Limitations
 - Current implementation uses simplified collision for bullets
-- Visual recoil and muzzle flash effects are not yet implemented
+- Muzzle flash effects not yet implemented
 - Reload animations will be added in future updates
