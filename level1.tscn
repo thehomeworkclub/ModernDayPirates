@@ -1,7 +1,28 @@
-[gd_scene load_steps=13 format=3 uid="uid://bvrnxw8xf5syb"]
+[gd_scene load_steps=11 format=3 uid="uid://bvrnxw8xf5syb"]
 
 [ext_resource type="Script" path="res://level_1_script.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://ds2gxiccgqbfe" path="res://Gun.tscn" id="2_gun"]
+[ext_resource type="PackedScene" uid="uid://eum51m82whp" path="res://cargo_ships/meshes/Dry_Cargo_Ship.fbx" id="3_nbyqe"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_laser"]
+transparency = 1
+albedo_color = Color(0, 0.5, 1, 0.6)
+emission_enabled = true
+emission = Color(0, 0.5, 1, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_laser"]
+top_radius = 0.005
+bottom_radius = 0.005
+height = 10.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_cursor"]
+radius = 0.02
+height = 0.04
+radial_segments = 8
+rings = 4
+
+[sub_resource type="BoxMesh" id="BoxMesh_k7lr1"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_52vrd"]
 sky_top_color = Color(0.753002, 0.908772, 1, 1)
@@ -50,31 +71,11 @@ fog_height = -258.69
 fog_height_density = 0.0665
 adjustment_enabled = true
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_laser"]
-transparency = 1
-albedo_color = Color(0, 0.5, 1, 0.6)
-emission_enabled = true
-emission = Color(0, 0.5, 1, 1)
-emission_energy_multiplier = 1.5
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_laser"]
-top_radius = 0.005
-bottom_radius = 0.005
-height = 10.0
-
-[sub_resource type="SphereMesh" id="SphereMesh_cursor"]
-radius = 0.02
-height = 0.04
-radial_segments = 8
-rings = 4
-
-[sub_resource type="BoxMesh" id="BoxMesh_k7lr1"]
-
 [node name="Level1" type="Node3D"]
 script = ExtResource("1_script")
 
 [node name="XROrigin3D" type="XROrigin3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.45716, 16.3239, 53.035)
 current = true
 
 [node name="Head" type="Node3D" parent="XROrigin3D"]
@@ -88,7 +89,6 @@ transform = Transform3D(1, 0, 0, 0, 1.05226, 0, 0, 0, 0.894814, 0, 0, 0)
 
 [node name="Gun" parent="XROrigin3D/Head/GunPivot" instance=ExtResource("2_gun")]
 transform = Transform3D(-0.106698, 0, -0.994291, 0, 0.950334, 0, 1.11117, 0, -0.11924, -0.447631, -0.29922, 0.486637)
-
 
 [node name="XRController3DLeft" type="XRController3D" parent="XROrigin3D"]
 tracker = &"left_hand"
@@ -140,7 +140,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
 [node name="wave_center" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
 
-
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_c51ac")
 
@@ -161,3 +160,6 @@ directional_shadow_split_3 = 0.219
 directional_shadow_fade_start = 1.0
 directional_shadow_max_distance = 670.0
 directional_shadow_pancake_size = 0.0
+
+[node name="Dry_Cargo_Ship" parent="." instance=ExtResource("3_nbyqe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.94615, 4.18604, 15.7145)

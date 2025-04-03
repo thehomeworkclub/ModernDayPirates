@@ -13,6 +13,35 @@ New game levels have been pulled from GitHub, found in the temp-game/ directory.
 ## Current Focus
 The VR campaign menu system is now complete with all core functionality implemented and working as expected. The menu provides a solid foundation for the rest of the game's VR interaction systems.
 
+Asset integration is underway, with cargo ship meshes and textures imported from the temp-game directory into a dedicated cargo_ships/ folder in the main project. Initial integration has surfaced an important consideration: VR camera position must be properly coordinated with ship positioning in scenes to avoid placing the player inside or below ships.
+
+Important VR positioning:
+- Campaign menu VR position: Vector3(10.954, -7.596, 4.236)
+- Level1 XROrigin3D editor position: Vector3(2.45716, 16.3239, 53.035)
+
+Key finding: Editor-defined XROrigin3D positions should be preserved rather than overridden in scripts. This ensures that carefully positioned camera elements remain where placed in the 3D editor.
+
+## Performance Optimizations
+
+VR performance issues were identified when integrating the cargo ship models. These have been addressed through:
+
+1. Runtime optimizations:
+   - Disabled expensive rendering features (SDFGI, SSIL)
+   - Reduced shadow quality and draw distance
+   - Implemented LOD (Level of Detail) support
+   - Optimized mesh instance properties (GI mode, shadow casting)
+
+2. Resource optimization tools:
+   - Created performance_optimizer.gd for runtime scene optimization
+   - Added optimize_resources.gd for editor-time asset optimization
+   - Implemented automatic mesh instance optimization
+
+3. Key performance settings:
+   - Configurable optimization levels (LOW, MEDIUM, HIGH)
+   - Target FPS: 90 (VR standard)
+   - Physics tick rate: 60
+   - Texture size limit: 1024px
+
 ## Recently Completed
 1. VR Menu System
 - Complete menu functionality

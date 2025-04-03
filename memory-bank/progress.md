@@ -26,6 +26,9 @@
 - Enemy system integration
 - Wave-based spawning system implementation
 
+### Asset Integration
+- ✓ Imported cargo ship meshes and textures from temp-game/Cargo_Ships/
+
 ## To Do
 - Adapt player character for VR interaction
 - Integrate enemy AI systems:
