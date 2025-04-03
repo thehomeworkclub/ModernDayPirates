@@ -53,10 +53,13 @@ func _physics_process(delta):
 
 		# If the collider is with a mob
 		if collision.get_collider() is Enemy:
+			
 			var mob = collision.get_collider()
+			if mob.is_dead:
+				break
 			hitimmunity = 40
 			# we check that we are hitting it from above.
-			mob.take_damage(10)
+			mob.take_damage(50)
 			
 			break
 				# If so, we squash it and bounce.

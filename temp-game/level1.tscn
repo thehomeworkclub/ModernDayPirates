@@ -87,9 +87,11 @@ mesh = SubResource("BoxMesh_p2pxr")
 skeleton = NodePath("")
 
 [node name="bossspawn" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.02163, -5.59499, 40.6711)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.02163, -6.4121, 40.6711)
 
 [node name="wave_center" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.02163, -5.59499, 14.8993)
+
+[node name="WaveTimer" type="Timer" parent="."]
 
 [editable path="StaticBody3D/Dry_Cargo_Ship"]
