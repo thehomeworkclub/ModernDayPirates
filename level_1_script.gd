@@ -25,7 +25,7 @@ func _ready():
 	if xr_origin:
 		# Use position already set in the scene editor
 		print_verbose("Using editor-defined VR origin position: " + str(xr_origin.position))
-		# Add VR origin to player group for enemy targeting
+		# Add VR origin to player group for future targeting
 		xr_origin.add_to_group("player")
 	else:
 		print("ERROR: XROrigin3D not found")
@@ -33,10 +33,10 @@ func _ready():
 		
 	# Apply performance optimizations for VR
 	optimize_for_vr()
-
-	# Start waves after setup
-	wave_1()
-	boss_wave()
+	
+	# Enemy spawning disabled while focusing on player actions
+	# wave_1()
+	# boss_wave()
 	
 # Apply performance optimizations for VR
 func optimize_for_vr():
