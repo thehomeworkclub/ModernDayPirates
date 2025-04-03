@@ -2,7 +2,7 @@ extends "res://Gun.gd"
 
 # Rifle-specific properties
 @export_range(1, 30) var magazine_size: int = 30
-@export var reload_time: float = 2.0
+@export var reload_time: float = 0.5  # Time to complete reload once magazine is inserted
 @export_range(0.0, 1.0) var accuracy: float = 0.9  # 1.0 = perfect accuracy
 @export_range(0.0, 1.0) var recoil: float = 0.2    # Recoil intensity
 @export var automatic: bool = false                # Whether the gun can fire continuously
@@ -21,20 +21,38 @@ var muzzle_flash_scene = preload("res://MuzzleFlash.tscn")
 var muzzle_flash_instance = null
 var muzzle_flash_timer: Timer
 
+# Magazine state
+enum MagazineState { ATTACHED_TO_GUN, ATTACHED_TO_HAND, BEING_INSERTED }
+var magazine_state = MagazineState.ATTACHED_TO_GUN
+var magazine_node: Node3D = null
+var magazine_original_transform: Transform3D
+var hand_magazine_position = Vector3(0, 0, 0.05)  # Position relative to left controller
+var magazine_detection_distance: float = 0.1  # Distance for detecting magazine insertion
+
 func _process(delta: float) -> void:
 	if automatic and Input.is_action_pressed("shoot") and can_shoot and current_ammo > 0 and not is_reloading:
 		shoot()
 	elif Input.is_action_just_pressed("shoot") and can_shoot and current_ammo > 0 and not is_reloading:
 		shoot()
 	
-	if Input.is_action_just_pressed("reload") and not is_reloading and current_ammo < magazine_size:
-		reload()
+	# Handle physical reloading motions
+	if magazine_state != MagazineState.BEING_INSERTED:
+		check_magazine_detachment()
+		check_magazine_reattachment()
 
 func _ready() -> void:
 	super._ready()
 	
 	# Set initial ammo
 	current_ammo = magazine_size
+	
+	# Find magazine node
+	magazine_node = find_magazine_node()
+	if magazine_node:
+		magazine_original_transform = magazine_node.transform
+		print_verbose("Found magazine node: " + magazine_node.name)
+	else:
+		print_verbose("WARNING: Magazine node not found")
 	
 	# Create reload timer
 	reload_timer = Timer.new()
@@ -57,13 +75,134 @@ func _ready() -> void:
 	
 	print_verbose("Rifle gun initialized: " + str(gun_type))
 
+# Find the magazine node in the model
+func find_magazine_node() -> Node3D:
+	var model = $Model
+	if model:
+		return model.get_node_or_null("Magazine")
+	return null
+
+# Check if left controller has moved away from right controller's "line"
+func check_magazine_detachment() -> void:
+	if magazine_state != MagazineState.ATTACHED_TO_GUN or current_ammo <= 0:
+		return
+		
+	if not right_controller or not left_controller:
+		return
+		
+	# Get right controller's forward direction
+	var right_forward = -right_controller.global_transform.basis.z.normalized()
+	
+	# Calculate vector from right to left controller
+	var right_to_left = left_controller.global_position - right_controller.global_position
+	
+	# Project right_to_left onto right_forward to get the parallel component
+	var parallel_component = right_to_left.dot(right_forward) * right_forward
+	
+	# Perpendicular component is what we need to check
+	var perpendicular_component = right_to_left - parallel_component
+	
+	# If perpendicular distance is above threshold, detach magazine
+	if perpendicular_component.length() > 0.15:  # Threshold distance
+		detach_magazine()
+
+# Check if left controller is in position to reattach magazine
+func check_magazine_reattachment() -> void:
+	if magazine_state != MagazineState.ATTACHED_TO_HAND:
+		return
+		
+	if not right_controller or not left_controller:
+		return
+		
+	# Get the magazine well position in global space
+	var model = $Model
+	if not model:
+		return
+		
+	var magazine_well_global = global_transform * model.transform * magazine_original_transform.origin
+	
+	# Calculate distance from left controller to magazine well
+	var distance = (left_controller.global_position - magazine_well_global).length()
+	
+	# If left controller is close enough to the magazine well, reattach
+	if distance < magazine_detection_distance:
+		reattach_magazine()
+
+# Detach magazine from gun and attach to left hand
+func detach_magazine() -> void:
+	if not magazine_node or not left_controller:
+		return
+		
+	print_verbose("Detaching magazine")
+	
+	# Change state
+	magazine_state = MagazineState.ATTACHED_TO_HAND
+	
+	# Remove magazine from gun
+	var magazine_model = magazine_node.get_child(0)
+	magazine_node.remove_child(magazine_model)
+	
+	# Create a new magazine parent on left controller
+	var hand_magazine = Node3D.new()
+	hand_magazine.name = "HandMagazine"
+	left_controller.add_child(hand_magazine)
+	
+	# Position it in front of left controller
+	hand_magazine.transform.origin = hand_magazine_position
+	
+	# Add magazine model to hand
+	hand_magazine.add_child(magazine_model)
+	
+	# Trigger haptic feedback
+	if left_controller:
+		left_controller.trigger_haptic_pulse("haptic", 0.5, 0.1, 1.0, 0.0)
+
+# Reattach magazine to gun and start reload process
+func reattach_magazine() -> void:
+	if not left_controller:
+		return
+		
+	print_verbose("Reattaching magazine")
+	
+	# Change state
+	magazine_state = MagazineState.BEING_INSERTED
+	
+	# Find hand magazine
+	var hand_magazine = left_controller.get_node_or_null("HandMagazine")
+	if not hand_magazine:
+		return
+		
+	# Get magazine model
+	var magazine_model = null
+	if hand_magazine.get_child_count() > 0:
+		magazine_model = hand_magazine.get_child(0)
+	if not magazine_model:
+		return
+	
+	# Remove from hand
+	hand_magazine.remove_child(magazine_model)
+	
+	# Add back to gun's magazine node
+	magazine_node.add_child(magazine_model)
+	
+	# Restore original transform
+	magazine_model.transform = Transform3D.IDENTITY
+	
+	# Trigger haptic feedback
+	if right_controller:
+		right_controller.trigger_haptic_pulse("haptic", 0.7, 0.2, 1.0, 0.0)
+	if left_controller:
+		left_controller.trigger_haptic_pulse("haptic", 0.7, 0.2, 1.0, 0.0)
+	
+	# Start reload process
+	reload()
+
 # Override the shoot method completely - DON'T call super.shoot()
 func shoot() -> void:
 	# Stop shooting if empty or reloading
 	if current_ammo <= 0:
 		# Click sound would play here
 		print_verbose("Out of ammo!")
-		reload()
 		return
 		
 	if is_reloading:
@@ -101,9 +240,9 @@ func shoot() -> void:
 	shoot_timer.wait_time = fire_rate
 	shoot_timer.start()
 	
-	# Auto-reload when empty
-	if current_ammo <= 0:
-		reload()
+	# Detach magazine automatically if empty (to simulate ejecting the empty mag)
+	if current_ammo <= 0 and magazine_state == MagazineState.ATTACHED_TO_GUN:
+		detach_magazine()
 
 func spawn_bullet(spread_offset: Vector3) -> void:
 	if not bullet_scene:
@@ -168,7 +307,7 @@ func _on_muzzle_flash_timeout() -> void:
 		muzzle_flash_instance = null
 
 func reload() -> void:
-	if is_reloading or current_ammo == magazine_size:
+	if is_reloading or current_ammo == magazine_size or magazine_state != MagazineState.BEING_INSERTED:
 		return
 		
 	print_verbose("Reloading rifle...")
@@ -182,6 +321,7 @@ func reload() -> void:
 func _on_reload_timer_timeout() -> void:
 	current_ammo = magazine_size
 	is_reloading = false
+	magazine_state = MagazineState.ATTACHED_TO_GUN
 	print_verbose("Reload complete. Ammo: " + str(current_ammo))
 
 func apply_recoil() -> void:

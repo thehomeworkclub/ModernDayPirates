@@ -24,12 +24,8 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
 	
-	# Add a small initial rotation for realism
-	rotation = Vector3(
-		randf_range(-0.05, 0.05),
-		randf_range(-0.05, 0.05),
-		0
-	)
+	# Orient bullet along the direction of travel
+	look_at(global_position + direction, Vector3.UP)
 	
 	# Debug info
 	print_verbose("Bullet spawned with damage: " + str(damage))
@@ -41,9 +37,6 @@ func _physics_process(delta: float) -> void:
 	# Apply slight gravity and deceleration for realism
 	direction.y -= 0.01 * delta
 	speed = max(speed - 5.0 * delta, 40.0)  # Slow down slightly over time, but keep minimum speed
-	
-	# Add slight spin for visual effect
-	rotate_x(delta * 15.0)
 
 func _on_body_entered(body: Node3D) -> void:
 	if body.has_method("take_damage"):

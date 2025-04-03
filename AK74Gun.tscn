@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://dtmvvf6y0byhf"]
+[gd_scene load_steps=8 format=3 uid="uid://dtmvvf6y0byhf"]
 
 [ext_resource type="Script" path="res://AK74Gun.gd" id="1_ak74"]
 [ext_resource type="PackedScene" uid="uid://b8v1cvnsgvxad" path="res://AK74Bullet.tscn" id="2_bullet"]
 [ext_resource type="PackedScene" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/AK-74.fbx" id="3_ak74_model"]
+[ext_resource type="PackedScene" path="res://assets/guns_hands/VRFPS_Kit/Models/Cartridges/545 ak magazine.fbx" id="4_ak_magazine"]
 
 [sub_resource type="Animation" id="Animation_recoil"]
 resource_name = "recoil"
@@ -74,6 +75,12 @@ bullet_scene = ExtResource("2_bullet")
 transform = Transform3D(0.07, 0, 0, 0, 0.07, 0, 0, 0, 0.07, 0, 0, -0.2)
 
 [node name="AK74Model" parent="Model" instance=ExtResource("3_ak74_model")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
+
+[node name="Magazine" type="Node3D" parent="Model"]
+transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, -1.5, 0)
+
+[node name="AK74Magazine" parent="Model/Magazine" instance=ExtResource("4_ak_magazine")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
 
 [node name="Muzzle" type="Node3D" parent="."]

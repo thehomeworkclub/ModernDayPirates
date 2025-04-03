@@ -5,7 +5,7 @@ This document describes the implementation of the rifle system for Modern Day Pi
 ## Overview
 
 The rifle system extends the existing VR gun framework with realistic rifle-specific behaviors including:
-- Magazine-based ammo system with reloading
+- Magazine-based ammo system with physical reloading
 - Rifle-specific properties (fire rate, damage, accuracy, recoil)
 - Automatic/semi-automatic firing modes
 - Model-specific visual representation using imported 3D models
@@ -29,22 +29,28 @@ Gun.gd (Base Gun Class)
   - Fire Rate: 0.15 seconds
   - Damage: 2 per shot
   - Magazine Size: 30 rounds
-  - Reload Time: 2.5 seconds
+  - Reload Time: 0.5 seconds
   - Accuracy: 0.9 (90%)
   - Recoil: 0.2
   - Firing Mode: Automatic
-- **Visual**: Uses M16A1.fbx model from VRFPS_Kit
+- **Visual Components**:
+  - M16A1.fbx model
+  - STANAG 5.56mm magazine attached to proper position
+  - Proper alignment of magazine in magazine well
 
 ### AK-74
 - **Properties**:
   - Fire Rate: 0.1 seconds (faster than M16A1)
   - Damage: 3 per shot (higher damage)
   - Magazine Size: 30 rounds
-  - Reload Time: 3.0 seconds (longer reload)
+  - Reload Time: 0.5 seconds
   - Accuracy: 0.85 (85%, less accurate)
   - Recoil: 0.25 (more recoil)
   - Firing Mode: Automatic
-- **Visual**: Uses AK-74.fbx model from VRFPS_Kit
+- **Visual Components**:
+  - AK-74.fbx model
+  - 5.45mm AK magazine attached to proper position
+  - Proper alignment of magazine in magazine well
 
 ## Planned Rifle Implementations
 - SCAR-L (Tactical rifle with balanced stats)
@@ -66,7 +72,7 @@ Gun.gd (Base Gun Class)
        fire_rate = 0.2
        bullet_damage = 2
        magazine_size = 25
-       reload_time = 2.0
+       reload_time = 0.5
        accuracy = 0.95
        recoil = 0.15
        automatic = true
@@ -105,6 +111,40 @@ The rifle system integrates with the VR system through:
 - Primary button (usually X on Oculus) for switching weapons
 - Haptic feedback when shooting and switching weapons
 - Automatic hiding of menu laser pointers when using rifles
+
+## Physical Reloading System
+
+The rifles implement a physical reloading system designed for use with a VR gunstock:
+
+### Magazine States
+The magazine can be in one of three states:
+1. **ATTACHED_TO_GUN**: Magazine is attached to the rifle
+2. **ATTACHED_TO_HAND**: Magazine is removed and held by left controller
+3. **BEING_INSERTED**: Magazine is being inserted back into the rifle
+
+### Reloading Process
+1. **Detaching the Magazine**:
+   - When the left controller moves away from the "line" of the right controller
+   - This simulates moving the left hand away from the stock to grab a new magazine
+   - The magazine visually detaches from the gun and attaches to the left controller
+   - Haptic feedback provides tactile confirmation
+
+2. **Attaching the Magazine**:
+   - When the left controller (with magazine) is brought close to the magazine well position
+   - The magazine will visually reattach to the gun
+   - Haptic feedback on both controllers confirms the insertion
+   - Reload timer starts to simulate locking the magazine in place
+
+3. **Empty Magazine Handling**:
+   - When the gun runs out of ammo, the magazine automatically detaches
+   - User must perform the physical reloading motion to insert a new magazine
+   - No automatic reloading - physical action is required
+
+### Detection Algorithm
+- Uses vector mathematics to detect when left controller moves off the right controller's "firing line"
+- Calculates perpendicular distance between controllers to detect removal
+- Uses proximity detection to determine when magazine is being reinserted
+- Provides appropriate haptic feedback for each stage of the process
 
 ## Balancing Tips
 
@@ -158,16 +198,16 @@ When creating new rifles, consider these balancing principles:
 - When aiming is critical for gameplay, lower the smoothing_speed value
 
 ### Bullet System
-- Each gun uses custom bullet types matching their ammunition:
-  - **M16A1**: 5.56mm cartridge model with moderate damage
-  - **AK-74**: 5.45mm cartridge model with higher damage
+- Each gun fires properly shaped bullets matching their ammunition type:
+  - **M16A1**: 5.56mm sized bullets with moderate damage
+  - **AK-74**: 5.45mm sized bullets with higher damage
 - Bullets feature:
-  - Realistic cartridge models from VRFPS_Kit
+  - Realistic bullet shape with pointed head and cylindrical body
+  - Proper orientation along flight path (pointing in direction of travel)
   - Visual trails for better visibility
   - Proper collision detection
   - Slight bullet drop for realism
   - Progressive deceleration over distance
-  - Random rotation for visual variety
 
 ### Muzzle Flash System
 - Extremely subtle, realistic muzzle flash effects:
@@ -179,6 +219,22 @@ When creating new rifles, consider these balancing principles:
   - Reduced particle count (8 particles vs. original 20)
   - Automatically created/destroyed with each shot
 
+### Magazine Positioning
+The magazine positioning for rifles has been carefully adjusted to fit in the magazine wells:
+
+#### M16A1 Magazine
+```
+[node name="Magazine" type="Node3D" parent="Model"]
+transform = Transform3D(-15, 0, -2.26494e-06, 0, 15, 0, 2.26494e-06, 0, -15, 0, -1.2, 0)
+```
+
+#### AK-74 Magazine
+```
+[node name="Magazine" type="Node3D" parent="Model"]
+transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, -1.5, 0)
+```
+
 ### Known Limitations
 - Shell ejection animations not yet implemented
-- Reload animations will be added in future updates
+- Magazine removal/insertion animations are basic and could be enhanced
+- Bolt manipulation for chamber checking not implemented

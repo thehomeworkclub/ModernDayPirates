@@ -1,17 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://b8v1cvnsgvxad"]
+[gd_scene load_steps=4 format=3 uid="uid://b8v1cvnsgvxad"]
 
 [ext_resource type="Script" path="res://EnhancedBullet.gd" id="1_script"]
-[ext_resource type="PackedScene" uid="uid://cv04sq6duhy0s" path="res://assets/guns_hands/VRFPS_Kit/Models/Cartridges/545 cartridge.fbx" id="2_cartridge"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_bullet"]
-radius = 0.02
-height = 0.1
+radius = 0.018
+height = 0.055
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bullet"]
-metallic = 0.8
-roughness = 0.2
+metallic = 0.9
+roughness = 0.1
 emission_enabled = true
-emission = Color(1, 0.5, 0, 1)
+emission = Color(1, 0.6, 0, 1)
 emission_energy_multiplier = 0.25
 
 [node name="AK74Bullet" type="Area3D"]
@@ -25,14 +24,22 @@ damage = 3
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_bullet")
 
-[node name="Trail" type="CSGCylinder3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0.05)
-radius = 0.01
-height = 0.12
+[node name="BulletMesh" type="CSGCombiner3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+
+[node name="BulletHead" type="CSGSphere3D" parent="BulletMesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.023, 0)
+radius = 0.018
 material = SubResource("StandardMaterial3D_bullet")
 
-[node name="Model" type="Node3D" parent="."]
-transform = Transform3D(0.08, 0, 0, 0, 0.08, 0, 0, 0, 0.08, 0, 0, 0)
+[node name="BulletBody" type="CSGCylinder3D" parent="BulletMesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.009, 0)
+radius = 0.018
+height = 0.045
+material = SubResource("StandardMaterial3D_bullet")
 
-[node name="545Cartridge" parent="Model" instance=ExtResource("2_cartridge")]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+[node name="Trail" type="CSGCylinder3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0.05)
+radius = 0.009
+height = 0.25
+material = SubResource("StandardMaterial3D_bullet")

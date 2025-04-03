@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://b4n6han5eh8w0"]
+[gd_scene load_steps=8 format=3 uid="uid://b4n6han5eh8w0"]
 
 [ext_resource type="Script" path="res://M16A1Gun.gd" id="1_m16a1"]
 [ext_resource type="PackedScene" path="res://M16A1Bullet.tscn" id="2_bullet"]
 [ext_resource type="PackedScene" uid="uid://cv04sq6duhy0s" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/M16A1.fbx" id="3_m16a1_model"]
+[ext_resource type="PackedScene" uid="uid://drdfisyp8ih1k" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/stanag 556 magazine.fbx" id="4_magazine"]
 
 [sub_resource type="Animation" id="Animation_reset"]
 resource_name = "RESET"
@@ -75,6 +76,11 @@ transform = Transform3D(0.07, 0, 0, 0, 0.07, 0, 0, 0, 0.07, 0, 0, -0.2)
 
 [node name="M16A1Model" parent="Model" instance=ExtResource("3_m16a1_model")]
 transform = Transform3D(-3, 0, -4.52987e-07, 0, 3, 0, 4.52987e-07, 0, -3, 0, 0, 0)
+
+[node name="Magazine" type="Node3D" parent="Model"]
+transform = Transform3D(-15, 0, -2.26494e-06, 0, 15, 0, 2.26494e-06, 0, -15, 0, -1.2, 0.168348)
+
+[node name="StanagMagazine" parent="Model/Magazine" instance=ExtResource("4_magazine")]
 
 [node name="Muzzle" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.7)
