@@ -128,6 +128,13 @@ When creating new rifles, consider these balancing principles:
 - Accuracy affects random spread applied to bullets
 - Recoil is implemented as both visual animation and haptic feedback
 
+### Single Bullet System
+- Each rifle fires exactly one bullet per trigger pull:
+  - Custom firing implementation that overrides the base Gun.gd behavior
+  - Prevents multiple bullets being fired (unlike the base gun system)
+  - Minimal spread application tailored specifically for rifles
+  - Accurate simulation of single-shot and automatic rifle fire
+
 ### Recoil Animation System
 - Each gun has a custom recoil animation:
   - **Visual Recoil**: Gun model moves back and tilts upward
@@ -163,11 +170,13 @@ When creating new rifles, consider these balancing principles:
   - Random rotation for visual variety
 
 ### Muzzle Flash System
-- Dynamic muzzle flash effects when firing:
-  - Particle-based fire emission
-  - Light glow effect
-  - Omni light for environment illumination
-  - Adjustable duration (currently 0.1 seconds)
+- Extremely subtle, realistic muzzle flash effects:
+  - Tiny orange-red particle-based fire emission (radius of 0.002)
+  - Minimal light glow effect (1/10 of original size)
+  - Almost imperceptible omni light for environment illumination
+  - Very short duration (0.08 seconds)
+  - Deep orange-red color scheme for realistic rifle fire
+  - Reduced particle count (8 particles vs. original 20)
   - Automatically created/destroyed with each shot
 
 ### Known Limitations
