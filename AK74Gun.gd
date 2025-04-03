@@ -1,5 +1,8 @@
 extends "res://BaseRifleGun.gd"
 
+# Animation reference
+@onready var animation_player = $AnimationPlayer
+
 func _ready() -> void:
 	# Set AK-74 specific properties
 	gun_type = "ak74"
@@ -15,3 +18,13 @@ func _ready() -> void:
 	super._ready()
 	
 	print_verbose("AK-74 rifle initialized")
+
+# Override shoot method to add recoil animation
+func shoot() -> void:
+	# Play recoil animation
+	if animation_player != null and animation_player.has_animation("recoil"):
+		animation_player.stop()
+		animation_player.play("recoil")
+	
+	# Call the parent shoot method
+	super.shoot()
