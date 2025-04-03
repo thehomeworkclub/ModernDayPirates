@@ -1,9 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://e48ofk0ue0q2"]
+[gd_scene load_steps=8 format=3 uid="uid://bwff6x5in66jt"]
 
 [ext_resource type="Script" path="res://MosinNagantGun.gd" id="1_mosin"]
 [ext_resource type="PackedScene" path="res://M16A1Bullet.tscn" id="2_bullet"]
-[ext_resource type="PackedScene" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/mosin nagant.fbx" id="3_mosin_model"]
-[ext_resource type="PackedScene" path="res://assets/guns_hands/VRFPS_Kit/Models/Cartridges/762 54R cartridge.fbx" id="4_magazine"]
+[ext_resource type="PackedScene" uid="uid://baaai5e72rjil" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/mosin nagant.fbx" id="3_mosin_model"]
+[ext_resource type="PackedScene" uid="uid://bttes5de73g6w" path="res://assets/guns_hands/VRFPS_Kit/Models/Cartridges/762 54R cartridge.fbx" id="4_magazine"]
 
 [sub_resource type="Animation" id="Animation_reset"]
 resource_name = "RESET"
@@ -68,6 +68,7 @@ _data = {
 }
 
 [node name="MosinNagantGun" type="Node3D"]
+transform = Transform3D(3.71, 0, 0, 0, 3.71, 0, 0, 0, 3.71, 0, 0, 0.107676)
 script = ExtResource("1_mosin")
 bullet_scene = ExtResource("2_bullet")
 
@@ -75,13 +76,13 @@ bullet_scene = ExtResource("2_bullet")
 transform = Transform3D(0.08, 0, 0, 0, 0.08, 0, 0, 0, 0.09, 0, 0, -0.2)
 
 [node name="MosinModel" parent="Model" instance=ExtResource("3_mosin_model")]
-transform = Transform3D(-3, 0, -4.52987e-07, 0, 3, 0, 4.52987e-07, 0, -3, 0, 0, 0)
+transform = Transform3D(-8.738, 0, -1.3194e-06, 0, 8.738, 0, 1.3194e-06, 0, -8.738, 0, 0, 0)
 
 [node name="Magazine" type="Node3D" parent="Model"]
 transform = Transform3D(-15, 0, -2.26494e-06, 0, 15, 0, 2.26494e-06, 0, -15, 0, -1.2, 0)
 
 [node name="MosinMagazine" parent="Model/Magazine" instance=ExtResource("4_magazine")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(0.525327, -6.32161e-08, 6.95844e-08, 7.93223e-08, -1.83003e-08, -0.460836, 7.93223e-08, 0.418661, -2.01438e-08, 0.000830271, 0.0811565, 0)
 
 [node name="Muzzle" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.8)

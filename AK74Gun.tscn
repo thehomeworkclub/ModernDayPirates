@@ -1,37 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://dtmvvf6y0byhf"]
+[gd_scene load_steps=8 format=3 uid="uid://fej0f8n68stl"]
 
 [ext_resource type="Script" path="res://AK74Gun.gd" id="1_ak74"]
-[ext_resource type="PackedScene" uid="uid://b8v1cvnsgvxad" path="res://AK74Bullet.tscn" id="2_bullet"]
-[ext_resource type="PackedScene" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/AK-74.fbx" id="3_ak74_model"]
-[ext_resource type="PackedScene" path="res://assets/guns_hands/VRFPS_Kit/Models/Cartridges/545 ak magazine.fbx" id="4_ak_magazine"]
-
-[sub_resource type="Animation" id="Animation_recoil"]
-resource_name = "recoil"
-length = 0.2
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Model:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.05, 0.2),
-"transitions": PackedFloat32Array(0.5, 2, 1),
-"update": 0,
-"values": [Vector3(0, 0, -0.2), Vector3(0, 0, -0.15), Vector3(0, 0, -0.2)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Model:rotation")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.05, 0.2),
-"transitions": PackedFloat32Array(0.5, 2, 1),
-"update": 0,
-"values": [Vector3(0, 0, 0), Vector3(-0.15, 0, 0), Vector3(0, 0, 0)]
-}
+[ext_resource type="PackedScene" path="res://AK74Bullet.tscn" id="2_bullet"]
+[ext_resource type="PackedScene" uid="uid://du4ngp1s3morv" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/AK-74.fbx" id="3_ak74_model"]
+[ext_resource type="PackedScene" uid="uid://rm0u2kkcwmk7" path="res://assets/guns_hands/VRFPS_Kit/Models/Cartridges/545 ak magazine.fbx" id="4_ak_magazine"]
 
 [sub_resource type="Animation" id="Animation_reset"]
 resource_name = "RESET"
@@ -61,6 +33,34 @@ tracks/1/keys = {
 "values": [Vector3(0, 0, 0)]
 }
 
+[sub_resource type="Animation" id="Animation_recoil"]
+resource_name = "recoil"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Model:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.2),
+"transitions": PackedFloat32Array(0.5, 2, 1),
+"update": 0,
+"values": [Vector3(0, 0, -0.2), Vector3(0, 0, -0.15), Vector3(0, 0, -0.2)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Model:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.2),
+"transitions": PackedFloat32Array(0.5, 2, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-0.15, 0, 0), Vector3(0, 0, 0)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ak74"]
 _data = {
 "RESET": SubResource("Animation_reset"),
@@ -75,10 +75,10 @@ bullet_scene = ExtResource("2_bullet")
 transform = Transform3D(0.07, 0, 0, 0, 0.07, 0, 0, 0, 0.07, 0, 0, -0.2)
 
 [node name="AK74Model" parent="Model" instance=ExtResource("3_ak74_model")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
+transform = Transform3D(-8.74228e-08, 0, 2, 0, 2, 0, -2, 0, -8.74228e-08, 0, 0, 0)
 
 [node name="Magazine" type="Node3D" parent="Model"]
-transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, -1.5, 0)
+transform = Transform3D(17.7422, 0, 0, 0, 15, 0, 0, 0, 15, 0.20631, -0.598388, 0)
 
 [node name="AK74Magazine" parent="Model/Magazine" instance=ExtResource("4_ak_magazine")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)

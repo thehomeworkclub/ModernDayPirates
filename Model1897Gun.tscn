@@ -1,9 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://dmpj4x62d6jms"]
+[gd_scene load_steps=8 format=3 uid="uid://brrv0sqo2dhtk"]
 
 [ext_resource type="Script" path="res://Model1897Gun.gd" id="1_m1897"]
 [ext_resource type="PackedScene" path="res://AK74Bullet.tscn" id="2_bullet"]
-[ext_resource type="PackedScene" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/Model 1897.fbx" id="3_m1897_model"]
-[ext_resource type="PackedScene" path="res://assets/guns_hands/VRFPS_Kit/Models/Cartridges/12-gauge shell.fbx" id="4_magazine"]
+[ext_resource type="PackedScene" uid="uid://62en50tit4yv" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/Model 1897.fbx" id="3_m1897_model"]
+[ext_resource type="PackedScene" uid="uid://bf3x6hhq5jnfk" path="res://assets/guns_hands/VRFPS_Kit/Models/Cartridges/12-gauge shell.fbx" id="4_magazine"]
 
 [sub_resource type="Animation" id="Animation_reset"]
 resource_name = "RESET"
@@ -72,16 +72,15 @@ script = ExtResource("1_m1897")
 bullet_scene = ExtResource("2_bullet")
 
 [node name="Model" type="Node3D" parent="."]
-transform = Transform3D(0.07, 0, 0, 0, 0.07, 0, 0, 0, 0.1, 0, 0, -0.2)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2.857, 0, 0, -0.2)
 
 [node name="ShotgunModel" parent="Model" instance=ExtResource("3_m1897_model")]
-transform = Transform3D(-3, 0, -4.52987e-07, 0, 3, 0, 4.52987e-07, 0, -3, 0, 0, 0)
+transform = Transform3D(-1.5, 0, -2.26494e-07, 0, 1.5, 0, 2.26494e-07, 0, -1.5, 0, 0, 0)
 
 [node name="Magazine" type="Node3D" parent="Model"]
-transform = Transform3D(-15, 0, -2.26494e-06, 0, 15, 0, 2.26494e-06, 0, -15, 0, -1.2, 0)
+transform = Transform3D(-0.0085016, 0, -1.50445e-09, 1.28371e-09, -2.79424e-10, -0.00996353, 2.84622e-17, -0.00639248, 4.3552e-10, 0, 0.0166236, -0.140824)
 
 [node name="ShotgunMagazine" parent="Model/Magazine" instance=ExtResource("4_magazine")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="Muzzle" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.8)

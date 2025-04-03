@@ -1,9 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://bsvl3fwvpnpkx"]
+[gd_scene load_steps=8 format=3 uid="uid://d1w65mx4uau1t"]
 
 [ext_resource type="Script" path="res://MP5Gun.gd" id="1_mp5"]
 [ext_resource type="PackedScene" path="res://AK74Bullet.tscn" id="2_bullet"]
-[ext_resource type="PackedScene" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/MP5.fbx" id="3_mp5_model"]
-[ext_resource type="PackedScene" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/MP5 magazine.fbx" id="4_magazine"]
+[ext_resource type="PackedScene" uid="uid://dxyd8b2i5lrp" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/MP5.fbx" id="3_mp5_model"]
+[ext_resource type="PackedScene" uid="uid://dgh33rhqxemot" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/MP5 magazine.fbx" id="4_magazine"]
 
 [sub_resource type="Animation" id="Animation_reset"]
 resource_name = "RESET"
@@ -68,6 +68,7 @@ _data = {
 }
 
 [node name="MP5Gun" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.145761)
 script = ExtResource("1_mp5")
 bullet_scene = ExtResource("2_bullet")
 
@@ -75,10 +76,10 @@ bullet_scene = ExtResource("2_bullet")
 transform = Transform3D(0.06, 0, 0, 0, 0.06, 0, 0, 0, 0.06, 0, 0, -0.2)
 
 [node name="MP5Model" parent="Model" instance=ExtResource("3_mp5_model")]
-transform = Transform3D(-3, 0, -4.52987e-07, 0, 3, 0, 4.52987e-07, 0, -3, 0, 0, 0)
+transform = Transform3D(-15, 0, -2.26494e-06, 0, 15, 0, 2.26494e-06, 0, -15, 0, 0, 0)
 
 [node name="Magazine" type="Node3D" parent="Model"]
-transform = Transform3D(-15, 0, -2.26494e-06, 0, 15, 0, 2.26494e-06, 0, -15, 0, -1.2, 0)
+transform = Transform3D(-15, 0, -2.26494e-06, 0, 15, 0, 2.26494e-06, 0, -15, 0, -1.2, -1.57481)
 
 [node name="MP5Magazine" parent="Model/Magazine" instance=ExtResource("4_magazine")]
 
