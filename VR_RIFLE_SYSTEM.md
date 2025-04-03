@@ -150,7 +150,26 @@ When creating new rifles, consider these balancing principles:
 - Controller position smoothing improves stability for aiming
 - When aiming is critical for gameplay, lower the smoothing_speed value
 
+### Bullet System
+- Each gun uses custom bullet types matching their ammunition:
+  - **M16A1**: 5.56mm cartridge model with moderate damage
+  - **AK-74**: 5.45mm cartridge model with higher damage
+- Bullets feature:
+  - Realistic cartridge models from VRFPS_Kit
+  - Visual trails for better visibility
+  - Proper collision detection
+  - Slight bullet drop for realism
+  - Progressive deceleration over distance
+  - Random rotation for visual variety
+
+### Muzzle Flash System
+- Dynamic muzzle flash effects when firing:
+  - Particle-based fire emission
+  - Light glow effect
+  - Omni light for environment illumination
+  - Adjustable duration (currently 0.1 seconds)
+  - Automatically created/destroyed with each shot
+
 ### Known Limitations
-- Current implementation uses simplified collision for bullets
-- Muzzle flash effects not yet implemented
+- Shell ejection animations not yet implemented
 - Reload animations will be added in future updates

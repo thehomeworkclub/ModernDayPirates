@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://dtmvvf6y0byhf"]
 
 [ext_resource type="Script" path="res://AK74Gun.gd" id="1_ak74"]
-[ext_resource type="PackedScene" uid="uid://bmpimc7okdghl" path="res://Bullet.tscn" id="2_bullet"]
+[ext_resource type="PackedScene" uid="uid://b8v1cvnsgvxad" path="res://AK74Bullet.tscn" id="2_bullet"]
 [ext_resource type="PackedScene" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/AK-74.fbx" id="3_ak74_model"]
 
 [sub_resource type="Animation" id="Animation_recoil"]
