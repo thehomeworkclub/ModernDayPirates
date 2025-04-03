@@ -12,7 +12,19 @@ func _ready() -> void:
 	add_to_group("Player")
 	
 	# Calculate max health with any permanent upgrades
-	max_health = int(base_health * (1.0 + GameManager.max_health_bonus) * CurrencyManager.max_health_multiplier)
+	# Check if GameManager has max_health_bonus property
+	var health_bonus = 0.0
+	if GameManager.has_method("get") and GameManager.get("max_health_bonus") != null:
+		health_bonus = GameManager.max_health_bonus
+	
+	# Check if CurrencyManager exists and has the multiplier property
+	var health_multiplier = 1.0
+	if Engine.has_singleton("CurrencyManager"):
+		var currency_manager = Engine.get_singleton("CurrencyManager")
+		if currency_manager.has_method("get") and currency_manager.get("max_health_multiplier") != null:
+			health_multiplier = currency_manager.max_health_multiplier
+	
+	max_health = int(base_health * (1.0 + health_bonus) * health_multiplier)
 	health = max_health
 	
 	monitoring = true
@@ -161,9 +173,21 @@ func heal(amount: float) -> void:
 	update_health_display()
 
 func upgrade_max_health(bonus: float) -> void:
-	max_health = int(base_health * (1.0 + GameManager.max_health_bonus + bonus) * CurrencyManager.max_health_multiplier)
+	# Get max_health_bonus if it exists
+	var health_bonus = 0.0
+	if GameManager.has_method("get") and GameManager.get("max_health_bonus") != null:
+		health_bonus = GameManager.max_health_bonus
+	
+	# Get max_health_multiplier if it exists
+	var health_multiplier = 1.0
+	if Engine.has_singleton("CurrencyManager"):
+		var currency_manager = Engine.get_singleton("CurrencyManager")
+		if currency_manager.has_method("get") and currency_manager.get("max_health_multiplier") != null:
+			health_multiplier = currency_manager.max_health_multiplier
+	
+	max_health = int(base_health * (1.0 + health_bonus + bonus) * health_multiplier)
 	# Also heal when max health increases
-	health += int(base_health * bonus * CurrencyManager.max_health_multiplier)
+	health += int(base_health * bonus * health_multiplier)
 	health = min(health, max_health)
 	update_health_display()
 

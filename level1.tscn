@@ -1,8 +1,15 @@
-[gd_scene load_steps=11 format=3 uid="uid://bvrnxw8xf5syb"]
+[gd_scene load_steps=21 format=3 uid="uid://bvrnxw8xf5syb"]
 
 [ext_resource type="Script" path="res://level_1_script.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://eum51m82whp" path="res://cargo_ships/meshes/Dry_Cargo_Ship.fbx" id="3_nbyqe"]
 [ext_resource type="Script" path="res://VRGunController.gd" id="3_vrguns"]
+[ext_resource type="Script" path="res://EnemySpawner.gd" id="4_pnw7a"]
+[ext_resource type="PackedScene" uid="uid://bdjsg4y1dhl0f" path="res://Enemy.tscn" id="5_lwsvo"]
+[ext_resource type="PackedScene" uid="uid://bcfxrp7gegi45" path="res://Boat.tscn" id="6_1kiwj"]
+[ext_resource type="Shader" path="res://ocean.gdshader" id="7_7jvyp"]
+[ext_resource type="Script" path="res://RoundBoard.gd" id="8_lc0v4"]
+[ext_resource type="Script" path="res://BombCleaner.gd" id="9_fj7i8"]
+[ext_resource type="PackedScene" path="res://TargetPlane.tscn" id="10_3k7rt"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_laser"]
 transparency = 1
@@ -41,11 +48,32 @@ sky = SubResource("Sky_b2uq0")
 ambient_light_color = Color(0.6, 0.6, 0.6, 1)
 ambient_light_sky_contribution = 0.5
 
+[sub_resource type="PlaneMesh" id="PlaneMesh_y1l8n"]
+size = Vector2(250, 250)
+subdivide_width = 65
+subdivide_depth = 125
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xr1l8"]
+render_priority = 1
+shader = ExtResource("7_7jvyp")
+shader_parameter/amplitude = 2.0
+shader_parameter/speed = 1.0
+shader_parameter/frequency = 2.0
+shader_parameter/noise_factor = 0.2
+shader_parameter/water_color = Vector3(0, 0.4, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eq1s2"]
+transparency = 1
+albedo_color = Color(0, 0.5, 1, 0.2)
+emission_enabled = true
+emission = Color(0, 0.5, 1, 0.5)
+emission_energy_multiplier = 0.3
+
 [node name="Level1" type="Node3D"]
 script = ExtResource("1_script")
 
 [node name="XROrigin3D" type="XROrigin3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.45716, 16.3239, 52.6422)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.45716, 16.3239, -13.8489)
 current = true
 
 [node name="Head" type="Node3D" parent="XROrigin3D"]
@@ -100,4 +128,33 @@ light_energy = 0.7
 light_indirect_energy = 0.0
 
 [node name="Dry_Cargo_Ship" parent="." instance=ExtResource("3_nbyqe")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.94615, 4.18604, 15.7145)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.94615, 4.18604, -50.4967)
+
+[node name="EnemySpawner" type="Node3D" parent="." groups=["EnemySpawner"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 45)
+script = ExtResource("4_pnw7a")
+enemy_scene = ExtResource("5_lwsvo")
+ship_spawn_height = 0.0
+
+[node name="Area3D" parent="." groups=["player_boat"] instance=ExtResource("6_1kiwj")]
+transform = Transform3D(-2.64326, 0, -1.67425e-07, 0, 2.62623, 0, 2.31081e-07, 0, -1.91512, 8.38106, 0, -36.1083)
+visible = false
+
+[node name="sea" type="MeshInstance3D" parent="."]
+transform = Transform3D(-1.71122e-07, 0, -2.70399, 0, 1, 0, 3.91482, 0, -1.18195e-07, 0, -0.230235, 162.095)
+visible = false
+mesh = SubResource("PlaneMesh_y1l8n")
+surface_material_override/0 = SubResource("ShaderMaterial_xr1l8")
+
+[node name="RoundBoard" type="Node3D" parent="."]
+transform = Transform3D(463.086, 0, 0, 0, 253.705, 0, 0, 0, 1, 0, 6.9544, -31.8352)
+script = ExtResource("8_lc0v4")
+
+[node name="Label3D" type="Label3D" parent="RoundBoard"]
+
+[node name="BombCleaner" type="Node" parent="."]
+script = ExtResource("9_fj7i8")
+
+[node name="TargetPlane" parent="." instance=ExtResource("10_3k7rt")]
+transform = Transform3D(0.667082, 0, 0, 0, 1, 0, 0, 0, 0.514231, 0, -1.24286, 20)
+material_override = SubResource("StandardMaterial3D_eq1s2")

@@ -12,6 +12,11 @@ var boss_enemy = null
 @onready var world_env = $WorldEnvironment
 @onready var directional_light = $DirectionalLight3D
 @onready var ship = $Dry_Cargo_Ship
+@onready var enemy_spawner = $EnemySpawner
+@onready var player_boat = $Area3D
+@onready var sea = $sea
+@onready var round_board = $RoundBoard
+@onready var bomb_cleaner = $BombCleaner
 
 # VR optimization level (LOW=0, MEDIUM=1, HIGH=2)
 var vr_optimization_level = 2  # Set to HIGH for better performance
@@ -48,9 +53,63 @@ func _ready():
 	# Apply performance optimizations for VR
 	optimize_for_vr()
 	
-	# Enemy spawning disabled while focusing on player actions
-	# wave_1()
-	# boss_wave()
+	# Initialize the player boat if it exists
+	if player_boat:
+		print_verbose("Player boat found and initialized")
+	else:
+		print("WARNING: Player boat not found")
+	
+	# Initialize the enemy spawner if it exists
+	if enemy_spawner:
+		print_verbose("Enemy spawner found and initialized")
+	else:
+		print("WARNING: Enemy spawner not found")
+	
+	# Initialize the sea if it exists
+	if sea:
+		print_verbose("Sea/ocean found and initialized")
+	else:
+		print("WARNING: Sea/ocean not found")
+		
+	# Initialize the round board if it exists
+	if round_board:
+		print_verbose("Round board found and initialized")
+	else:
+		print("WARNING: Round board not found")
+		
+	# Initialize the bomb cleaner if it exists
+	if bomb_cleaner:
+		print_verbose("Bomb cleaner found and initialized")
+	else:
+		print("WARNING: Bomb cleaner not found")
+		
+	# Initialize enemy spawning
+	if enemy_spawner:
+		print("Starting enemy spawning...")
+		# Force GameManager into a state where spawning will work
+		GameManager.game_started = true
+		GameManager.enemies_per_wave = 10
+		GameManager.enemy_spawn_rate = 1.0
+		GameManager.wave_difficulty_multiplier = 1.0
+		GameManager.enemy_speed = 1.0
+		GameManager.enemy_health = 1.0
+		
+		# Ensure the player boat is properly registered with GameManager
+		if player_boat:
+			GameManager.player_boat = player_boat
+			if not player_boat.is_in_group("player_boat"):
+				player_boat.add_to_group("player_boat")
+			print("Player boat registered with GameManager")
+		
+		# Register enemy spawner with GameManager
+		GameManager.enemy_spawner = enemy_spawner
+		
+		# Force spawn a wave of enemies
+		if enemy_spawner.has_method("start_wave_spawning"):
+			enemy_spawner.start_wave_spawning()
+			print("Enemy wave spawning started")
+	else:
+		print("WARNING: Enemy spawner not found or initialized")
 	
 # Apply performance optimizations for VR
 func optimize_for_vr():

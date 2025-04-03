@@ -74,13 +74,20 @@ func _ready() -> void:
 				boat_model = child
 				break
 	
-	# Calculate health based on difficulty
-	var round_bonus = GameManager.current_round - 1
+	# Calculate health based on difficulty with safe access
+	var round_bonus = 0
+	if GameManager.has_method("get") and GameManager.get("current_round") != null:
+		round_bonus = GameManager.current_round - 1
+	
 	health = int(base_health * health_multiplier) + round_bonus
 	
 	# Use the same difficulty factors for currency as we do for enemy stats
 	# This aligns with the GameManager difficulty system
-	bronze_value = int(base_bronze_value * health_multiplier + GameManager.current_round)
+	var round_value = 1
+	if GameManager.has_method("get") and GameManager.get("current_round") != null:
+		round_value = GameManager.current_round
+	
+	bronze_value = int(base_bronze_value * health_multiplier + round_value)
 	
 	# Connect signal using the new signal syntax
 	area_entered.connect(_on_area_entered)

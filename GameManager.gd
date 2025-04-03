@@ -16,10 +16,16 @@ var enemy_speed: float = 1.0
 var enemy_health: float = 1.0
 var enemies_spawned_in_wave: int = 0
 var current_enemies_count: int = 0
+var current_bomber_id: int = -1  # Tracks which enemy is the designated bomber
+var next_enemy_id: int = 0  # Counter for assigning unique enemy IDs
 
 # Game state tracking
 var current_voyage_num = 0
 var current_voyage_difficulty = 0
+var current_round = 1  # Current level round
+var current_wave = 1   # Current wave within the round
+var voyage_name = "Modern Day Pirates"  # Name of the current voyage
+var difficulty = "Normal"  # Difficulty level as a string
 
 # Player equipment and stats
 var gun_type = "basic"  # Default gun type
@@ -51,6 +57,32 @@ const DIFFICULTY_VALUES = {
 func _ready() -> void:
 	print("Initializing GameManager...")
 	initialize_game_state()
+
+# Register an enemy and return a unique ID
+func register_enemy() -> int:
+	var new_id = next_enemy_id
+	next_enemy_id += 1
+	print("Registered enemy with ID: ", new_id)
+	
+	# Automatically assign first enemy as bomber
+	if current_bomber_id == -1:
+		current_bomber_id = new_id
+		print("Setting enemy ", new_id, " as initial bomber")
+	
+	update_enemy_count(current_enemies_count + 1)
+	return new_id
+
+# Handle enemy defeat
+func enemy_defeated(enemy_id: int) -> void:
+	print("Enemy ", enemy_id, " defeated")
+	
+	# Update enemy count
+	update_enemy_count(current_enemies_count - 1)
+	
+	# If the bomber was defeated, assign a new one
+	if enemy_id == current_bomber_id:
+		current_bomber_id = -1
+		print("Bomber defeated, will assign new bomber")
 
 func update_enemy_count(count: int) -> void:
 	if current_enemies_count != count:
