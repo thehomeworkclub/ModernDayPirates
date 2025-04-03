@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Gun.gd" id="1_gun_script"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_body"]
+
+[node name="VRGunModel" type="Node3D"]
+script = ExtResource("1_gun_script")
+
+[node name="GunBody" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.1, 0, 0, 0, 0.05, 0, 0, 0, 0.5, 0, 0, -0.4)
+mesh = SubResource("BoxMesh_body")
+
+[node name="Muzzle" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.2)

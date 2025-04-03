@@ -2,6 +2,28 @@
 
 ## Completed Features
 
+### VR Weapons System
+- ✓ Implemented base rifle framework with inheritance pattern
+- ✓ Created physical reloading system with magazine detachment/reattachment
+- ✓ Developed M16A1 rifle with proper magazine positioning
+- ✓ Developed AK-74 rifle with proper magazine positioning
+- ✓ Implemented single bullet firing system (overriding base gun behavior)
+- ✓ Added subtle muzzle flash effects
+- ✓ Created recoil animations with weapon-specific parameters
+- ✓ Integrated haptic feedback for controllers
+- ✓ Fixed detachment/reattachment issues with improved state management
+- ✓ Optimized detection thresholds for better VR gunstock compatibility
+- ✓ Documented rifle system thoroughly in VR_RIFLE_SYSTEM.md
+- ✓ Implemented 5 additional weapons with unique characteristics:
+  - ✓ SCAR-L (Tactical rifle with balanced stats)
+  - ✓ HK416 (High-precision rifle with better accuracy)
+  - ✓ MP5 (Submachine gun with faster fire rate but lower damage)
+  - ✓ Mosin Nagant (Bolt-action rifle with high damage but slow fire rate)
+  - ✓ Model 1897 (Shotgun with pellet spread and 2-shell magazine)
+- ✓ Added weapon switching via keyboard number keys (1-7)
+- ✓ Fixed ghost magazine issue when switching weapons
+- ✓ Added proper textured models for all weapons with correct UIDs
+
 ### 3D Campaign Menu
 - ✓ Implemented VR laser pointer interaction system
 - ✓ Created button collision and interaction system
@@ -21,12 +43,25 @@
 - ✓ Scene transitions
 
 ## In Progress
-- Shop functionality
-- Campaign gameplay implementation
-- Enemy spawning system
+- Integration of new game levels from temp-game/
+- Enemy system integration
+- Wave-based spawning system implementation
+- Weapon selection interface for VR (currently keyboard-only for debugging)
+
+### Asset Integration
+- ✓ Imported cargo ship meshes and textures from temp-game/Cargo_Ships/
+- ✓ Imported rifle models from assets/guns_hands/VRFPS_Kit/Models/Weapons/
 
 ## To Do
-- Weapon system
+- Adapt player character for VR interaction
+- Integrate enemy AI systems:
+  - Melee enemy behavior
+  - Ranged enemy attacks
+  - Boss fight mechanics
+  - Summoner abilities
+- Implement wave spawning in VR space
+- Connect level progression with campaign menu
+- Weapon system integration with rifle framework
 - Ship damage mechanics
 - Save/load system
 - Leader boards
@@ -41,12 +76,18 @@
 - Efficient collision detection and handling
 - Clean separation of concerns in menu system
 - Detailed debug logging for troubleshooting
+- Reliable physical reloading system for VR gunstock usage
+- Optimized detection thresholds for VR motion
+- Implemented diverse weapon types with consistent reloading mechanics
+- Fixed ghost object issues with proper cleanup during weapon switching
 
 ## Next Steps
-1. Implement shop functionality
-2. Develop core gameplay mechanics
-3. Create enemy AI and spawning system
-4. Design and implement weapon systems
+1. Implement VR controller-based weapon selection interface
+2. Add visual indicator for current selected weapon
+3. Create weapon rack for in-game selection
+4. Adapt enemy systems for VR combat
+5. Implement wave spawning mechanics
+6. Connect rifle system with enemy damage system
 
 ## Known Issues
-- None currently reported for menu system
+- None currently reported for menu or weapons systems

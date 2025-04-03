@@ -1,0 +1,92 @@
+[gd_scene load_steps=8 format=3 uid="uid://dt6vg0kyerwsi"]
+
+[ext_resource type="Script" path="res://SCARLGun.gd" id="1_scarl"]
+[ext_resource type="PackedScene" path="res://M16A1Bullet.tscn" id="2_bullet"]
+[ext_resource type="PackedScene" uid="uid://b31iny8xxsu0u" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/scar-l.fbx" id="3_scarl_model"]
+[ext_resource type="PackedScene" uid="uid://drdfisyp8ih1k" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/stanag 556 magazine.fbx" id="4_magazine"]
+
+[sub_resource type="Animation" id="Animation_reset"]
+resource_name = "RESET"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Model:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, -0.2)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Model:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_recoil"]
+resource_name = "recoil"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Model:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.2),
+"transitions": PackedFloat32Array(0.5, 2, 1),
+"update": 0,
+"values": [Vector3(0, 0, -0.2), Vector3(0, 0, -0.15), Vector3(0, 0, -0.2)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Model:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.2),
+"transitions": PackedFloat32Array(0.5, 2, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-0.1, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_scarl"]
+_data = {
+"RESET": SubResource("Animation_reset"),
+"recoil": SubResource("Animation_recoil")
+}
+
+[node name="SCARLGun" type="Node3D"]
+transform = Transform3D(0.755, 0, 0, 0, 0.755, 0, 0, 0, 0.755, 0, 0, 0.0553557)
+script = ExtResource("1_scarl")
+bullet_scene = ExtResource("2_bullet")
+
+[node name="Model" type="Node3D" parent="."]
+transform = Transform3D(0.07, 0, 0, 0, 0.07, 0, 0, 0, 0.07, 0, 0, -0.2)
+
+[node name="SCARLModel" parent="Model" instance=ExtResource("3_scarl_model")]
+transform = Transform3D(-2, 0, -3.01992e-07, 0, 2, 0, 3.01992e-07, 0, -2, 0, 0, 0)
+
+[node name="Magazine" type="Node3D" parent="Model"]
+transform = Transform3D(-22.712, 0, -2.79967e-06, 0, 15, 0, 3.42942e-06, 0, -18.5414, 0, -1.44094, 0.35201)
+
+[node name="SCARLMagazine" parent="Model/Magazine" instance=ExtResource("4_magazine")]
+
+[node name="Muzzle" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.7)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_scarl")
+}

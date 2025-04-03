@@ -1,0 +1,93 @@
+[gd_scene load_steps=8 format=3 uid="uid://bwff6x5in66jt"]
+
+[ext_resource type="Script" path="res://MosinNagantGun.gd" id="1_mosin"]
+[ext_resource type="PackedScene" path="res://M16A1Bullet.tscn" id="2_bullet"]
+[ext_resource type="PackedScene" uid="uid://baaai5e72rjil" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/mosin nagant.fbx" id="3_mosin_model"]
+[ext_resource type="PackedScene" uid="uid://bttes5de73g6w" path="res://assets/guns_hands/VRFPS_Kit/Models/Cartridges/762 54R cartridge.fbx" id="4_magazine"]
+
+[sub_resource type="Animation" id="Animation_reset"]
+resource_name = "RESET"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Model:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, -0.2)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Model:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_recoil"]
+resource_name = "recoil"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Model:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.4),
+"transitions": PackedFloat32Array(0.5, 2, 1),
+"update": 0,
+"values": [Vector3(0, 0, -0.2), Vector3(0, 0, -0.1), Vector3(0, 0, -0.2)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Model:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.4),
+"transitions": PackedFloat32Array(0.5, 2, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-0.2, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_mosin"]
+_data = {
+"RESET": SubResource("Animation_reset"),
+"recoil": SubResource("Animation_recoil")
+}
+
+[node name="MosinNagantGun" type="Node3D"]
+transform = Transform3D(3.71, 0, 0, 0, 3.71, 0, 0, 0, 3.71, 0, 0, 0.107676)
+script = ExtResource("1_mosin")
+bullet_scene = ExtResource("2_bullet")
+
+[node name="Model" type="Node3D" parent="."]
+transform = Transform3D(0.08, 0, 0, 0, 0.08, 0, 0, 0, 0.09, 0, 0, -0.2)
+
+[node name="MosinModel" parent="Model" instance=ExtResource("3_mosin_model")]
+transform = Transform3D(-8.738, 0, -1.3194e-06, 0, 8.738, 0, 1.3194e-06, 0, -8.738, 0, 0, 0)
+
+[node name="Magazine" type="Node3D" parent="Model"]
+transform = Transform3D(-15, 0, -2.26494e-06, 0, 15, 0, 2.26494e-06, 0, -15, 0, -1.2, 0)
+
+[node name="MosinMagazine" parent="Model/Magazine" instance=ExtResource("4_magazine")]
+transform = Transform3D(0.525327, -6.32161e-08, 6.95844e-08, 7.93223e-08, -1.83003e-08, -0.460836, 7.93223e-08, 0.418661, -2.01438e-08, 0.000830271, 0.0811565, 0)
+
+[node name="Muzzle" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.8)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_mosin")
+}

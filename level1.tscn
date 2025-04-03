@@ -1,0 +1,103 @@
+[gd_scene load_steps=11 format=3 uid="uid://bvrnxw8xf5syb"]
+
+[ext_resource type="Script" path="res://level_1_script.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://eum51m82whp" path="res://cargo_ships/meshes/Dry_Cargo_Ship.fbx" id="3_nbyqe"]
+[ext_resource type="Script" path="res://VRGunController.gd" id="3_vrguns"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_laser"]
+transparency = 1
+albedo_color = Color(0, 0.5, 1, 0.6)
+emission_enabled = true
+emission = Color(0, 0.5, 1, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_laser"]
+top_radius = 0.005
+bottom_radius = 0.005
+height = 10.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_cursor"]
+radius = 0.02
+height = 0.04
+radial_segments = 8
+rings = 4
+
+[sub_resource type="BoxMesh" id="BoxMesh_k7lr1"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_52vrd"]
+sky_top_color = Color(0.753002, 0.908772, 1, 1)
+sky_horizon_color = Color(0.946513, 0.58414, 0.463084, 1)
+sky_curve = 0.279909
+sky_energy_multiplier = 0.8
+sun_angle_max = 52.22
+sun_curve = 0.289781
+
+[sub_resource type="Sky" id="Sky_b2uq0"]
+sky_material = SubResource("ProceduralSkyMaterial_52vrd")
+
+[sub_resource type="Environment" id="Environment_c51ac"]
+background_mode = 2
+sky = SubResource("Sky_b2uq0")
+ambient_light_color = Color(0.6, 0.6, 0.6, 1)
+ambient_light_sky_contribution = 0.5
+
+[node name="Level1" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="XROrigin3D" type="XROrigin3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.45716, 16.3239, 52.6422)
+current = true
+
+[node name="Head" type="Node3D" parent="XROrigin3D"]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D/Head"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+fov = 90.5
+
+[node name="VRGunController" type="Node3D" parent="XROrigin3D"]
+script = ExtResource("3_vrguns")
+enable_gun_switching = true
+
+[node name="XRController3DRight" type="XRController3D" parent="XROrigin3D"]
+tracker = &"right_hand"
+pose = &"aim"
+
+[node name="LaserBeamRight" type="MeshInstance3D" parent="XROrigin3D/XRController3DRight"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -5)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("CylinderMesh_laser")
+
+[node name="LaserDotRight" type="MeshInstance3D" parent="XROrigin3D/XRController3DRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+material_override = SubResource("StandardMaterial3D_laser")
+mesh = SubResource("SphereMesh_cursor")
+
+[node name="RayCastRight" type="RayCast3D" parent="XROrigin3D/XRController3DRight"]
+target_position = Vector3(0, 0, -10)
+collision_mask = 7
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/XRController3DRight"]
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.2, 0, 0, -0.1)
+mesh = SubResource("BoxMesh_k7lr1")
+
+[node name="XRController3DLeft" type="XRController3D" parent="XROrigin3D"]
+tracker = &"left_hand"
+pose = &"aim"
+
+[node name="bossspawn" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+
+[node name="wave_center" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_c51ac")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.0359045, -0.00788646, 0.0378684, 0.00271598, 0.0510263, 0.0132018, -0.0385854, 0.0109302, -0.034308, 0, 8.65769, -23.929)
+light_color = Color(1, 0.84, 0.69, 1)
+light_energy = 0.7
+light_indirect_energy = 0.0
+
+[node name="Dry_Cargo_Ship" parent="." instance=ExtResource("3_nbyqe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.94615, 4.18604, 15.7145)

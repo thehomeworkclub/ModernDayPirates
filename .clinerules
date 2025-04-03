@@ -102,3 +102,21 @@ root/
 - Monitor frame rates
 - Track controller positions
 - Validate collision detection
+
+## Magazine Positioning - DO NOT CHANGE
+
+The magazine positioning for rifles has been carefully adjusted to fit in the magazine wells. Do not modify these values:
+
+### M16A1 Magazine
+```
+[node name="Magazine" type="Node3D" parent="Model"]
+transform = Transform3D(-15, 0, -2.26494e-06, 0, 15, 0, 2.26494e-06, 0, -15, 0, -1.2, 0)
+```
+
+### AK-74 Magazine
+```
+[node name="Magazine" type="Node3D" parent="Model"]
+transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, -1.5, 0)
+```
+
+These values provide the correct scale (15) and position for the magazines to properly fit in their respective magazine wells.

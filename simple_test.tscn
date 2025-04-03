@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" uid="uid://cqgkigf2djtxf" path="res://SimpleHealthDisplay.tscn" id="1_health"]
+
+[sub_resource type="GDScript" id="GDScript_test"]
+script/source = "extends Node
+
+func _ready():
+	print(\"Health display test running\")
+	print(\"Press the '9' key to take damage and test the health display\")
+"
+
+[node name="SimpleTest" type="Node"]
+script = SubResource("GDScript_test")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(640, 360)
+
+[node name="SimpleHealthDisplay" parent="." instance=ExtResource("1_health")]
+
+[node name="Instructions" type="Label" parent="."]
+offset_left = 341.0
+offset_top = 224.0
+offset_right = 896.0
+offset_bottom = 276.0
+text = "Health Display Test
+Press the 9 key to test taking damage.
+Hearts should appear in the top-left corner and update with damage."
+horizontal_alignment = 1

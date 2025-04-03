@@ -3,11 +3,11 @@
 [ext_resource type="ArrayMesh" uid="uid://doim0agbwg3o4" path="res://Container/model/cargo_container.obj" id="1_2rmb7"]
 [ext_resource type="Texture2D" uid="uid://db4eeivr2onv8" path="res://map_camp_1_spritesheet.png" id="2_sfn5j"]
 [ext_resource type="Script" path="res://3dcampaignmenu.gd" id="3_eqhyj"]
-[ext_resource type="Texture2D" uid="uid://dn5os07p45kji" path="res://campaignart/difficultyrange.png" id="4_0x0at"]
-[ext_resource type="Texture2D" uid="uid://cwjcfb7m2hxek" path="res://campaignart/flags.png" id="5_8or5p"]
-[ext_resource type="Texture2D" uid="uid://buip3fpknwjtj" path="res://campaignart/shopmenu.png" id="6_v777b"]
-[ext_resource type="Texture2D" uid="uid://cx2hxedpue6tf" path="res://campaignart/start.png" id="7_g4i43"]
-[ext_resource type="Texture2D" uid="uid://cufc6na3kmom" path="res://campaignart/exit.png" id="8_j0fg6"]
+[ext_resource type="Texture2D" uid="uid://c1v78siggg7o3" path="res://campaignart/difficultyrange.png" id="4_0x0at"]
+[ext_resource type="Texture2D" uid="uid://2jrv8uoiaofq" path="res://campaignart/flags.png" id="5_8or5p"]
+[ext_resource type="Texture2D" uid="uid://catkur5bxdyt7" path="res://campaignart/shopmenu.png" id="6_v777b"]
+[ext_resource type="Texture2D" uid="uid://u8eisli6gu6d" path="res://campaignart/start.png" id="7_g4i43"]
+[ext_resource type="Texture2D" uid="uid://p58gr1esambr" path="res://campaignart/exit.png" id="8_j0fg6"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_ixhad"]
 

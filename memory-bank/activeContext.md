@@ -1,59 +1,107 @@
 # Active Development Context
 
 ## Current Focus
-The VR campaign menu system is now complete with all core functionality implemented and working as expected. The menu provides a solid foundation for the rest of the game's VR interaction systems.
+We have successfully implemented a comprehensive VR weapons system with physical reloading mechanics optimized for use with a gunstock. The system allows for realistic magazine removal and insertion using physical hand movements. Seven different weapon models are now implemented with proper magazines, muzzle flashes, and recoil animations.
+
+The completed weapon arsenal includes:
+1. M16A1 (Assault rifle - default)
+2. AK-74 (Assault rifle)
+3. SCAR-L (Tactical rifle with balanced stats)
+4. HK416 (High-precision rifle with better accuracy)
+5. MP5 (Submachine gun with faster fire rate but lower damage)
+6. Mosin Nagant (Bolt-action rifle with high damage but slow fire rate)
+7. Model 1897 (Shotgun with pellet spread and 2-shell magazine)
+
+Each weapon has unique handling characteristics, animations, and mechanics while maintaining a consistent reloading system.
+
+Key implementation details:
+- Base rifle functionality in BaseRifleGun.gd for inheritance
+- Physical reloading using controller position tracking
+- Properly scaled magazines with scale factor 15
+- Generous detection margins for easier VR interaction:
+  - Detachment threshold: 0.3 meters perpendicular distance
+  - Reattachment detection radius: 0.2 meters from magazine well
+- Simplified two-state system (ATTACHED_TO_GUN and DETACHED)
+- Visual toggling of magazines with duplicated models for hand attachment
+
+## VR Positioning Reference
+- Campaign menu VR position: Vector3(10.954, -7.596, 4.236)
+- Level1 XROrigin3D editor position: Vector3(2.45716, 16.3239, 85.035)
+- Camera height: 1.8
+- Ray length: 10.0
+- Button press distance: 0.03
+
+## Performance Optimizations
+VR performance considerations remain important, especially as we add more weapon models:
+
+1. Runtime optimizations:
+   - Disabled expensive rendering features (SDFGI, SSIL)
+   - Reduced shadow quality and draw distance
+   - Implemented LOD (Level of Detail) support
+   - Optimized mesh instance properties
+
+2. Resource optimization tools:
+   - performance_optimizer.gd for runtime scene optimization
+   - optimize_resources.gd for editor-time asset optimization
+
+3. Key performance settings:
+   - Target FPS: 90 (VR standard)
+   - Physics tick rate: 60
+   - Texture size limit: 1024px
 
 ## Recently Completed
-1. VR Menu System
-- Laser pointer interaction
-- Button collision and feedback
-- Campaign selection
-- Difficulty indicators
-- Map display system
-- Material handling for visual feedback
-- Disabled map clicking for cleaner UX
+1. VR Weapons System Expansion
+   - Added 5 new weapon types with diverse characteristics:
+     - SCAR-L: Tactical rifle with balanced stats (damage: 3, accuracy: 0.92)
+     - HK416: High-precision rifle (damage: 3, accuracy: 0.95, low recoil: 0.15)
+     - MP5: Submachine gun (damage: 1, fast fire rate: 0.08, lower accuracy: 0.85)
+     - Mosin Nagant: Bolt-action rifle (high damage: 8, excellent accuracy: 0.98, 5-round magazine)
+     - Model 1897: Shotgun (fires 8 pellets per shot, spread pattern, 2-shell magazine)
+   - Implemented weapon switching via keyboard number keys (1-7) for debugging
+   - Fixed ghost magazine issue when switching weapons
+   - Added proper textured models for all weapons with appropriate UIDs
 
-2. Core Systems
-- VR environment initialization
-- Controller setup and interaction
-- Scene management
-- Game state handling
+2. VR Rifle System Core
+   - Physical reloading with magazine detachment/reattachment
+   - Realistic weapon models and magazines
+   - Single bullet firing system that overrides base gun system
+   - Subtle muzzle flash effects
+   - Haptic feedback on both controllers
+   - Recoil animations
+   - Support for automatic and semi-automatic firing modes
+   - Bolt-action mechanism for Mosin Nagant
+   - Pellet spread system for shotgun
 
-## Current Development Stage
-With the menu system complete, we're ready to move on to implementing the core gameplay systems:
-1. Shop functionality
-2. Campaign gameplay mechanics
-3. Enemy spawning system
-4. Weapon systems
-
-## Technical Foundation
-- OpenXR integration is working properly
-- VR interaction patterns are established
-- Collision system is well-tested
-- Debug systems are in place
-- Scene transitions are handled
+3. Core System Integration
+   - XR controller integration for interaction
+   - Ray casting for precise VR interaction
+   - Animation system for visual feedback
+   - Haptic feedback for tactile confirmation
 
 ## Next Steps
-1. Begin implementation of shop system:
-   - Item display
-   - Purchase mechanics
-   - Inventory management
-   - Currency system
+1. Gameplay Integration:
+   - Connect rifle system with enemy damage system
+   - Implement ammo pickup/management
+   - Balance gameplay around different weapon types
+   - Add visual effects for different weapon types (unique muzzle flashes, etc.)
+   - Implement weapon unlocking/progression system
+   - Add haptic feedback variation for different weapons
 
-2. Start developing gameplay mechanics:
-   - Ship controls
-   - Combat systems
-   - Enemy behavior
-   - Scoring system
+2. Quality of Life Improvements:
+   - Implement weapon selection via VR controllers (not just keyboard)
+   - Add visual indicator for current selected weapon
+   - Create weapon rack for in-game selection
+   - Refine magazine positioning for optimal usability
 
 ## Active Considerations
-- Maintain consistent VR interaction patterns established in menu
-- Keep performance optimization in mind for future scaling
-- Continue using established debug logging patterns
-- Follow same code organization structure
+- Maintain consistent interaction patterns across all rifle types
+- Keep performance optimization in mind - monitor frame rate with multiple weapons
+- Ensure magazine models are properly positioned for each new rifle
+- Balance reload difficulty across different weapon types
+- Design weapon attributes to encourage use of different rifles
 
 ## Documentation Status
-- Menu system fully documented
-- Debug outputs implemented
-- Code comments up to date
-- Progress tracking current
+- Rifle system fully documented in VR_RIFLE_SYSTEM.md
+- Magazine positioning documented in .clinerules
+- Interaction patterns established
+- Debug logging implemented
