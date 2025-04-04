@@ -5,10 +5,11 @@ var SPEED = 5.0
 const JUMP_VELOCITY = 4.5
 var hp = 100
 var hitimmunity = 20
-
+var camera = $Camera3D
 func _ready():
 	PlayerVariables.player = self
 	add_to_group("player")
+	camera.set_current()
 	
 func damage(damage):
 	hp -= damage

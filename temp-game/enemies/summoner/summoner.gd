@@ -3,11 +3,15 @@ extends Enemy
 class_name SummonerEnemy
 # Melee-specific properties
 @export var attack_range: float = 2.0
-@export var attack_cooldown: float = 1.0
+@export var attack_cooldown: float = 10.0
 
 # Melee components
 @onready var attack_timer: Timer = $AttackTimer
 @onready var nav = $NavigationAgent3D
+@onready var pMin1 = $summon1.global_position
+@onready var pMin2 = $summon2.global_position
+@onready var pMin3 = $summon3.global_position
+@onready var pMin4 = $summon4.global_position
 
 @onready var minion = preload("res://enemies/summoner/minion/minion.tscn")
 
@@ -16,7 +20,6 @@ var accel = 6
 func _init_enemy():
 	# Initialize melee-specific components
 	attack_timer.wait_time = attack_cooldown
-	attack_timer.one_shot = true
 
 func _handle_movement(delta):
 	var direction = Vector3()
@@ -25,9 +28,16 @@ func _handle_movement(delta):
 	direction = direction.normalized()
 	velocity = velocity.lerp(direction * speed, accel * delta)
 	move_and_slide()
+func spawn_minion(pos):
+	minion.instantiate()
+	minion.global_position = pos
+	add_child(minion)
 
 func _summon():
-	pass
+	spawn_minion(pMin1)
+	spawn_minion(pMin2)
+	spawn_minion(pMin3)
+	spawn_minion(pMin4)
 
 #func _perform_melee_attack():
 	## Start cooldown

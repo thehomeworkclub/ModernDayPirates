@@ -1,7 +1,7 @@
 extends Node
 
 var melee_damage = 10
-var range_damage = 10
+var range_damage = 4
 
 var melee_hp = 100
 var range_hp = 75

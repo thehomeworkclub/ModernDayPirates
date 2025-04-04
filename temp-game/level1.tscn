@@ -1,7 +1,7 @@
-[gd_scene load_steps=11 format=3 uid="uid://bupxq4opruejf"]
+[gd_scene load_steps=13 format=3 uid="uid://bupxq4opruejf"]
 
 [ext_resource type="Script" path="res://level_1_script.gd" id="1_lb3mq"]
-[ext_resource type="PackedScene" uid="uid://dckpmqi18w2o1" path="res://Cargo Ships III/Meshes/Dry_Cargo_Ship.fbx" id="2_jwk7d"]
+[ext_resource type="PackedScene" uid="uid://dq7qhe6k0quxb" path="res://Cargo Ships III/Meshes/Dry_Cargo_Ship.fbx" id="2_jwk7d"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qlkg0"]
 sky_top_color = Color(0.488971, 0.819536, 0.873177, 1)
@@ -49,6 +49,11 @@ data = PackedVector3Array(0.0325, 0.0547, 0.4757, 0, 0.0547, 0.4983, 0, 0.0547, 
 
 [sub_resource type="BoxMesh" id="BoxMesh_p2pxr"]
 
+[sub_resource type="PlaneMesh" id="PlaneMesh_nei57"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k3fti"]
+albedo_color = Color(0.376165, 0.625465, 0.75244, 1)
+
 [node name="Node3D" type="Node3D"]
 script = ExtResource("1_lb3mq")
 
@@ -93,5 +98,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.02163, -6.4121, 40.6711)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.02163, -5.59499, 14.8993)
 
 [node name="WaveTimer" type="Timer" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1374.59, 0, 0, 0, 1374.59, 0, 0, 0, 1374.59, 0, -11.7613, 0)
+mesh = SubResource("PlaneMesh_nei57")
+surface_material_override/0 = SubResource("StandardMaterial3D_k3fti")
 
 [editable path="StaticBody3D/Dry_Cargo_Ship"]
