@@ -1,29 +1,37 @@
 extends Control
 
+# Simple red fade overlay for game over
+var fade_timer: float = 0.0
+var fade_duration: float = 2.0
+var is_fading: bool = true
+
 func _ready() -> void:
-	# Release mouse for UI interaction
-	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	# Simplify the UI - just a full-screen red overlay that fades in
+	# Create a ColorRect if it doesn't exist
+	if not has_node("RedOverlay"):
+		var overlay = ColorRect.new()
+		overlay.name = "RedOverlay"
+		overlay.color = Color(1, 0, 0, 0)  # Start fully transparent
+		overlay.anchor_right = 1.0
+		overlay.anchor_bottom = 1.0
+		add_child(overlay)
 	
-	# Update stats
-	$Panel/VBoxContainer/Stats.text = "Voyage: %d - %s\nDifficulty: %s\nCompleted Waves: %d" % [
-		GameManager.current_voyage,
-		GameManager.voyage_name,
-		GameManager.difficulty,
-		(GameManager.current_round - 1) * GameManager.waves_per_round + (GameManager.current_wave - 1)
-	]
-	
-	# Connect buttons
-	$Panel/VBoxContainer/RestartButton.pressed.connect(_on_restart_pressed)
-	$Panel/VBoxContainer/MenuButton.pressed.connect(_on_menu_pressed)
+	# Start the return to menu timer
+	var timer = Timer.new()
+	timer.name = "MenuTimer"
+	timer.wait_time = fade_duration
+	timer.one_shot = true
+	timer.autostart = true
+	add_child(timer)
+	timer.timeout.connect(_return_to_campaign_menu)
 
-func _on_restart_pressed() -> void:
-	# Restart the same voyage
-	get_tree().paused = false
-	GameManager.start_campaign()
-	get_tree().change_scene_to_file("res://Main.tscn")
-	queue_free()
+func _process(delta: float) -> void:
+	if is_fading:
+		fade_timer += delta
+		var alpha = min(fade_timer / fade_duration, 1.0)
+		$RedOverlay.color.a = alpha
 
-func _on_menu_pressed() -> void:
+func _return_to_campaign_menu() -> void:
 	# Return to 3D campaign menu
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://3dcampaignmenu.tscn")

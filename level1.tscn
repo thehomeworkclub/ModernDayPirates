@@ -50,7 +50,7 @@ ambient_light_color = Color(0.6, 0.6, 0.6, 1)
 ambient_light_sky_contribution = 0.5
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_njkxu"]
-size = Vector3(10, 5, 20)
+size = Vector3(17.1384, 9.31348, 98.2429)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_y1l8n"]
 size = Vector2(250, 250)
@@ -139,6 +139,7 @@ script = ExtResource("11_81knf")
 [node name="Dry_Cargo_Ship" parent="PlayerShip" instance=ExtResource("3_nbyqe")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerShip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.288452, 2.15674, 1.38952)
 shape = SubResource("BoxShape3D_njkxu")
 
 [node name="EnemySpawner" type="Node3D" parent="." groups=["EnemySpawner"]]

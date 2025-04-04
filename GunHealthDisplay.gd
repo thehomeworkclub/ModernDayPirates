@@ -23,6 +23,21 @@ func _ready():
 	timer.wait_time = 0.3
 	timer.one_shot = true
 	add_child(timer)
+	
+	# Sync with boat health on startup
+	call_deferred("sync_with_boat_health")
+
+func sync_with_boat_health():
+	# Wait a frame to ensure all nodes are loaded
+	await get_tree().process_frame
+	
+	# Find the player boat and sync health
+	var boat = get_tree().get_first_node_in_group("player_boat")
+	if boat and boat.has_method("get") and boat.get("health") != null:
+		current_health = boat.health
+		max_health = boat.max_health
+		print("DEBUG: Gun health display synced with boat: " + str(current_health) + "/" + str(max_health))
+		update_hearts()
 
 func _process(delta):
 	# Check for damage input (key 9)

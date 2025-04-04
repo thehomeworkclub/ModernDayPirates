@@ -16,8 +16,7 @@ func _process(_delta: float) -> void:
 	if GameManager.has_method("get"):
 		if GameManager.get("current_voyage_num") != null:
 			voyage_num = GameManager.current_voyage_num
-		if GameManager.get("current_voyage") != null:
-			voyage_num = GameManager.current_voyage
+		# Removed invalid reference to 'current_voyage'
 		
 		if GameManager.get("voyage_name") != null:
 			voyage_name = GameManager.voyage_name

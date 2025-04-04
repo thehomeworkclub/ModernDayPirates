@@ -10,6 +10,7 @@ var health_display: Label
 
 func _ready() -> void:
 	add_to_group("Player")
+	add_to_group("player_boat")  # Add to player_boat group for health display syncing
 	
 	# Calculate max health with any permanent upgrades
 	# Check if GameManager has max_health_bonus property
@@ -144,28 +145,41 @@ func take_damage(amount: int) -> void:
 	
 	print("DEBUG: Player took " + str(amount) + " damage, health now: " + str(health))
 	
+	# Update the gun health display if it exists
+	var xr_origin = get_tree().get_first_node_in_group("Player")
+	if xr_origin:
+		var vr_gun_controller = xr_origin.get_node_or_null("VRGunController")
+		if vr_gun_controller and vr_gun_controller.health_display:
+			print("DEBUG: Updating gun health display to match boat health: " + str(health))
+			vr_gun_controller.health_display.current_health = health
+			vr_gun_controller.health_display.update_hearts()
+	
 	if health <= 0:
 		# Game over!
 		health = 0
 		get_tree().paused = true
 		
-		# Show game over UI
-		var game_over_scene = load("res://GameOverMenu.tscn")
-		if game_over_scene:
-			var game_over_instance = game_over_scene.instantiate()
-			
-			# Connect the retry button to return to 3D campaign menu
-			if game_over_instance.has_node("RetryButton"):
-				game_over_instance.get_node("RetryButton").pressed.connect(func(): 
-					get_tree().paused = false
-					get_tree().change_scene_to_file("res://3dcampaignmenu.tscn")
-				)
-				
-			get_tree().current_scene.add_child(game_over_instance)
-		else:
-			# Fallback if game over scene doesn't exist yet - go directly to 3D menu
-			get_tree().paused = false
-			get_tree().change_scene_to_file("res://3dcampaignmenu.tscn")
+		# Create a simple red overlay that fades in
+		var overlay = ColorRect.new()
+		overlay.name = "GameOverOverlay"
+		overlay.color = Color(1, 0, 0, 0) # Start transparent red
+		overlay.anchor_right = 1.0
+		overlay.anchor_bottom = 1.0
+		
+		# Add to the UI layer
+		var canvas_layer = CanvasLayer.new()
+		canvas_layer.layer = 100 # Make sure it's above everything
+		get_tree().current_scene.add_child(canvas_layer)
+		canvas_layer.add_child(overlay)
+		
+		# Create a fade animation
+		var tween = get_tree().create_tween()
+		tween.tween_property(overlay, "color:a", 1.0, 2.0)
+		
+		# Return to campaign menu after fade
+		await get_tree().create_timer(2.0).timeout
+		get_tree().paused = false
+		get_tree().change_scene_to_file("res://3dcampaignmenu.tscn")
 
 func heal(amount: float) -> void:
 	var heal_amount = int(amount)
