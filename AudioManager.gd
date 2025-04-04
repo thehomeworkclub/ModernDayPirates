@@ -167,14 +167,24 @@ func _ready():
 	# Variables for scene change detection
 	self.current_scene_path = ""
 	
-	# Process the first scene
-	call_deferred("_check_for_scene_change")
+	# Special case for the main menu - ALWAYS play lofi
+	# This handles the case when the game starts directly in the 3dcampaignmenu
+	var current_scene = get_tree().current_scene
+	if current_scene:
+		var scene_name = current_scene.name
+		print("AudioManager: Initial scene check detected: ", scene_name)
+		if scene_name == "3dcampaignmenu" or scene_name == "CampaignMenu":
+			print("AudioManager: FORCING lofi for main menu!")
+			is_in_lobby = true
+			current_track = ""  # Reset current track to ensure fresh start
+			play_music("lofi")
+			return  # Skip the rest of initialization
 	
 	# Connect to wave completed signal from GameManager
 	GameManager.wave_completed.connect(_on_wave_completed)
 	
-	# Start with determining correct music based on current scene
-	determine_initial_music()
+	# Process the first scene
+	call_deferred("_check_for_scene_change")
 
 func determine_initial_music():
 	# Identify the current scene
@@ -186,6 +196,14 @@ func determine_initial_music():
 	var scene_name = current_scene.name
 	
 	print("AudioManager: Starting music for scene: ", scene_name)
+	
+	# Hard-coded check for main menu scene
+	if scene_name == "3dcampaignmenu":
+		print("AudioManager: DETECTED MAIN MENU - forcing lofi music!")
+		is_in_lobby = true
+		stop_music()  # Ensure we stop any existing music
+		play_music("lofi")
+		return
 	
 	# Explicit check for if we're in a lobby scene
 	var is_lobby_scene = is_lobby_scene(scene_name)
@@ -220,7 +238,6 @@ func is_lobby_scene(scene_name: String) -> bool:
 var current_scene_path = ""
 var previous_scene = null
 
-
 func _check_for_scene_change():
 	# Get the current scene
 	var scene = get_tree().current_scene
@@ -229,6 +246,14 @@ func _check_for_scene_change():
 		
 	# Get the current scene path
 	var new_scene_path = scene.scene_file_path
+	
+	# Check again for 3dcampaignmenu
+	if scene.name == "3dcampaignmenu" and current_track != "lofi":
+		print("AudioManager: Emergency fix - 3dcampaignmenu detected, must play lofi!")
+		is_in_lobby = true
+		stop_music()
+		play_music("lofi")
+		return
 	
 	# If the scene path changed, we have a new scene
 	if new_scene_path != current_scene_path:
@@ -242,6 +267,21 @@ func _on_scene_change(scene):
 	var scene_name = scene.name
 	print("AudioManager: Scene changed to: ", scene_name, " (", current_scene_path, ")")
 	
+	# Special override for main menu - always play lofi
+	if scene_name == "3dcampaignmenu":
+		print("AudioManager: MAIN MENU DETECTED - forcing lofi!")
+		is_in_lobby = true
+		stop_music()
+		play_music("lofi")
+		return
+	
+	# Special handling for level1 - always start fresh round music
+	if scene_name == "level1":
+		print("AudioManager: Detected main gameplay level, starting fresh round music")
+		is_in_lobby = false
+		play_round_music()
+		return
+	
 	# Use the helper function to determine if this is a lobby scene
 	var is_lobby_scene = is_lobby_scene(scene_name)
 	
@@ -249,9 +289,10 @@ func _on_scene_change(scene):
 	if is_lobby_scene:
 		print("AudioManager: Transitioning to lobby scene, playing lofi music")
 		is_in_lobby = true
-		cross_fade_to("lofi")
+		stop_music()  # Stop any previous music completely
+		play_music("lofi")  # Start lofi fresh
 	else:
-		print("AudioManager: Transitioning to gameplay scene, playing round music")
+		print("AudioManager: Transitioning to other gameplay scene, playing round music")
 		is_in_lobby = false
 		play_round_music()
 
@@ -259,8 +300,12 @@ func play_round_music():
 	# Get the current round and play music according to the pattern
 	var round_index = (GameManager.current_round - 1) % round_music_pattern.size()
 	var track_to_play = round_music_pattern[round_index]
-	cross_fade_to(track_to_play)
-	print("AudioManager: Playing round music: ", track_to_play, " for round ", GameManager.current_round)
+	
+	print("AudioManager: Selected round music: ", track_to_play, " for round ", GameManager.current_round)
+	
+	# Always start the track from the beginning with a fresh play
+	stop_music()  # Ensure any previous music is completely stopped
+	play_music(track_to_play)  # Play music directly (no crossfade)
 
 func _on_wave_completed():
 	print("AudioManager: Wave completed, checking if it's the last wave in round")
@@ -528,6 +573,13 @@ func _process(_delta):
 	# For debugging
 	if Input.is_action_just_pressed("key_1"):
 		print("Current position: ", music_player.get_playback_position(), " seconds")
+		
+		# SPECIAL DEBUG HACK - If we're in the campaign menu but not playing lofi, force lofi now
+		var current_scene = get_tree().current_scene
+		if current_scene and current_scene.name == "3dcampaignmenu" and current_track != "lofi":
+			print("EMERGENCY DEBUG FIX - forcing lofi for campaign menu!")
+			stop_music()
+			play_music("lofi")
 	
 	# Debug - test gun sounds with key presses
 	if Input.is_action_just_pressed("key_2"):

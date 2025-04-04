@@ -50,13 +50,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.312, -2.381, -9.427)
 
 [node name="BronzeShop" type="Sprite3D" parent="ShopBackgrounds"]
 transform = Transform3D(12.346, 0, 0, 0, 12.346, 0, 0, 0, 1, 0, 0, 0)
+visible = false
 pixel_size = 0.001
 texture_filter = 0
 texture = ExtResource("2_bronze")
 
 [node name="SilverShop" type="Sprite3D" parent="ShopBackgrounds"]
 transform = Transform3D(12.346, 0, 0, 0, 12.346, 0, 0, 0, 12.346, 0, 0, 0)
-visible = false
 pixel_size = 0.001
 texture_filter = 0
 texture = ExtResource("3_silver")
@@ -98,7 +98,7 @@ theme_override_colors/font_color = Color(0.87, 0.443, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 16
 theme_override_font_sizes/font_size = 64
-text = "100"
+text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -112,7 +112,7 @@ theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 16
 theme_override_font_sizes/font_size = 64
-text = "100"
+text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -126,12 +126,12 @@ theme_override_colors/font_color = Color(1, 0.843, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 16
 theme_override_font_sizes/font_size = 64
-text = "100"
+text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="CurrencyDisplay" type="Sprite3D" parent="."]
-transform = Transform3D(0.921263, 0, 0, 0, 1, 0, 0, 0, 1, 11.2021, -1.64224, -9.4134)
+transform = Transform3D(0.921263, 0, 0, 0, 1, 0, 0, 0, 1, 11.3149, -1.64084, -9.4134)
 sorting_offset = 100.0
 pixel_size = 0.001
 double_sided = false

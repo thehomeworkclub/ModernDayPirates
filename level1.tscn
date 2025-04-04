@@ -166,6 +166,7 @@ surface_material_override/0 = SubResource("ShaderMaterial_xr1l8")
 
 [node name="RoundBoard" type="Node3D" parent="."]
 transform = Transform3D(463.086, 0, 0, 0, 253.705, 0, 0, 0, 1, 0, 6.9544, -31.8352)
+visible = false
 script = ExtResource("8_lc0v4")
 
 [node name="Label3D" type="Label3D" parent="RoundBoard"]

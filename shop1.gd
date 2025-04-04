@@ -8,6 +8,14 @@ extends Node3D
 @onready var silver_shop = $ShopBackgrounds/SilverShop
 @onready var gold_shop = $ShopBackgrounds/GoldShop
 
+# References to gun models
+@onready var m16a1_model = $M16A1
+@onready var ak74_model = $"AK-74"
+@onready var scar_model = $"scar-l" 
+@onready var hk416_model = $hk416
+@onready var mp5_model = $MP5
+@onready var mosin_model = $"mosin nagant"
+
 var current_shop = "bronze"
 var right_controller
 var left_controller
@@ -65,6 +73,15 @@ func _ready():
 	# Initialize VR controllers
 	right_controller = $XROrigin3D/XRController3DRight
 	left_controller = $XROrigin3D/XRController3DLeft
+	
+	# Debug gun model references
+	print("Initializing gun model references:")
+	print("M16A1:", "Found" if m16a1_model else "Not Found")
+	print("AK-74:", "Found" if ak74_model else "Not Found")
+	print("SCAR-L:", "Found" if scar_model else "Not Found")
+	print("HK416:", "Found" if hk416_model else "Not Found")
+	print("MP5:", "Found" if mp5_model else "Not Found")
+	print("Mosin Nagant:", "Found" if mosin_model else "Not Found")
 
 	if right_controller:
 		print("Found right controller")
@@ -246,40 +263,27 @@ func update_item_display(item_name: String):
 				price_label.modulate = Color(0, 0, 0, 1)  # Black for price
 		
 		elif current_shop == "silver":
-			# Silver shop shows upgrade level and description
+			# Silver shop shows upgrade level and price only
 			label.text = str(levels[item_name])
-			
-			# Create description for enhancement (e.g. "+10% Silver" for Level 2)
-			var enhancement = ""
-			var level_bonus = (levels[item_name] - 1) * 10
-			
-			if item_name == "ItemBox6":  # Health is special - shows +1 per level
-				enhancement = "+" + str(levels[item_name] - 1) + " Health"
-			else:
-				enhancement = "+" + str(level_bonus) + "% " + SILVER_DESCRIPTIONS[item_name]
 			
 			# Set the price or MAX text
 			if levels[item_name] < MAX_LEVEL:
-				price_label.text = enhancement + " | $" + str(calculate_price(levels[item_name]))
+				price_label.text = "$" + str(calculate_price(levels[item_name]))
 				price_label.modulate = Color(0, 0, 0, 1)
 			else:
-				price_label.text = enhancement + " | MAX"
+				price_label.text = "MAX"
 				price_label.modulate = Color(0, 0.5, 0, 1)  # Green for maxed
 				
 		elif current_shop == "gold":
-			# Gold shop shows upgrade level and percentage boost
+			# Gold shop shows upgrade level and price only
 			label.text = str(levels[item_name])
-			
-			# Create description for multiplier (e.g. "x1.15 Damage" for Level 4)
-			var multiplier = pow(1.05, levels[item_name] - 1)
-			var multiplier_text = "x" + str(snappedf(multiplier, 0.01)) + " " + GOLD_DESCRIPTIONS[item_name]
 			
 			# Set the price or MAX text
 			if levels[item_name] < MAX_LEVEL:
-				price_label.text = multiplier_text + " | $" + str(calculate_price(levels[item_name]))
+				price_label.text = "$" + str(calculate_price(levels[item_name]))
 				price_label.modulate = Color(0, 0, 0, 1)
 			else:
-				price_label.text = multiplier_text + " | MAX"
+				price_label.text = "MAX"
 				price_label.modulate = Color(0, 0.5, 0, 1)  # Green for maxed
 
 func update_all_price_labels():
@@ -312,6 +316,16 @@ func change_shop(shop_type: String):
 	bronze_shop.visible = false
 	silver_shop.visible = false
 	gold_shop.visible = false
+	
+	# Hide/show gun models based on shop type
+	var guns_visible = shop_type == "bronze"
+	print("Changing to shop: " + shop_type + ", gun models " + ("visible" if guns_visible else "hidden"))
+	if m16a1_model: m16a1_model.visible = guns_visible
+	if ak74_model: ak74_model.visible = guns_visible
+	if scar_model: scar_model.visible = guns_visible
+	if hk416_model: hk416_model.visible = guns_visible
+	if mp5_model: mp5_model.visible = guns_visible
+	if mosin_model: mosin_model.visible = guns_visible
 
 	# Show selected shop
 	match shop_type:
