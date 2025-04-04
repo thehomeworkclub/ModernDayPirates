@@ -1,17 +1,27 @@
 extends Control
 
-# Simple red fade overlay for game over
+# Dark red fade overlay for game over
 var fade_timer: float = 0.0
 var fade_duration: float = 2.0
 var is_fading: bool = true
 
 func _ready() -> void:
-	# Simplify the UI - just a full-screen red overlay that fades in
-	# Create a ColorRect if it doesn't exist
+	# Set process to run _process even when game is paused
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	
+	# Make sure the game is paused
+	get_tree().paused = true
+	
+	# Reset GameManager to round 1
+	if GameManager:
+		GameManager.current_round = 1
+		print("DEBUG: GameManager reset to round 1 in GameOverMenu")
+	
+	# Simplify the UI - just a full-screen dark red overlay that fades in
 	if not has_node("RedOverlay"):
 		var overlay = ColorRect.new()
 		overlay.name = "RedOverlay"
-		overlay.color = Color(1, 0, 0, 0)  # Start fully transparent
+		overlay.color = Color(0.5, 0, 0, 0)  # Start with dark red, fully transparent
 		overlay.anchor_right = 1.0
 		overlay.anchor_bottom = 1.0
 		add_child(overlay)
@@ -32,7 +42,15 @@ func _process(delta: float) -> void:
 		$RedOverlay.color.a = alpha
 
 func _return_to_campaign_menu() -> void:
-	# Return to 3D campaign menu
+	print("DEBUG: Returning to campaign menu after game over")
+	
+	# Unpause game before changing scenes
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://3dcampaignmenu.tscn")
+	
+	# Return to 3D campaign menu
+	var result = get_tree().change_scene_to_file("res://3dcampaignmenu.tscn")
+	if result != OK:
+		print("ERROR: Failed to change to campaign menu scene")
+	
+	# Clean up this menu
 	queue_free()

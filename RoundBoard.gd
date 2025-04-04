@@ -34,11 +34,22 @@ func _process(_delta: float) -> void:
 		elif GameManager.get("enemies_spawned_in_wave") != null:
 			current_wave = GameManager.enemies_spawned_in_wave
 	
+	# Get total waves per round from GameParameters
+	var total_waves = 5
+	if GameManager.has_method("get") and GameManager.get("game_parameters") != null:
+		total_waves = GameManager.game_parameters.waves_per_round
+	
+	# Calculate the current wave within round
+	var wave_in_round = GameManager.waves_completed_in_round + 1
+	if wave_in_round > total_waves:
+		wave_in_round = total_waves
+	
 	# Update the display
-	$Label3D.text = "Voyage %d: %s\nDifficulty: %s\nRound: %d\nWave: %d" % [
+	$Label3D.text = "Voyage %d: %s\nDifficulty: %s\nRound: %d\nWave: %d/%d" % [
 		voyage_num,
 		voyage_name,
 		difficulty,
-		current_round, 
-		current_wave
+		current_round,
+		wave_in_round,
+		total_waves
 	]

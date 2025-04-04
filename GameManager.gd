@@ -37,6 +37,7 @@ var current_voyage_num = 0
 var current_voyage_difficulty = 0
 var current_round = 1  # Current level round
 var current_wave = 1   # Current wave within the round
+var waves_completed_in_round = 0  # Track completed waves in current round
 var voyage_name = "Modern Day Pirates"  # Name of the current voyage
 var difficulty = "Normal"  # Difficulty level as a string
 
@@ -170,6 +171,14 @@ func register_enemy() -> int:
 	update_enemy_count(current_enemies_count + 1)
 	return new_id
 
+# Reset enemy tracking - important to call between waves
+func reset_enemy_tracking() -> void:
+	print("DEBUG: Resetting enemy tracking. Current count: " + str(current_enemies_count))
+	current_enemies_count = 0
+	bomber_ids.clear()
+	current_bomber_id = -1
+	# Don't reset next_enemy_id as it's used to generate unique IDs across the game
+
 # Handle enemy defeat
 func enemy_defeated(enemy_id: int) -> void:
 	print("Enemy ", enemy_id, " defeated")
@@ -187,6 +196,13 @@ func enemy_defeated(enemy_id: int) -> void:
 		if bomber_ids.size() > 0:
 			current_bomber_id = bomber_ids[0]
 			print("Setting existing bomber as active: ", current_bomber_id)
+	
+	# Directly notify the enemy spawner to check for wave completion
+	# This ensures that wave completion is checked immediately when an enemy is defeated
+	var enemy_spawner = get_tree().get_first_node_in_group("EnemySpawner")
+	if enemy_spawner and enemy_spawner.has_method("check_wave_completion"):
+		print("DEBUG: Directly calling check_wave_completion after enemy defeat")
+		enemy_spawner.check_wave_completion()
 
 func update_enemy_count(count: int) -> void:
 	if current_enemies_count != count:
@@ -197,15 +213,31 @@ func complete_wave() -> void:
 	print("Wave completed")
 	current_enemies_count = 0
 	emit_signal("enemies_changed", current_enemies_count)
-	emit_signal("wave_completed")
+	
+	# Track wave progression within the round
+	waves_completed_in_round += 1
+	current_wave += 1
+	print("Wave " + str(waves_completed_in_round) + "/" + str(game_parameters.waves_per_round) + " completed")
 	
 	# When wave completes, increment enemy kill count to trigger shop teleport
 	enemy_kill_count += game_parameters.get_total_ships_per_wave()
 	
-	# Check if we should teleport to shop
-	if enemy_kill_count >= kills_before_shop:
-		print("Wave complete - teleporting to shop")
-		call_deferred("teleport_to_shop")
+	# Check if we've completed all waves in the round
+	if waves_completed_in_round >= game_parameters.waves_per_round:
+		print("Round complete! All " + str(game_parameters.waves_per_round) + " waves finished")
+		waves_completed_in_round = 0
+		
+		# Check if we should teleport to shop
+		if enemy_kill_count >= kills_before_shop:
+			print("Round complete - teleporting to shop")
+			call_deferred("teleport_to_shop")
+	else:
+		print("Starting next wave (" + str(waves_completed_in_round + 1) + "/" + str(game_parameters.waves_per_round) + ")")
+	
+	# Send the wave_completed signal AFTER processing wave counting
+	# This ensures all state updates are done before handlers are called
+	print("DEBUG: Emitting wave_completed signal")
+	emit_signal("wave_completed")
 
 func initialize_game_state() -> void:
 	# Reset wave-related variables
@@ -213,6 +245,8 @@ func initialize_game_state() -> void:
 	current_enemies_count = 0
 	bomber_ids.clear()
 	current_bomber_id = -1
+	waves_completed_in_round = 0
+	current_wave = 1
 	emit_signal("enemies_changed", current_enemies_count)
 	
 	# Update game parameters with current difficulty level

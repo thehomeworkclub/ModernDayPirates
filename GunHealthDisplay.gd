@@ -1,8 +1,8 @@
 extends Node3D
 
 # Health settings
-var max_health = 10
-var current_health = 10
+var max_health = 10  # Fixed max health at 10
+var current_health = 10  # Starting health
 
 # Heart textures
 var full_heart_texture = preload("res://art/fullheart.png")
@@ -35,10 +35,10 @@ func _input(event):
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_MINUS or event.keycode == KEY_KP_SUBTRACT:
 			take_damage(1)
-			print("DEBUG: Manual damage test triggered - current health: " + str(current_health))
+			print("DEBUG: Manual damage test triggered - current health: ", current_health)
 		elif event.keycode == KEY_EQUAL or event.keycode == KEY_KP_ADD:
 			heal(1)
-			print("DEBUG: Manual healing test triggered - current health: " + str(current_health))
+			print("DEBUG: Manual healing test triggered - current health: ", current_health)
 
 func sync_with_boat_health():
 	# Wait a frame to ensure all nodes are loaded
@@ -47,9 +47,10 @@ func sync_with_boat_health():
 	# Find the player boat and sync health
 	var boat = get_tree().get_first_node_in_group("player_boat")
 	if boat and boat.has_method("get") and boat.get("health") != null:
+		# Use the boat's health but maintain fixed max health of 10
 		current_health = boat.health
-		max_health = boat.max_health
-		print("DEBUG: Gun health display synced with boat: " + str(current_health) + "/" + str(max_health))
+		max_health = 10  # Always keep max_health at 10
+		print("DEBUG: Gun health display synced with boat: ", current_health, "/", max_health)
 		update_hearts()
 	else:
 		print("DEBUG: Failed to sync with boat health - boat not found or missing health property")
@@ -101,28 +102,23 @@ func create_hearts():
 		heart_sprites.append(heart)
 	
 	update_hearts()
-	print("DEBUG: Created " + str(heart_sprites.size()) + " heart sprites")
+	print("DEBUG: Created ", heart_sprites.size(), " heart sprites")
 
 func take_damage(amount):
-	current_health = max(0, current_health - amount)
+	current_health = max(0, current_health - amount)  # Allow health to go to 0 but not below
 	update_hearts()
-	print("DEBUG: GunHealthDisplay - Player took damage! Health: " + str(current_health) + "/" + str(max_health))
+	print("DEBUG: GunHealthDisplay - Player took damage! Health: ", current_health, "/", max_health)
 	
-	# Check for death
-	if current_health <= 0:
-		print("DEBUG: GunHealthDisplay - Player died!")
-		# For testing, reset health after death
-		await get_tree().create_timer(1.0).timeout
-		heal(max_health)
+	# We don't need to trigger game over here as the Boat.gd script handles that
 
 func heal(amount):
 	current_health = min(max_health, current_health + amount)
 	update_hearts()
-	print("DEBUG: GunHealthDisplay - Player healed! Health: " + str(current_health) + "/" + str(max_health))
+	print("DEBUG: GunHealthDisplay - Player healed! Health: ", current_health, "/", max_health)
 
 func update_hearts():
 	# Print debug to confirm this function is called
-	print("DEBUG: Updating heart display: " + str(current_health) + "/" + str(max_health) + " hearts")
+	print("DEBUG: Updating heart display: ", current_health, "/", max_health, " hearts")
 	
 	# Update the heart textures based on current health
 	for i in range(heart_sprites.size()):

@@ -2,8 +2,8 @@ extends Area3D
 
 @export var base_health: int = 10
 @export var barrier_distance: float = 20.0  # Distance where enemies stop
-var max_health: int
-var health: int
+var max_health: int = 10  # Fixed max health at 10
+var health: int = 10      # Starting health at 10
 var enemies_in_range: int = 0
 var damage_timer: float = 0.0
 var health_display: Label
@@ -12,21 +12,11 @@ func _ready() -> void:
 	add_to_group("Player")
 	add_to_group("player_boat")  # Add to player_boat group for health display syncing
 	
-	# Calculate max health with any permanent upgrades
-	# Check if GameManager has max_health_bonus property
-	var health_bonus = 0.0
-	if GameManager.has_method("get") and GameManager.get("max_health_bonus") != null:
-		health_bonus = GameManager.max_health_bonus
+	# Set fixed health values (ignoring bonuses/multipliers)
+	max_health = 10  # Force max health to exactly 10
+	health = 10      # Start with full health
 	
-	# Check if CurrencyManager exists and has the multiplier property
-	var health_multiplier = 1.0
-	if Engine.has_singleton("CurrencyManager"):
-		var currency_manager = Engine.get_singleton("CurrencyManager")
-		if currency_manager.has_method("get") and currency_manager.get("max_health_multiplier") != null:
-			health_multiplier = currency_manager.max_health_multiplier
-	
-	max_health = int(base_health * (1.0 + health_bonus) * health_multiplier)
-	health = max_health
+	print("DEBUG: Player health initialized at ", health, "/", max_health)
 	
 	monitoring = true
 	monitorable = true
@@ -141,9 +131,19 @@ func _physics_process(delta: float) -> void:
 
 func take_damage(amount: int) -> void:
 	health -= amount
+	
+	# Ensure health never goes below 0
+	if health < 0:
+		health = 0
+	
 	update_health_display()
 	
-	print("DEBUG: Player took " + str(amount) + " damage, health now: " + str(health))
+	print("DEBUG: Player took ", amount, " damage, health now: ", health)
+	
+	# Check if player is dead
+	if health <= 0:
+		print("DEBUG: Player health reached 0, showing game over screen")
+		show_game_over_screen()
 	
 	# DIRECT HEALTH DISPLAY UPDATE - Force update XROrigin controllers
 	force_health_update()
@@ -154,7 +154,7 @@ func take_damage(amount: int) -> void:
 		var vr_gun_controller = xr_origin.get_node_or_null("VRGunController")
 		if vr_gun_controller:
 			if vr_gun_controller.has_method("get") and vr_gun_controller.get("health_display"):
-				print("DEBUG: Updating gun health display to match boat health: " + str(health))
+				print("DEBUG: Updating gun health display to match boat health: ", health)
 				vr_gun_controller.health_display.current_health = health
 				vr_gun_controller.health_display.update_hearts()
 			else:
@@ -174,17 +174,17 @@ func force_health_update() -> void:
 	
 	# SEARCH EVERYWHERE FOR HEALTHDISPLAY
 	var origin_nodes = get_tree().get_nodes_in_group("Player")
-	print("DEBUG: Found " + str(origin_nodes.size()) + " player nodes")
+	print("DEBUG: Found ", origin_nodes.size(), " player nodes")
 	
 	# First try - XROrigin/VRGunController path
 	for origin in origin_nodes:
-		print("DEBUG: Checking player node: " + origin.name + " (type: " + str(origin.get_class()) + ")")
+		print("DEBUG: Checking player node: ", origin.name, " (type: ", origin.get_class(), ")")
 		
 		# APPROACH 1: Direct known path
 		for child in origin.get_children():
-			print("DEBUG: Found child: " + child.name)
+			print("DEBUG: Found child: ", child.name)
 			if "GunController" in child.name:
-				print("DEBUG: Found controller: " + child.name)
+				print("DEBUG: Found controller: ", child.name)
 				var gun_controller = child
 				
 				if gun_controller.has_method("get") and gun_controller.get("health_display") != null:
@@ -194,7 +194,7 @@ func force_health_update() -> void:
 					return
 					
 				for gun_child in gun_controller.get_children():
-					print("DEBUG: Checking gun controller child: " + gun_child.name)
+					print("DEBUG: Checking gun controller child: ", gun_child.name)
 					if gun_child.name == "GunInstance":
 						for instance_child in gun_child.get_children():
 							if instance_child.name == "HealthDisplay":
@@ -209,7 +209,7 @@ func force_health_update() -> void:
 	_find_health_displays(get_tree().current_scene, found_displays)
 	
 	for display in found_displays:
-		print("DEBUG: Found health display: " + str(display.get_path()))
+		print("DEBUG: Found health display: ", display.get_path())
 		display.current_health = health
 		display.update_hearts()
 		return
@@ -217,15 +217,35 @@ func force_health_update() -> void:
 # Helper to recursively find health displays
 func _find_health_displays(node: Node, result: Array) -> void:
 	if node.get_script() and node.get_script().resource_path == "res://GunHealthDisplay.gd":
-		print("DEBUG: Found health display via script path at: " + str(node.get_path()))
+		print("DEBUG: Found health display via script path at: ", node.get_path())
 		result.append(node)
 		
 	if node.name == "HealthDisplay" and node.has_method("update_hearts"):
-		print("DEBUG: Found health display via name at: " + str(node.get_path()))
+		print("DEBUG: Found health display via name at: ", node.get_path())
 		result.append(node)
 		
 	for child in node.get_children():
 		_find_health_displays(child, result)
+
+# Show the game over screen
+func show_game_over_screen() -> void:
+	# Pause the game
+	get_tree().paused = true
+	
+	# Create and show the GameOverMenu
+	var game_over_scene = load("res://GameOverMenu.tscn")
+	if game_over_scene:
+		var game_over_instance = game_over_scene.instantiate()
+		# Add to the main viewport rather than as a child of this node
+		get_tree().root.add_child(game_over_instance)
+		print("DEBUG: Game over screen displayed")
+	else:
+		print("ERROR: Could not load GameOverMenu.tscn")
+		
+	# Ensure GameManager is reset to round 1
+	if GameManager:
+		GameManager.current_round = 1
+		print("DEBUG: GameManager reset to round 1")
 
 func heal(amount: float) -> void:
 	var heal_amount = int(amount)

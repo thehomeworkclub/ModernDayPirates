@@ -2,7 +2,8 @@ extends Node
 
 # Base game parameters - all of these can be scaled with difficulty
 var ships_per_batch: int = 2      # Base number of ships per spawn batch
-var total_ships_per_wave: int = 10 # Total ships to spawn per wave
+var total_ships_per_wave: int = 2 # Base number of ships to spawn per wave
+var waves_per_round: int = 5      # Number of waves per round
 var bomb_damage: int = 2          # Base damage bombs deal to player
 var bullet_damage: int = 1        # Base damage bullets deal to player
 var bullet_cooldown: float = 5.0  # Base time between bullet shots (seconds)

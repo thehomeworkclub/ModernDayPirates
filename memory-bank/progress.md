@@ -3,11 +3,14 @@
 ## Completed Features
 
 ### Combat and Health System
-- ✓ Implemented boat health system with 10 hearts
+- ✓ Implemented boat health system with fixed maximum of 10 hearts
 - ✓ Created bidirectional health synchronization between boat and gun display
 - ✓ Fixed bomb explosion system to properly interact with player boat
 - ✓ Enhanced bomb collision detection for reliable damage application
-- ✓ Created simplified death sequence with red screen fade
+- ✓ Improved enemy bullet visualization using M16A1Bullet model scaled at 5x
+- ✓ Added red material to enemy bullets for visual distinction
+- ✓ Created dark red fade death sequence with proper scene transition
+- ✓ Implemented game reset to round 1 on player death
 - ✓ Fixed property reference errors in GameManager and RoundBoard scripts
 - ✓ Connected gun sight health display with boat damage system
 - ✓ Implemented boat group structure for proper reference and targeting

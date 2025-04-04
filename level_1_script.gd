@@ -90,7 +90,10 @@ func _ready():
 		print("Starting enemy spawning...")
 		# Force GameManager into a state where spawning will work
 		GameManager.game_started = true
-		GameManager.enemies_per_wave = 10
+		# Get enemies per wave from game parameters instead of hardcoding
+		GameManager.enemies_per_wave = GameManager.game_parameters.get_total_ships_per_wave()
+		GameManager.current_wave = 1
+		GameManager.waves_completed_in_round = 0
 		GameManager.enemy_spawn_rate = 1.0
 		GameManager.wave_difficulty_multiplier = 1.0
 		GameManager.enemy_speed = 1.0

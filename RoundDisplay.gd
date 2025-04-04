@@ -23,7 +23,17 @@ func _process(_delta: float) -> void:
 	update_display()
 	
 func update_display() -> void:
-	if GameManager.has_method("get") and GameManager.get("current_round") != null:
-		label.text = "Round: " + str(GameManager.current_round)
+	if GameManager.has_method("get"):
+		var round_text = "Round: " + str(GameManager.current_round)
+		
+		# Add wave information if available
+		if GameManager.get("current_wave") != null and GameManager.get("game_parameters") != null:
+			var total_waves = GameManager.game_parameters.waves_per_round
+			var current_wave = GameManager.waves_completed_in_round + 1
+			if current_wave > total_waves:
+				current_wave = total_waves
+			round_text += "\nWave: " + str(current_wave) + "/" + str(total_waves)
+		
+		label.text = round_text
 	else:
-		label.text = "Round: 1"
+		label.text = "Round: 1\nWave: 1/5"

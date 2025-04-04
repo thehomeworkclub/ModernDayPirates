@@ -6,6 +6,7 @@ extends Node3D
 
 var spawn_timer: Timer
 var batch_timer: Timer
+var next_wave_timer: Timer
 var enemies_spawned: int = 0  # Count of enemies spawned in current wave
 var spawning_paused: bool = false
 var wave_in_progress: bool = false
@@ -52,6 +53,15 @@ func _ready() -> void:
 	batch_timer.autostart = false
 	batch_timer.timeout.connect(_on_batch_timer_timeout)
 	add_child(batch_timer)
+	
+	# Create a timer for next wave delay
+	next_wave_timer = Timer.new()
+	next_wave_timer.name = "NextWaveTimer"
+	next_wave_timer.wait_time = 2.0  # 2 seconds between waves
+	next_wave_timer.one_shot = true
+	next_wave_timer.autostart = false
+	next_wave_timer.timeout.connect(_on_next_wave_timer_timeout)
+	add_child(next_wave_timer)
 	
 	# Connect to GameManager signals
 	GameManager.wave_completed.connect(_on_wave_completed)
@@ -148,6 +158,10 @@ func _on_batch_timer_timeout() -> void:
 	
 	# Check if we should spawn the next batch now
 	check_for_next_batch()
+	
+func _on_next_wave_timer_timeout() -> void:
+	print("DEBUG: Next wave timer expired, starting new wave")
+	start_wave_spawning()
 
 func check_for_next_batch() -> void:
 	# Only spawn next batch if:
@@ -242,6 +256,9 @@ func _on_wave_completed() -> void:
 	enemies_spawned = 0
 	spawned_enemies.clear()
 	
+	# CRITICAL: Reset enemy tracking in GameManager to ensure clean state
+	GameManager.reset_enemy_tracking()
+	
 	# Clear used positions for next wave
 	used_target_positions.clear()
 	
@@ -249,8 +266,36 @@ func _on_wave_completed() -> void:
 	var markers = get_tree().get_nodes_in_group("TargetMarker")
 	for marker in markers:
 		marker.queue_free()
+	
+	# Also clean up any stray enemy objects that might still exist
+	var stray_enemies = get_tree().get_nodes_in_group("Enemy")
+	if stray_enemies.size() > 0:
+		print("DEBUG: Found " + str(stray_enemies.size()) + " stray enemies, cleaning up")
+		for enemy in stray_enemies:
+			enemy.queue_free()
 		
 	print("Wave completed, cleaned up for next wave")
+	
+	# If this wasn't the last wave in the round, start the next wave
+	if GameManager.waves_completed_in_round < GameManager.game_parameters.waves_per_round:
+		print("DEBUG: Starting next wave automatically in 2 seconds...")
+		print("DEBUG: Current wave progress: " + str(GameManager.waves_completed_in_round) + "/" + 
+			str(GameManager.game_parameters.waves_per_round))
+		# Start the timer for next wave
+		if next_wave_timer:
+			next_wave_timer.start()
+		else:
+			print("ERROR: next_wave_timer is null, creating new timer")
+			# Fallback if timer doesn't exist somehow
+			next_wave_timer = Timer.new()
+			next_wave_timer.wait_time = 2.0
+			next_wave_timer.one_shot = true
+			next_wave_timer.autostart = false
+			next_wave_timer.timeout.connect(_on_next_wave_timer_timeout)
+			add_child(next_wave_timer)
+			next_wave_timer.start()
+	else:
+		print("DEBUG: All waves in round completed! Waiting for next round.")
 
 func _on_Timer_timeout() -> void:
 	if spawning_paused or not wave_in_progress:
@@ -458,24 +503,69 @@ func find_valid_spawn_position(min_x: float, max_x: float, min_z: float, max_z: 
 		
 	return position
 
+# Variable to track if a force check is scheduled
+var force_wave_check_scheduled: bool = false
+
+# Call this to schedule a force check after a delay
+func schedule_force_wave_completion_check() -> void:
+	if force_wave_check_scheduled:
+		return  # Already scheduled
+		
+	force_wave_check_scheduled = true
+	print("DEBUG: Scheduling forced wave completion check in 1 second")
+	
+	# Create a one-shot timer for the forced check
+	var force_check_timer = Timer.new()
+	force_check_timer.wait_time = 1.0  # 1 second delay
+	force_check_timer.one_shot = true
+	force_check_timer.autostart = false
+	add_child(force_check_timer)
+	
+	# Connect to timeout and start
+	force_check_timer.timeout.connect(func():
+		print("DEBUG: Executing forced wave completion check")
+		force_wave_check_scheduled = false
+		
+		# If GameManager reports 0 enemies, trust it and force completion
+		if GameManager.current_enemies_count <= 0 and wave_in_progress:
+			print("DEBUG: FORCE COMPLETE - GameManager reports 0 enemies")
+			complete_wave()
+			
+		# Clean up timer
+		force_check_timer.queue_free()
+	)
+	force_check_timer.start()
+
 # Unified wave completion check that coordinates with GameManager
 func check_wave_completion() -> void:
 	# Only check completion if all enemies have been spawned
 	if enemies_spawned < GameManager.enemies_per_wave or not wave_in_progress:
 		return
 		
-	# Count how many enemies are still alive
-	var active_count = count_active_enemies()
+	# CRITICAL: Completely trust GameManager's count
+	var active_count = GameManager.current_enemies_count
 	
-	# Ensure GameManager tracking is accurate
-	GameManager.enemies_spawned_in_wave = enemies_spawned
-	GameManager.current_enemies_count = active_count
+	# Add extra debugging to track this function's execution
+	print("DEBUG: Checking wave completion - active enemies: " + str(active_count) + 
+		", enemies spawned: " + str(enemies_spawned) + "/" + str(GameManager.enemies_per_wave))
 	
-	if active_count <= 0:
+	# Force a cleanup of spawned_enemies list to ensure accurate counting
+	for i in range(spawned_enemies.size() - 1, -1, -1):
+		if i < spawned_enemies.size() and not is_instance_valid(spawned_enemies[i]):
+			print("DEBUG: Cleaning up invalid enemy from list during wave check")
+			spawned_enemies.remove_at(i)
+	
+	# If active count is 0 according to GameManager, schedule a force completion check
+	if active_count <= 0 and enemies_spawned >= GameManager.enemies_per_wave:
 		print("DEBUG: WAVE COMPLETE - All " + str(GameManager.enemies_per_wave) + 
 			" enemies have been spawned and defeated")
 		complete_wave()
 	else:
+		# Check if we're down to 0 enemies in GameManager but still have scene objects
+		# This could be a race condition - schedule a force check
+		if active_count == 0 and not force_wave_check_scheduled:
+			schedule_force_wave_completion_check()
+			
 		print("DEBUG: Wave not complete yet - " + str(active_count) + 
 			" enemies still active out of " + str(GameManager.enemies_per_wave) + " total")
 
@@ -492,6 +582,14 @@ func complete_wave() -> void:
 	# Notify GameManager
 	GameManager.complete_wave()
 	
+# Called by enemies to explicitly remove themselves from tracking
+func remove_from_tracking(enemy: Node) -> void:
+	if enemy in spawned_enemies:
+		print("DEBUG: Explicitly removing enemy " + str(enemy.get("enemy_id") if enemy.get("enemy_id") != null else "unknown") + " from tracking")
+		spawned_enemies.erase(enemy)
+	else:
+		print("DEBUG: Enemy not found in tracking list for removal")
+
 # DEBUG FUNCTION TO CHECK FOR OVERLAPPING SHIPS
 func check_for_overlapping_ships() -> void:
 	# Collect valid enemies

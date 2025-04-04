@@ -129,12 +129,26 @@ Price Labels:
 - Explosion timer: 0.5 seconds
 
 ### Death Sequence
-- Simple red screen fade (full-screen ColorRect)
+- Dark red screen fade (full-screen ColorRect with Color(0.5, 0, 0))
 - Fade duration: 2.0 seconds
+- Process continues during pause (process_mode = PROCESS_MODE_ALWAYS)
+- Game reset to round 1 on death
 - Automatic return to campaign menu after fade
+- Ensures GameManager resets game state properly
 - No complex UI elements for clean VR experience
 
-### Enemy Spawning System
+### Enemy Combat Systems
+
+#### Enemy Bullet System
+- Uses M16A1Bullet.tscn model scaled at 5x for visibility
+- Custom red material (Color(1.0, 0.2, 0.0) with emission)
+- Straight-line trajectory toward player
+- Set as EnemyBullet group for collision filtering
+- Collision layer 16, mask 1 (player only)
+- Uses customized EnhancedBullet.gd script for straight movement
+- Bullet damage: Scales with game difficulty
+
+#### Enemy Spawning System
 - Batch-based enemy spawning 
 - Initial batch size: 2 enemies
 - Spawn threshold: 3 active enemies for next batch

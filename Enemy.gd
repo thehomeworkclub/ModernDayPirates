@@ -479,46 +479,18 @@ func shoot_bullet() -> void:
 		print("DEBUG: Cannot shoot bullet - no valid player reference")
 		return
 	
-	# Create an enemy bullet using a box shape like player bullets but larger
-	var bullet = Area3D.new()
-	bullet.name = "EnemyBullet_" + str(enemy_id) + "_" + str(bullets_shot_count)
-	bullet.add_to_group("EnemyBullet")
-	
-	# Set up collision - only collide with player, not player bullets
-	bullet.collision_layer = 16  # Enemy bullet layer
-	bullet.collision_mask = 1    # Player layer only
-	
 	# Calculate direction to player - straight line
 	var direction = (player_position - global_position).normalized()
 	
-	# Create a box collision shape (like player bullets)
-	var collision = CollisionShape3D.new()
-	var box_shape = BoxShape3D.new()
-	# Make it longer in the direction of travel
-	box_shape.size = Vector3(0.8, 0.8, 3.0)  # Bigger than player bullets for visibility
-	collision.shape = box_shape
-	bullet.add_child(collision)
+	# Instance the M16A1Bullet.tscn scene instead of creating a custom bullet
+	var bullet_scene = load("res://M16A1Bullet.tscn")
+	var bullet = bullet_scene.instantiate()
+	bullet.name = "EnemyBullet_" + str(enemy_id) + "_" + str(bullets_shot_count)
+	bullet.add_to_group("EnemyBullet")
 	
-	# Create bullet mesh - box shape like player bullets
-	var mesh_instance = MeshInstance3D.new()
-	mesh_instance.name = "BulletMesh"
-	var box_mesh = BoxMesh.new()
-	mesh_instance.mesh = box_mesh
-	
-	# Scale the mesh to make it look like an elongated bullet
-	mesh_instance.transform.basis = Basis().scaled(Vector3(0.8, 0.8, 3.0))
-	
-	# Create bullet material - red to distinguish from player bullets
-	var material = StandardMaterial3D.new()
-	material.albedo_color = Color(1.0, 0.2, 0.0)  # Red
-	material.metallic = 0.7
-	material.roughness = 0.2
-	material.emission_enabled = true
-	material.emission = Color(1.0, 0.3, 0.0)  # Red glow
-	material.emission_energy = 2.0
-	mesh_instance.set_surface_override_material(0, material)
-	
-	bullet.add_child(mesh_instance)
+	# Set up collision for enemy bullets - only collide with player, not player bullets
+	bullet.collision_layer = 16  # Enemy bullet layer
+	bullet.collision_mask = 1    # Player layer only
 	
 	# Position the bullet in front of the enemy, pointing toward player
 	var spawn_offset = direction * 2.0
@@ -528,54 +500,55 @@ func shoot_bullet() -> void:
 	get_tree().current_scene.add_child(bullet)
 	bullet.global_position = bullet_pos
 	
-	# Rotate bullet to face direction of travel
-	bullet.look_at(bullet.global_position + direction, Vector3.UP)
+	# Scale up the bullet by a factor of 5
+	bullet.scale = Vector3(5.0, 5.0, 5.0)
 	
-	# Add script properties
+	# Set bullet properties
+	bullet.direction = direction
+	
+	# Get damage value and set it
 	var actual_bullet_damage = GameManager.game_parameters.get_bullet_damage() if GameManager.has_method("get") and GameManager.get("game_parameters") != null else bullet_damage
+	bullet.damage = actual_bullet_damage
 	
-	# Create script for the bullet
-	bullet.set_script(GDScript.new())
-	bullet.get_script().source_code = """
-extends Area3D
-
-var direction = Vector3%s
-var speed = 50.0
-var damage = %d
-var owner_id = %d
-var lifetime = 0.0
-var max_lifetime = 5.0
-
-func _ready() -> void:
-	area_entered.connect(_on_area_entered)
+	# Override some of the EnhancedBullet behavior to ensure bullets travel straight
+	bullet.set_script(load("res://EnhancedBullet.gd").duplicate())
+	bullet.get_script().source_code = bullet.get_script().source_code.replace(
+		"func _physics_process(delta: float) -> void:",
+		"""func _physics_process(delta: float) -> void:
+	# Move in straight line toward target - no gravity for enemy bullets
+	global_position += direction * speed * delta
+	"""
+	)
 	
-func _physics_process(delta: float) -> void:
-	# Move in straight line toward target
-	global_translate(direction * speed * delta)
-	
-	# Track lifetime and destroy if too old
-	lifetime += delta
-	if lifetime > max_lifetime:
-		queue_free()
-
-func _on_area_entered(area: Area3D) -> void:
+	# Customize area_entered to only damage player
+	bullet.get_script().source_code = bullet.get_script().source_code.replace(
+		"func _on_area_entered(area: Area3D) -> void:",
+		"""func _on_area_entered(area: Area3D) -> void:
 	if area.is_in_group("Player") or area.is_in_group("player_boat"):
 		if area.has_method("take_damage"):
 			print("DEBUG: Enemy bullet hit player, applying damage: ", damage)
 			area.take_damage(damage)
 			queue_free()
-"""
-	
-	# Format the script with the actual values - replace placeholders with actual values
-	var script_code = bullet.get_script().source_code
-	script_code = script_code.replace("%s", str(direction))
-	script_code = script_code.replace("%d", str(actual_bullet_damage))
-	script_code = script_code.replace("%d", str(enemy_id))  # Replace the second %d
-	bullet.get_script().source_code = script_code
-	
+	return  # Don't process other collisions for enemy bullets
+	"""
+	)
 	bullet.get_script().reload()
 	
-	print("DEBUG: Enemy bullet fired successfully")
+	# Add a distinctive material to enemy bullets (red)
+	var bullet_parts = ["BulletMesh/BulletHead", "BulletMesh/BulletBody", "Trail"]
+	for part_path in bullet_parts:
+		var part = bullet.get_node_or_null(part_path)
+		if part:
+			var material = StandardMaterial3D.new()
+			material.albedo_color = Color(1.0, 0.2, 0.0)  # Red
+			material.metallic = 0.7
+			material.roughness = 0.2
+			material.emission_enabled = true
+			material.emission = Color(1.0, 0.3, 0.0)  # Red glow
+			material.emission_energy = 2.0
+			part.material = material
+	
+	print("DEBUG: Enemy bullet fired successfully using M16A1Bullet model at 5x scale")
 	
 func _on_area_entered(area: Area3D) -> void:
 	print("DEBUG: Enemy collision with ", area.name)
@@ -595,6 +568,9 @@ func take_damage(damage: int) -> void:
 	if health <= 0:
 		print("DEBUG: Enemy defeated! ID: ", enemy_id)
 		
+		# Before removing - let the spawner know this enemy is no longer valid
+		remove_from_spawner_tracking()
+		
 		# Instead, just count and log existing bombs for debugging
 		var existing_bombs = get_tree().get_nodes_in_group("EnemyBomb")
 		var bomb_count = 0
@@ -612,6 +588,11 @@ func take_damage(damage: int) -> void:
 		GameManager.enemy_kill_count += 1
 		print("Enemy kill count: " + str(GameManager.enemy_kill_count))
 		
+		# IMPORTANT - Update enemy count first
+		# We need to decrease enemy count BEFORE notifying GameManager to ensure 
+		# accurate count when wave completion is checked
+		GameManager.current_enemies_count -= 1
+		
 		# Notify GameManager that an enemy has been defeated - pass our ID
 		GameManager.enemy_defeated(enemy_id)
 		
@@ -620,5 +601,23 @@ func take_damage(damage: int) -> void:
 		if ship_manager:
 			ship_manager.clear_target_position(target_position)
 		
-		# Destroy the enemy
+		# Immediately check if this was the last enemy in the wave
+		# Get enemy spawner to force a wave completion check
+		var spawner = get_tree().get_first_node_in_group("EnemySpawner")
+		if spawner and spawner.has_method("check_wave_completion"):
+			spawner.check_wave_completion()
+		
+		# CRITICAL: Force a scheduled check to make sure wave completes even if there's a discrepancy
+		if spawner and spawner.has_method("schedule_force_wave_completion_check"):
+			spawner.schedule_force_wave_completion_check()
+		
+		# Now it's safe to destroy the enemy
 		queue_free()
+
+# Explicitly remove this enemy from the spawner's tracking
+func remove_from_spawner_tracking() -> void:
+	var spawner = get_tree().get_first_node_in_group("EnemySpawner")
+	if spawner and spawner.has_method("remove_from_tracking"):
+		spawner.remove_from_tracking(self)
+	else:
+		print("WARNING: Could not find spawner to remove from tracking")

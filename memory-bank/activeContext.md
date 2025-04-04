@@ -52,12 +52,13 @@ VR performance considerations remain important, especially as we add more weapon
    - Texture size limit: 1024px
 
 ## Recently Completed
-1. Enemy Bombs and Health System Integration
-   - Fixed bomb explosion system to properly damage the player's boat
-   - Implemented bidirectional health synchronization between boat and gun display
-   - Added 10-heart health display on the side of the gun that mirrors boat health
-   - Created simple death sequence with red screen fade
-   - Fixed various property reference errors in GameManager
+1. Enemy Weapons and Health System Improvements
+   - Upgraded enemy bullets to use M16A1Bullet.tscn model scaled at 5x
+   - Added red coloration to enemy bullets for visual distinction
+   - Fixed health system to maintain exactly 10 maximum health
+   - Implemented a proper death sequence with dark red fade overlay
+   - Added system to restart game at round 1 after player death
+   - Fixed bidirectional health synchronization between boat and gun display
    - Improved bomb collision detection with player boat
 
 2. VR Weapons System Expansion
