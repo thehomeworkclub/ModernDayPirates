@@ -52,6 +52,9 @@ func _ready():
 		print("ERROR: XROrigin3D not found")
 		return
 		
+	# Update player stats based on shop upgrades
+	GameManager.update_player_stats()
+	
 	# Set the current gun based on GameManager's bronze_upgrade_levels
 	if vr_gun_controller and vr_gun_controller.has_method("switch_gun"):
 		# Find which gun is currently selected in GameManager's bronze_upgrade_levels
@@ -67,6 +70,23 @@ func _ready():
 			print("Initializing level with gun: " + selected_gun)
 		else:
 			print("No gun selected in GameManager, using default")
+			
+		# Apply upgrades to gun properties
+		if vr_gun_controller.current_gun:
+			# Apply damage multiplier
+			if vr_gun_controller.current_gun.has_method("set_damage_multiplier"):
+				vr_gun_controller.current_gun.set_damage_multiplier(GameManager.player_damage_multiplier)
+				print("Applied damage multiplier: " + str(GameManager.player_damage_multiplier))
+			
+			# Apply fire rate multiplier
+			if vr_gun_controller.current_gun.has_method("set_fire_rate_multiplier"):
+				vr_gun_controller.current_gun.set_fire_rate_multiplier(GameManager.player_fire_rate_multiplier)
+				print("Applied fire rate multiplier: " + str(GameManager.player_fire_rate_multiplier))
+			
+			# Apply bullet speed multiplier
+			if vr_gun_controller.current_gun.has_method("set_bullet_speed_multiplier"):
+				vr_gun_controller.current_gun.set_bullet_speed_multiplier(GameManager.player_bullet_speed_multiplier)
+				print("Applied bullet speed multiplier: " + str(GameManager.player_bullet_speed_multiplier))
 	
 	# Get the health display from the gun controller
 	if vr_gun_controller and vr_gun_controller.health_display:
@@ -170,15 +190,25 @@ func setup_health_display():
 			
 			health_display = vr_gun_controller.health_display
 			print("Gun health display created via forced initialization")
+		
+		# Set the max health from GameManager's calculated value
+		if health_display:
+			# Round max health to nearest integer for display purposes
+			var display_max_health = int(round(GameManager.player_max_health))
 			
-		# Ensure a connection to the boat
-		var player_boat = get_tree().get_first_node_in_group("player_boat")
-		if player_boat and health_display:
-			if player_boat.has_method("get") and player_boat.get("health") != null:
-				health_display.current_health = player_boat.health
-				health_display.max_health = player_boat.max_health
-				health_display.update_hearts()
-				print("Synchronized health display with player boat: " + str(health_display.current_health) + "/" + str(health_display.max_health))
+			# Set current health to max if it's a new game, otherwise keep current value
+			var display_current_health = min(health_display.current_health, display_max_health)
+			if display_current_health <= 0:
+				display_current_health = display_max_health
+				
+			# Update the health display
+			health_display.max_health = display_max_health
+			health_display.current_health = display_current_health
+			health_display.update_hearts()
+			
+			print("Health display configured with upgraded values:")
+			print("- Max health: " + str(display_max_health))
+			print("- Current health: " + str(display_current_health))
 
 # Apply performance optimizations for VR
 func optimize_for_vr():

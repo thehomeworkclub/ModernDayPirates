@@ -43,9 +43,31 @@ var difficulty = "Normal"  # Difficulty level as a string
 
 # Player equipment and stats
 var gun_type = "basic"  # Default gun type
-var player_health = 100
+var player_base_health = 10.0  # Base health (10 hearts)
+var player_health = 10.0       # Current health with upgrades applied
+var player_max_health = 10.0   # Maximum health with upgrades applied
 var player_damage_multiplier = 1.0
-var player_speed = 1.0
+var player_bullet_speed_multiplier = 1.0
+var player_fire_rate_multiplier = 1.0
+var bronze_currency_multiplier = 1.0
+var silver_currency_multiplier = 1.0
+var gold_currency_multiplier = 1.0
+
+# Upgrade values applied from shop upgrades
+var extra_health = 0.0
+var extra_damage = 0.0
+var extra_fire_rate = 0.0
+var extra_bullet_speed = 0.0
+var extra_bronze = 0.0
+var extra_silver = 0.0
+
+# Percentage increases from gold shop (multiplicative)
+var percent_health_increase = 1.0  # 1.0 = 100% (base)
+var percent_damage_increase = 1.0
+var percent_fire_rate_increase = 1.0
+var percent_bronze_increase = 1.0
+var percent_silver_increase = 1.0
+var percent_gold_increase = 1.0
 
 # Shop upgrade levels - persist these across shop/level transitions
 # Only reset on death
@@ -123,8 +145,86 @@ func reset_upgrade_levels() -> void:
 		silver_upgrade_levels[key] = 1
 	for key in gold_upgrade_levels.keys():
 		gold_upgrade_levels[key] = 1
+	
+	# Reset all player stat upgrades to base values
+	extra_health = 0.0
+	extra_damage = 0.0
+	extra_fire_rate = 0.0
+	extra_bullet_speed = 0.0
+	extra_bronze = 0.0
+	extra_silver = 0.0
+	
+	# Reset all percentage modifiers to base (100%)
+	percent_health_increase = 1.0
+	percent_damage_increase = 1.0
+	percent_fire_rate_increase = 1.0
+	percent_bronze_increase = 1.0
+	percent_silver_increase = 1.0
+	percent_gold_increase = 1.0
+	
+	# Update player stats with reset values
+	update_player_stats()
 		
-	print("GameManager: Upgrade levels reset - Default gun selected")
+	print("GameManager: Upgrade levels and stats reset - Default gun selected")
+
+# Calculate and apply all player stat modifiers from shop upgrades
+func update_player_stats() -> void:
+	print("Updating player stats based on shop upgrades...")
+	
+	# Apply direct increases from Silver shop
+	# Silver shop mapping:
+	# 1. Extra silver
+	# 2. Faster bullets 
+	# 3. Extra bronze
+	# 4. Extra damage
+	# 5. Quicker fire rate
+	# 6. Extra health
+	
+	# Calculate direct increases (each level = +10% of base value)
+	extra_silver = (silver_upgrade_levels["ItemBox1"] - 1) * 0.1
+	extra_bullet_speed = (silver_upgrade_levels["ItemBox2"] - 1) * 0.1
+	extra_bronze = (silver_upgrade_levels["ItemBox3"] - 1) * 0.1
+	extra_damage = (silver_upgrade_levels["ItemBox4"] - 1) * 0.1
+	extra_fire_rate = (silver_upgrade_levels["ItemBox5"] - 1) * 0.1
+	extra_health = (silver_upgrade_levels["ItemBox6"] - 1) * 1.0  # Each level = +1 health
+	
+	# Apply percentage increases from Gold shop
+	# Gold shop mapping:
+	# 1. % Bronze increase
+	# 2. % Silver increase
+	# 3. % Gold increase
+	# 4. % Damage increase
+	# 5. % Fire rate increase
+	# 6. % Health increase
+	
+	# Calculate percentage increases (each level = +5% multiplicative)
+	percent_bronze_increase = pow(1.05, gold_upgrade_levels["ItemBox1"] - 1)
+	percent_silver_increase = pow(1.05, gold_upgrade_levels["ItemBox2"] - 1)
+	percent_gold_increase = pow(1.05, gold_upgrade_levels["ItemBox3"] - 1)
+	percent_damage_increase = pow(1.05, gold_upgrade_levels["ItemBox4"] - 1)
+	percent_fire_rate_increase = pow(1.05, gold_upgrade_levels["ItemBox5"] - 1)
+	percent_health_increase = pow(1.05, gold_upgrade_levels["ItemBox6"] - 1)
+	
+	# Apply all multipliers to player stats
+	player_damage_multiplier = (1.0 + extra_damage) * percent_damage_increase
+	player_bullet_speed_multiplier = (1.0 + extra_bullet_speed)
+	player_fire_rate_multiplier = (1.0 + extra_fire_rate) * percent_fire_rate_increase
+	bronze_currency_multiplier = (1.0 + extra_bronze) * percent_bronze_increase
+	silver_currency_multiplier = (1.0 + extra_silver) * percent_silver_increase
+	gold_currency_multiplier = 1.0 * percent_gold_increase
+	
+	# Calculate health with all modifiers
+	player_max_health = (player_base_health + extra_health) * percent_health_increase
+	
+	# Log results
+	print("Player stats updated:")
+	print("- Damage multiplier: ", player_damage_multiplier)
+	print("- Bullet speed multiplier: ", player_bullet_speed_multiplier)
+	print("- Fire rate multiplier: ", player_fire_rate_multiplier)
+	print("- Bronze currency multiplier: ", bronze_currency_multiplier)
+	print("- Silver currency multiplier: ", silver_currency_multiplier)
+	print("- Gold currency multiplier: ", gold_currency_multiplier)
+	print("- Max health: ", player_max_health)
 
 func _process(delta: float) -> void:
 	# Only handle shop timer when in shop

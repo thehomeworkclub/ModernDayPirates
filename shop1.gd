@@ -30,6 +30,26 @@ const BRONZE_PRICES = {
     "ItemBox6": 300   # Mosin/Model1897
 }
 
+# Item descriptions for silver shop
+const SILVER_DESCRIPTIONS = {
+    "ItemBox1": "Extra Silver",
+    "ItemBox2": "Faster Bullets",
+    "ItemBox3": "Extra Bronze", 
+    "ItemBox4": "Extra Damage",
+    "ItemBox5": "Faster Fire Rate",
+    "ItemBox6": "Extra Health"
+}
+
+# Item descriptions for gold shop
+const GOLD_DESCRIPTIONS = {
+    "ItemBox1": "Bronze Bonus",
+    "ItemBox2": "Silver Bonus",
+    "ItemBox3": "Gold Bonus",
+    "ItemBox4": "Damage Boost",
+    "ItemBox5": "Fire Rate Boost",
+    "ItemBox6": "Health Boost"
+}
+
 var normal_ray_color = Color(0, 0.5, 1, 0.6)
 var hover_ray_color = Color(0, 1, 1, 0.8)
 var bronze_color = Color(0.87, 0.443, 0, 1)
@@ -159,7 +179,14 @@ func try_upgrade_item(item_name: String):
 			purchased = currency_manager.purchase(0, price, 0)
 			
 			if purchased:
+				# Increase the upgrade level
 				levels[item_name] += 1
+				
+				# Update GameManager's player stats
+				GameManager.update_player_stats()
+				print("Upgraded " + SILVER_DESCRIPTIONS[item_name] + " to level " + str(levels[item_name]))
+				
+				# Update the UI
 				update_item_display(item_name)
 				update_currency_display()
 				
@@ -173,7 +200,14 @@ func try_upgrade_item(item_name: String):
 			purchased = currency_manager.purchase(0, 0, price)
 			
 			if purchased:
+				# Increase the upgrade level
 				levels[item_name] += 1
+				
+				# Update GameManager's player stats
+				GameManager.update_player_stats()
+				print("Upgraded " + GOLD_DESCRIPTIONS[item_name] + " to level " + str(levels[item_name]))
+				
+				# Update the UI
 				update_item_display(item_name)
 				update_currency_display()
 
@@ -210,15 +244,43 @@ func update_item_display(item_name: String):
 				label.text = ""
 				price_label.text = "$" + str(BRONZE_PRICES[item_name])
 				price_label.modulate = Color(0, 0, 0, 1)  # Black for price
-		else:
-			# Silver and Gold shops use normal upgrade levels (1-10)
+		
+		elif current_shop == "silver":
+			# Silver shop shows upgrade level and description
 			label.text = str(levels[item_name])
-			if levels[item_name] < MAX_LEVEL:
-				price_label.text = "$" + str(calculate_price(levels[item_name]))
-				price_label.modulate = Color(0, 0, 0, 1)  # Keep price label black
+			
+			# Create description for enhancement (e.g. "+10% Silver" for Level 2)
+			var enhancement = ""
+			var level_bonus = (levels[item_name] - 1) * 10
+			
+			if item_name == "ItemBox6":  # Health is special - shows +1 per level
+				enhancement = "+" + str(levels[item_name] - 1) + " Health"
 			else:
-				price_label.text = "MAX"
-				price_label.modulate = Color(0, 0, 0, 1)  # Keep MAX text black
+				enhancement = "+" + str(level_bonus) + "% " + SILVER_DESCRIPTIONS[item_name]
+			
+			# Set the price or MAX text
+			if levels[item_name] < MAX_LEVEL:
+				price_label.text = enhancement + " | $" + str(calculate_price(levels[item_name]))
+				price_label.modulate = Color(0, 0, 0, 1)
+			else:
+				price_label.text = enhancement + " | MAX"
+				price_label.modulate = Color(0, 0.5, 0, 1)  # Green for maxed
+				
+		elif current_shop == "gold":
+			# Gold shop shows upgrade level and percentage boost
+			label.text = str(levels[item_name])
+			
+			# Create description for multiplier (e.g. "x1.15 Damage" for Level 4)
+			var multiplier = pow(1.05, levels[item_name] - 1)
+			var multiplier_text = "x" + str(snappedf(multiplier, 0.01)) + " " + GOLD_DESCRIPTIONS[item_name]
+			
+			# Set the price or MAX text
+			if levels[item_name] < MAX_LEVEL:
+				price_label.text = multiplier_text + " | $" + str(calculate_price(levels[item_name]))
+				price_label.modulate = Color(0, 0, 0, 1)
+			else:
+				price_label.text = multiplier_text + " | MAX"
+				price_label.modulate = Color(0, 0.5, 0, 1)  # Green for maxed
 
 func update_all_price_labels():
 	var levels = get_current_levels()
