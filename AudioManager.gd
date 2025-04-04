@@ -2,13 +2,75 @@ extends Node
 
 signal music_ended
 
-# Music files
+# Music files (now WAVs instead of M4As)
 var music = {
-	"lofi": preload("res://art/music/Lofi.m4a"),
-	"somalian_pirates": preload("res://art/music/SomalianPirates.m4a"),
-	"egypt": preload("res://art/music/EgyptBeat.m4a"),
-	"montuno": preload("res://art/music/Montuno.m4a"),
-	"japan_night_race": preload("res://art/music/JapanNightRace.m4a")
+	"lofi": preload("res://art/music/Lofi.wav"),
+	"somalian_pirates": preload("res://art/music/SomalianPirates.wav"),
+	"egypt": preload("res://art/music/EgyptBeat.wav"),
+	"montuno": preload("res://art/music/Montuno.wav"),
+	"japan_night_race": preload("res://art/music/JapanNightRace.wav")
+}
+
+# Gun sound paths (loaded on demand to avoid errors with missing files)
+var gun_sound_paths = {
+	# AK-74 sounds
+	"ak74_shoot": "res://assets/guns_hands/VRFPS_Kit/Models/Weapons/Sounds/AKS-74U/ak_545_shoot.wav",
+	"ak74_bolt_close": "res://assets/guns_hands/VRFPS_Kit/Models/Weapons/Sounds/AKS-74U/ak_bolt_close.wav",
+	"ak74_bolt_open": "res://assets/guns_hands/VRFPS_Kit/Models/Weapons/Sounds/AKS-74U/ak_bolt_open.wav",
+	
+	# Generic rifle sounds (fallbacks)
+	"generic_rifle_shoot": "res://assets/guns_hands/VRFPS_Kit/Models/Weapons/Sounds/Generic/rifle_shoot.wav",
+	"generic_rifle_reload": "res://assets/guns_hands/VRFPS_Kit/Models/Weapons/Sounds/Generic/rifle_reload.wav",
+	"generic_rifle_bolt": "res://assets/guns_hands/VRFPS_Kit/Models/Weapons/Sounds/Generic/rifle_bolt.wav"
+}
+
+# Cache of loaded sounds
+var gun_sounds = {}
+
+# Map gun types to their sound sets - uses fallbacks as needed
+var gun_sound_map = {
+	"ak74": {
+		"shoot": "ak74_shoot",
+		"reload_start": "generic_rifle_reload",
+		"reload_end": "generic_rifle_reload",
+		"bolt": "ak74_bolt_close"
+	},
+	"m16a1": {
+		"shoot": "generic_rifle_shoot",
+		"reload_start": "generic_rifle_reload",
+		"reload_end": "generic_rifle_reload", 
+		"bolt": "generic_rifle_bolt"
+	},
+	"scarl": {
+		"shoot": "generic_rifle_shoot",
+		"reload_start": "generic_rifle_reload",
+		"reload_end": "generic_rifle_reload",
+		"bolt": "generic_rifle_bolt"
+	},
+	"hk416": {
+		"shoot": "generic_rifle_shoot",
+		"reload_start": "generic_rifle_reload",
+		"reload_end": "generic_rifle_reload",
+		"bolt": "generic_rifle_bolt"
+	},
+	"mp5": {
+		"shoot": "generic_rifle_shoot",
+		"reload_start": "generic_rifle_reload",
+		"reload_end": "generic_rifle_reload",
+		"bolt": "generic_rifle_bolt"
+	},
+	"mosin": {
+		"shoot": "generic_rifle_shoot", 
+		"reload_start": "generic_rifle_bolt",
+		"reload_end": "generic_rifle_bolt",
+		"bolt": "generic_rifle_bolt"
+	},
+	"model1897": {
+		"shoot": "generic_rifle_shoot",
+		"reload_start": "generic_rifle_bolt",
+		"reload_end": "generic_rifle_bolt",
+		"bolt": "generic_rifle_bolt"
+	}
 }
 
 # Loop and timing information in seconds
@@ -47,6 +109,11 @@ var loop_info = {
 # Audio players
 var music_player = AudioStreamPlayer.new()
 var fade_player = AudioStreamPlayer.new()
+
+# Sound effect players (pool for multiple simultaneous sounds)
+var sound_players = []
+var max_sound_players = 8  # Maximum number of simultaneous sound effects
+var next_player_index = 0  # For round-robin allocation
 var current_track = ""
 var next_track = ""
 var is_looping = false
@@ -64,9 +131,17 @@ var is_in_lobby = false
 var ending_started = false
 
 func _ready():
-	# Set up audio players
+	# Set up music players
 	add_child(music_player)
 	add_child(fade_player)
+	
+	# Set up sound effect player pool
+	for i in range(max_sound_players):
+		var player = AudioStreamPlayer.new()
+		player.name = "SoundPlayer" + str(i)
+		player.bus = "SFX" # Use a separate audio bus for sound effects
+		add_child(player)
+		sound_players.append(player)
 	
 	# Create loop timer
 	loop_timer = Timer.new()
@@ -328,6 +403,92 @@ func stop_music():
 	
 	print("AudioManager: Music stopped")
 
+# Gun sound methods
+
+# Play a gun sound for a specific gun type and action
+func play_gun_sound(gun_type: String, action: String, volume_db: float = 0.0) -> void:
+	# Get the appropriate sound name from the gun mapping
+	if gun_type in gun_sound_map and action in gun_sound_map[gun_type]:
+		var sound_name = gun_sound_map[gun_type][action]
+		play_sound(sound_name, volume_db)
+	else:
+		print("WARNING: No sound mapping for gun_type: " + gun_type + ", action: " + action)
+
+# Load a sound file if it exists
+func load_sound(sound_name: String) -> AudioStream:
+	# Check if we already loaded this sound
+	if sound_name in gun_sounds:
+		return gun_sounds[sound_name]
+	
+	# Get the path for this sound
+	if not sound_name in gun_sound_paths:
+		print("WARNING: No path defined for sound: " + sound_name)
+		return null
+		
+	var path = gun_sound_paths[sound_name]
+	
+	# Try to load the file
+	if ResourceLoader.exists(path):
+		var sound = load(path)
+		gun_sounds[sound_name] = sound
+		return sound
+	else:
+		print("WARNING: Sound file not found: " + path)
+		return null
+
+# Play a specific sound by name
+func play_sound(sound_name: String, volume_db: float = 0.0) -> void:
+	# Try to load the sound
+	var sound = load_sound(sound_name)
+	
+	# If sound wasn't found, try to use a generic sound
+	if sound == null and sound_name != "generic_rifle_shoot":
+		print("Trying generic sound instead")
+		sound = load_sound("generic_rifle_shoot")
+	
+	# If we have a valid sound, play it
+	if sound != null:
+		# Get the next available player in the pool
+		var player = get_next_sound_player()
+		if player:
+			player.stream = sound
+			player.volume_db = volume_db
+			player.play()
+			print("AudioManager: Playing sound: ", sound_name)
+		else:
+			print("WARNING: No available sound players")
+
+# Find an available sound player or reuse the oldest one
+func get_next_sound_player() -> AudioStreamPlayer:
+	# First try to find a player that's not currently playing
+	for player in sound_players:
+		if not player.playing:
+			return player
+	
+	# If all players are busy, use round-robin to replace the "oldest" one
+	var player = sound_players[next_player_index]
+	next_player_index = (next_player_index + 1) % max_sound_players
+	return player
+
+# Convenience methods for common gun actions
+func play_gun_shoot(gun_type: String) -> void:
+	play_gun_sound(gun_type, "shoot", -5.0)  # Slightly reduced volume
+
+func play_gun_reload_start(gun_type: String) -> void:
+	play_gun_sound(gun_type, "reload_start")
+	
+func play_gun_reload_end(gun_type: String) -> void:
+	play_gun_sound(gun_type, "reload_end")
+
+func play_gun_bolt(gun_type: String) -> void:
+	play_gun_sound(gun_type, "bolt")
+
+func play_bullet_impact() -> void:
+	play_sound("bullet_impact", -10.0)  # Lower volume for impacts
+
+func play_bullet_flyby() -> void:
+	play_sound("bullet_flyby", -15.0)  # Much lower volume for flybys
+
 func _process(_delta):
 	# Check for scene changes
 	_check_for_scene_change()
@@ -335,6 +496,14 @@ func _process(_delta):
 	# For debugging
 	if Input.is_action_just_pressed("key_1"):
 		print("Current position: ", music_player.get_playback_position(), " seconds")
+	
+	# Debug - test gun sounds with key presses
+	if Input.is_action_just_pressed("key_2"):
+		play_gun_shoot("ak74")
+	if Input.is_action_just_pressed("key_3"):
+		play_gun_reload_start("ak74")
+	if Input.is_action_just_pressed("key_4"):
+		play_gun_reload_end("ak74")
 	
 	# Update track position for debugging
 	if Engine.is_editor_hint():

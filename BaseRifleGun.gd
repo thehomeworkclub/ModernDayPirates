@@ -164,6 +164,9 @@ func detach_magazine() -> void:
 	if debug_enabled:
 		print("Detaching magazine. Current ammo: " + str(current_ammo))
 	
+	# Play magazine removal sound
+	AudioManager.play_gun_reload_start(gun_type)
+	
 	# Set cooldown to prevent immediate reattachment
 	detachment_cooldown = 0.5
 	
@@ -218,6 +221,9 @@ func reattach_magazine() -> void:
 	if debug_enabled:
 		print("Reattaching magazine")
 	
+	# Play magazine insertion sound
+	AudioManager.play_gun_reload_end(gun_type)
+	
 	# Find and remove hand magazine
 	var hand_magazine = left_controller.get_node_or_null("HandMagazine")
 	if hand_magazine:
@@ -242,7 +248,8 @@ func reattach_magazine() -> void:
 func shoot() -> void:
 	# Stop shooting if empty or reloading
 	if current_ammo <= 0:
-		# Click sound would play here
+		# Play empty click sound
+		AudioManager.play_sound("ak74_bolt_close", -10.0)  # Use bolt sound for empty click
 		print("Out of ammo!")
 		return
 		
@@ -265,6 +272,9 @@ func shoot() -> void:
 	
 	# Spawn exactly ONE bullet
 	spawn_bullet(random_spread)
+	
+	# Play shooting sound
+	AudioManager.play_gun_shoot(gun_type)
 	
 	# Show muzzle flash
 	show_muzzle_flash()
@@ -361,6 +371,9 @@ func reload() -> void:
 func _on_reload_timer_timeout() -> void:
 	current_ammo = magazine_size
 	is_reloading = false
+	
+	# Play bolt action sound when reload completes
+	AudioManager.play_gun_bolt(gun_type)
 	
 	print("Reload complete. Ammo: " + str(current_ammo))
 
