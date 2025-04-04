@@ -12,10 +12,11 @@ func _ready() -> void:
 	# Make sure the game is paused
 	get_tree().paused = true
 	
-	# Reset GameManager to round 1
+	# Reset GameManager to round 1 and reset upgrade levels
 	if GameManager:
 		GameManager.current_round = 1
-		print("DEBUG: GameManager reset to round 1 in GameOverMenu")
+		GameManager.reset_upgrade_levels()
+		print("DEBUG: GameManager reset to round 1 and upgrade levels reset in GameOverMenu")
 	
 	# Simplify the UI - just a full-screen dark red overlay that fades in
 	if not has_node("RedOverlay"):

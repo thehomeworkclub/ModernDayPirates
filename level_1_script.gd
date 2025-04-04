@@ -52,6 +52,22 @@ func _ready():
 		print("ERROR: XROrigin3D not found")
 		return
 		
+	# Set the current gun based on GameManager's bronze_upgrade_levels
+	if vr_gun_controller and vr_gun_controller.has_method("switch_gun"):
+		# Find which gun is currently selected in GameManager's bronze_upgrade_levels
+		var selected_gun = ""
+		for item_name in GameManager.bronze_upgrade_levels.keys():
+			if GameManager.bronze_upgrade_levels[item_name] == 1:
+				selected_gun = GameManager.gun_types_map[item_name]
+				break
+		
+		if selected_gun != "":
+			# Switch to the selected gun
+			vr_gun_controller.switch_gun(selected_gun)
+			print("Initializing level with gun: " + selected_gun)
+		else:
+			print("No gun selected in GameManager, using default")
+	
 	# Get the health display from the gun controller
 	if vr_gun_controller and vr_gun_controller.health_display:
 		health_display = vr_gun_controller.health_display

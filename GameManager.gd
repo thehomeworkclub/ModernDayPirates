@@ -47,6 +47,45 @@ var player_health = 100
 var player_damage_multiplier = 1.0
 var player_speed = 1.0
 
+# Shop upgrade levels - persist these across shop/level transitions
+# Only reset on death
+var bronze_upgrade_levels = {
+"ItemBox1": 1,  # M16A1 (Default)
+"ItemBox2": 0,  # AK74
+"ItemBox3": 0,  # SCAR-L
+"ItemBox4": 0,  # HK416
+"ItemBox5": 0,  # MP5
+"ItemBox6": 0   # Mosin Nagant/Model 1897
+}
+
+# Map ItemBox names to gun types for the bronze shop
+var gun_types_map = {
+"ItemBox1": "m16a1",
+"ItemBox2": "ak74",
+"ItemBox3": "scarl",
+"ItemBox4": "hk416", 
+"ItemBox5": "mp5",
+"ItemBox6": "mosin"  # Can change to model1897 if preferred
+}
+
+var silver_upgrade_levels = {
+"ItemBox1": 1,  # Shield
+"ItemBox2": 1,  # Dash
+"ItemBox3": 1,  # Critical
+"ItemBox4": 1,  # Range
+"ItemBox5": 1,  # Spread
+"ItemBox6": 1   # Special
+}
+
+var gold_upgrade_levels = {
+"ItemBox1": 1,  # Regen
+"ItemBox2": 1,  # Bounce
+"ItemBox3": 1,  # Pierce
+"ItemBox4": 1,  # Multi
+"ItemBox5": 1,  # Homing
+"ItemBox6": 1   # Ultimate
+}
+
 # Scene references
 var player_boat = null
 var player = null
@@ -71,6 +110,21 @@ const DIFFICULTY_VALUES = {
 func _ready() -> void:
 	print("Initializing GameManager...")
 	initialize_game_state()
+	
+# Reset all upgrade levels when player dies
+func reset_upgrade_levels() -> void:
+	# For bronze shop (guns), set everything to 0 except the default gun (M16A1)
+	for key in bronze_upgrade_levels.keys():
+		bronze_upgrade_levels[key] = 0
+	bronze_upgrade_levels["ItemBox1"] = 1  # M16A1 is the default gun
+	
+	# Reset silver and gold upgrades to level 1
+	for key in silver_upgrade_levels.keys():
+		silver_upgrade_levels[key] = 1
+	for key in gold_upgrade_levels.keys():
+		gold_upgrade_levels[key] = 1
+		
+	print("GameManager: Upgrade levels reset - Default gun selected")
 
 func _process(delta: float) -> void:
 	# Only handle shop timer when in shop
