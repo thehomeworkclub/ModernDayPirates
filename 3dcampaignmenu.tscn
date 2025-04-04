@@ -278,12 +278,12 @@ mesh = SubResource("BoxMesh_ixhad")
 skeleton = NodePath("../..")
 
 [node name="MeshInstance3D12" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(0.324175, -0.00536228, 0.00818995, -0.00799691, 0.00134105, 0.0379478, 0.630467, 0.00247868, -0.00331282, -1.11899, 0.0793288, 0.79592)
+transform = Transform3D(0.324175, -0.00536228, 0.00818995, -0.00799691, 0.00134105, 0.0379478, 0.630467, 0.00247868, -0.00331282, -1.11899, -0.0235195, 0.79592)
 mesh = SubResource("BoxMesh_ixhad")
 skeleton = NodePath("../..")
 
 [node name="MeshInstance3D13" type="MeshInstance3D" parent="CargoContainer"]
-transform = Transform3D(-0.318707, -0.00539652, 0.00785137, -0.00799691, 0.00134105, 0.0379478, 0.632951, -0.00241138, 0.00397821, -1.12459, 0.0793288, 1.65479)
+transform = Transform3D(-0.318707, -0.00539652, 0.00785137, -0.00799691, 0.00134105, 0.0379478, 0.632951, -0.00241138, 0.00397821, -1.12459, -0.0235195, 1.65479)
 mesh = SubResource("BoxMesh_ixhad")
 skeleton = NodePath("../..")
 
@@ -467,14 +467,14 @@ transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.1
 text = "QUIT"
 
 [node name="DifficultyRange" type="Sprite3D" parent="."]
-transform = Transform3D(0.907964, 0.124956, -0.399985, 0.00578876, 0.950676, 0.310132, 0.419009, -0.283904, 0.862455, 13.9031, -7.15983, 0.900894)
+transform = Transform3D(0.907964, 0.124956, -0.399985, 0.00578876, 0.950676, 0.310132, 0.419009, -0.283904, 0.862455, 13.9031, -8.81103, 0.900894)
 texture_filter = 0
 texture = ExtResource("4_0x0at")
 region_enabled = true
 region_rect = Rect2(0, 0, 201, 37)
 
 [node name="Flags" type="Sprite3D" parent="."]
-transform = Transform3D(0.904897, -0.0956922, 0.414735, -0.00418978, 0.97235, 0.233493, -0.425611, -0.213024, 0.879475, 7.89978, -7.22169, 0.645215)
+transform = Transform3D(0.904897, -0.0956922, 0.414735, -0.00418978, 0.97235, 0.233493, -0.425611, -0.213024, 0.879475, 7.89978, -8.87289, 0.645215)
 texture_filter = 0
 texture = ExtResource("5_8or5p")
 region_enabled = true

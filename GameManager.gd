@@ -9,17 +9,32 @@ signal enemies_changed(count: int)
 
 # Wave management
 var game_started: bool = false
-var enemies_per_wave: int = 5
+var enemies_per_wave: int = 10  # Set to 10 for 10 kills before shop
 var enemy_spawn_rate: float = 1.0
 var wave_difficulty_multiplier: float = 1.0
 var enemy_speed: float = 1.0
 var enemy_health: float = 1.0
 var enemies_spawned_in_wave: int = 0
 var current_enemies_count: int = 0
+var current_bomber_id: int = -1  # Tracks which enemy is the designated bomber
+var next_enemy_id: int = 0  # Counter for assigning unique enemy IDs
+
+# Shop teleportation functionality
+var enemy_kill_count: int = 0
+var difficulty_level: int = 1
+var kills_before_shop: int = 10
+var shop_timer: float = 20.0  # Seconds to spend in shop
+var in_shop: bool = false
+var shop_timer_running: bool = false
+var shop_timer_remaining: float = 0.0
 
 # Game state tracking
 var current_voyage_num = 0
 var current_voyage_difficulty = 0
+var current_round = 1  # Current level round
+var current_wave = 1   # Current wave within the round
+var voyage_name = "Modern Day Pirates"  # Name of the current voyage
+var difficulty = "Normal"  # Difficulty level as a string
 
 # Player equipment and stats
 var gun_type = "basic"  # Default gun type
@@ -52,6 +67,112 @@ func _ready() -> void:
 	print("Initializing GameManager...")
 	initialize_game_state()
 
+func _process(delta: float) -> void:
+	# Shop teleportation logic
+	if not in_shop:
+		# Check if we've reached the kill count to teleport to shop
+		if enemy_kill_count >= kills_before_shop:
+			print("Reached " + str(kills_before_shop) + " enemy kills, teleporting to shop")
+			teleport_to_shop()
+	else:
+		# We're in the shop, update shop timer
+		if shop_timer_running:
+			shop_timer_remaining -= delta
+			if shop_timer_remaining <= 0:
+				print("Shop timer expired, teleporting back to level")
+				teleport_to_level()
+
+# Teleport to shop after defeating N enemies
+func teleport_to_shop() -> void:
+	print("Teleporting to shop")
+	in_shop = true
+	shop_timer_running = true
+	shop_timer_remaining = shop_timer
+	enemy_kill_count = 0
+	
+	# Increase difficulty for next round
+	difficulty_level += 1
+	print("Difficulty level increased to: " + str(difficulty_level))
+	
+	# Save XR state
+	var xr_interface = XRServer.find_interface("OpenXR")
+	var was_vr_enabled = false
+	if xr_interface and xr_interface.is_initialized():
+		was_vr_enabled = true
+	
+	# Change to shop scene
+	print("Loading shop scene...")
+	var err = get_tree().change_scene_to_file("res://shop.tscn")
+	if err == OK:
+		print("Shop scene loaded")
+		
+		# Re-enable VR if it was enabled
+		if was_vr_enabled and xr_interface and xr_interface.is_initialized():
+			get_viewport().use_xr = true
+			vr_mode_enabled = true
+			emit_signal("vr_mode_changed", true)
+			print("VR mode re-enabled in shop")
+	else:
+		print("ERROR: Failed to load shop scene! Error code: ", err)
+		# Fallback if shop loading fails
+		teleport_to_level()
+
+# Teleport back to level1 after shop timer expires
+func teleport_to_level() -> void:
+	print("Teleporting back to level with difficulty: " + str(difficulty_level))
+	in_shop = false
+	shop_timer_running = false
+	
+	# Save XR state
+	var xr_interface = XRServer.find_interface("OpenXR")
+	var was_vr_enabled = false
+	if xr_interface and xr_interface.is_initialized():
+		was_vr_enabled = true
+	
+	# Reinitialize game state with new difficulty
+	initialize_game_state()
+	
+	# Change back to level1 scene
+	print("Loading level1 scene...")
+	var err = get_tree().change_scene_to_file("res://level1.tscn")
+	if err == OK:
+		print("Level1 scene loaded")
+		
+		# Re-enable VR if it was enabled
+		if was_vr_enabled and xr_interface and xr_interface.is_initialized():
+			get_viewport().use_xr = true
+			vr_mode_enabled = true
+			emit_signal("vr_mode_changed", true)
+			print("VR mode re-enabled in level")
+	else:
+		print("ERROR: Failed to load level1 scene! Error code: ", err)
+
+# Register an enemy and return a unique ID
+func register_enemy() -> int:
+	var new_id = next_enemy_id
+	next_enemy_id += 1
+	print("Registered enemy with ID: ", new_id)
+	
+	# Automatically assign first enemy as bomber
+	if current_bomber_id == -1:
+		current_bomber_id = new_id
+		print("Setting enemy ", new_id, " as initial bomber")
+	
+	update_enemy_count(current_enemies_count + 1)
+	return new_id
+
+# Handle enemy defeat
+func enemy_defeated(enemy_id: int) -> void:
+	print("Enemy ", enemy_id, " defeated")
+	
+	# Update enemy count
+	update_enemy_count(current_enemies_count - 1)
+	
+	# If the bomber was defeated, assign a new one
+	if enemy_id == current_bomber_id:
+		current_bomber_id = -1
+		print("Bomber defeated, will assign new bomber")
+
 func update_enemy_count(count: int) -> void:
 	if current_enemies_count != count:
 		current_enemies_count = count
@@ -68,12 +189,19 @@ func initialize_game_state() -> void:
 	enemies_spawned_in_wave = 0
 	current_enemies_count = 0
 	emit_signal("enemies_changed", current_enemies_count)
-	wave_difficulty_multiplier = 1.0 + (current_voyage_difficulty * 0.2)
+	
+	# Scale difficulty based on both voyage difficulty and current difficulty level
+	wave_difficulty_multiplier = 1.0 + (current_voyage_difficulty * 0.2) + (difficulty_level * 0.1)
 	enemy_spawn_rate = 1.0 + (current_voyage_difficulty * 0.1)
 	enemy_speed = 1.0 + (current_voyage_difficulty * 0.15)
-	enemy_health = 1.0 + (current_voyage_difficulty * 0.2)
-	enemies_per_wave = 5 + (2 * current_voyage_difficulty)
-	print("Setting up initial game state")
+	
+	# Scale enemy health with both difficulty sources
+	enemy_health = 1.0 + (current_voyage_difficulty * 0.2) + (difficulty_level * 0.3)
+	
+	# Always 10 enemies per wave for shop teleportation
+	enemies_per_wave = 10
+	
+	print("Setting up initial game state with difficulty level: ", difficulty_level)
 	verify_equipment()
 	
 	# Find player and initialize equipment
@@ -203,7 +331,7 @@ func setup_wave():
 		enemy_spawner.enemies_per_wave = wave_enemies
 
 		# Scale enemy health/damage with difficulty
-		enemy_spawner.enemy_health_multiplier = 1.0 + (current_voyage_difficulty * 0.1)
+		enemy_spawner.enemy_health_multiplier = 1.0 + (current_voyage_difficulty * 0.1) + (difficulty_level * 0.3)
 		enemy_spawner.enemy_damage_multiplier = 1.0 + (current_voyage_difficulty * 0.15)
 
 		print("Wave configured with:")

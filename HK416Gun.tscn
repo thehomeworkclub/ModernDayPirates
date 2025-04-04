@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://dxxwv3mkr4aqj"]
 
 [ext_resource type="Script" path="res://HK416Gun.gd" id="1_hk416"]
-[ext_resource type="PackedScene" path="res://M16A1Bullet.tscn" id="2_bullet"]
+[ext_resource type="PackedScene" uid="uid://dts5s7r3ghmwc" path="res://M16A1Bullet.tscn" id="2_bullet"]
 [ext_resource type="PackedScene" uid="uid://blvus5ljyjn56" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/hk416.fbx" id="3_hk416_model"]
 [ext_resource type="PackedScene" uid="uid://drdfisyp8ih1k" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/stanag 556 magazine.fbx" id="4_magazine"]
 

@@ -47,7 +47,7 @@ func _ready() -> void:
 	# Create a timer for batch delays
 	batch_timer = Timer.new()
 	batch_timer.name = "BatchTimer"
-	batch_timer.wait_time = 5.0  # 5 seconds between batches
+	batch_timer.wait_time = 2.0  # Reduced to 2 seconds between batches for more constant action
 	batch_timer.one_shot = true
 	batch_timer.autostart = false
 	batch_timer.timeout.connect(_on_batch_timer_timeout)
@@ -108,9 +108,8 @@ func start_wave_spawning() -> void:
 	start_next_batch()
 
 func calculate_first_batch_size() -> void:
-	# Always spawn just 1 enemy at a time regardless of difficulty
-	# This ensures they don't all appear at once and gives player time to react
-	current_batch_size = 1
+	# Spawn 2 enemies in first batch to create more engagement
+	current_batch_size = 2
 	
 	print("DEBUG: First batch will spawn " + str(current_batch_size) + " enemies")
 
@@ -162,9 +161,9 @@ func check_for_next_batch() -> void:
 		print("DEBUG: All enemies already spawned, no need for next batch")
 		return
 	
-	# Fixed threshold of 1 - only spawn next enemy when there is at most 1 active enemy
-	# This ensures enemies spawn one at a time with plenty of time between them
-	var threshold = 1
+	# Increase threshold to 3 - spawn next batch when there are 3 or fewer active enemies
+	# This ensures a more consistent stream of enemies
+	var threshold = 3
 	
 	# Count actual active enemies based on our tracked list
 	var active_count = count_active_enemies()
@@ -206,7 +205,8 @@ func _on_enemies_changed(count: int) -> void:
 		var active_count = count_active_enemies()
 		
 		# If we're running low on enemies and haven't spawned all yet
-		if active_count <= 3 and enemies_spawned < GameManager.enemies_per_wave:
+		# Reduce threshold to make sure new enemies spawn more frequently
+		if active_count <= 5 and enemies_spawned < GameManager.enemies_per_wave:
 			print("DEBUG: Enemy count dropped, starting batch timer")
 			var batch_timer = get_node_or_null("BatchTimer")
 			if batch_timer:
@@ -273,13 +273,11 @@ func _on_Timer_timeout() -> void:
 			
 			# Start timer for next batch if we have more enemies to spawn
 			if enemies_spawned < GameManager.enemies_per_wave:
-				print("DEBUG: Scheduling next batch in 5 seconds")
+				print("DEBUG: Scheduling next batch immediately")
 				
-				# Make sure batch timer is stopped before restarting
-				batch_timer.stop()
-					
-				# Start the delay timer
-				batch_timer.start()
+				# Don't wait - immediately prepare the next batch
+				next_batch_ready = true
+				check_for_next_batch()
 			else:
 				print("DEBUG: All " + str(enemies_spawned) + " enemies have been spawned")
 				check_wave_completion()

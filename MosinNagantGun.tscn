@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://bwff6x5in66jt"]
 
 [ext_resource type="Script" path="res://MosinNagantGun.gd" id="1_mosin"]
-[ext_resource type="PackedScene" path="res://M16A1Bullet.tscn" id="2_bullet"]
+[ext_resource type="PackedScene" uid="uid://dts5s7r3ghmwc" path="res://M16A1Bullet.tscn" id="2_bullet"]
 [ext_resource type="PackedScene" uid="uid://baaai5e72rjil" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/mosin nagant.fbx" id="3_mosin_model"]
 [ext_resource type="PackedScene" uid="uid://bttes5de73g6w" path="res://assets/guns_hands/VRFPS_Kit/Models/Cartridges/762 54R cartridge.fbx" id="4_magazine"]
 

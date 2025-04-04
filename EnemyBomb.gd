@@ -1,6 +1,6 @@
 extends Area3D
 
-var damage: int = 5
+var damage: int = 3  # Set to exactly 3 hearts of damage as requested
 var age: float = 0.0
 var owner_id: int = -1
 var target_player = null
@@ -11,10 +11,10 @@ var start_pos: Vector3
 var target_pos: Vector3
 var v_horizontal: Vector3
 var v_vertical: float
-var bomb_gravity: float = 50.0
-var arc_height: float = 25.0
-var min_arc_duration: float = 2.0
-var max_arc_duration: float = 3.0
+var bomb_gravity: float = 30.0  # Reduced gravity for longer arcs
+var arc_height: float = 50.0  # Increased arc height for better visibility and trajectory
+var min_arc_duration: float = 2.5  # Longer minimum duration
+var max_arc_duration: float = 4.0  # Longer maximum duration
 var arc_duration: float = 2.0
 var time_passed: float = 0.0
 var initialized = false
@@ -28,8 +28,8 @@ func _ready():
 	monitoring = true
 	monitorable = true
 	
-	# Scale down the bomb model
-	scale = Vector3(0.5, 0.5, 0.5)  # Make bomb 50% smaller
+	# Make the bomb much larger for better visibility and easier shooting
+	scale = Vector3(3.0, 3.0, 3.0)  # Triple-sized bombs for better visibility and collision
 	
 	print("DEBUG: Bomb created at " + str(global_position))
 
@@ -54,6 +54,7 @@ func initialize(dir: Vector3, dmg: int, target: Node3D = null):
 	damage = dmg
 	start_pos = global_position
 	
+	# Look for any player or player boat in the scene
 	var players = get_tree().get_nodes_in_group("Player")
 	if players.size() > 0:
 		target_player = players[0]
@@ -81,11 +82,11 @@ func initialize(dir: Vector3, dmg: int, target: Node3D = null):
 		# v0y = (y - y0 + (1/2)*g*t^2) / t
 		var base_velocity = (height_diff + (0.5 * bomb_gravity * arc_duration * arc_duration)) / arc_duration
 		
-		# Add just enough extra velocity to reach desired arc height at midpoint
+		# Add extra velocity to reach desired arc height at midpoint
 		var mid_time = arc_duration * 0.5
 		var extra_velocity = (2.0 * arc_height) / mid_time
 		
-		v_vertical = base_velocity + extra_velocity * 0.5  # Reduced multiplier for lower arc
+		v_vertical = base_velocity + extra_velocity * 0.75  # Increased multiplier for higher arc
 		
 		initialized = true
 		print("DEBUG: Bomb initialized with corrected trajectory:")
@@ -141,23 +142,32 @@ func handle_impact():
 	# Only handle actual collisions with player
 	if target_player != null and is_instance_valid(target_player):
 		var distance_to_player = global_position.distance_to(target_player.global_position)
-		if distance_to_player < 5.0:  # Reduced collision radius for more precise hits
+		if distance_to_player < 15.0:  # Greatly increased collision radius for easier hits
 			if target_player.has_method("take_damage"):
 				target_player.take_damage(damage)
 				print("DEBUG: DAMAGE APPLIED - Direct hit!")
 				explode()
 				
 func _on_area_entered(area):
+	# Increased hitbox detection at this point
 	if area.is_in_group("Player") and age > 0.5:
 		print("DEBUG: Direct collision with player!")
 		if area.has_method("take_damage") and not exploded:
 			exploded = true
+			print("DEBUG: Applying damage to player: ", damage)
+			area.take_damage(damage)
+			explode()
+	elif area.is_in_group("player_boat") and age > 0.5:
+		print("DEBUG: Direct collision with player boat!")
+		if area.has_method("take_damage") and not exploded:
+			exploded = true
+			print("DEBUG: Applying damage to player boat: ", damage)
 			area.take_damage(damage)
 			explode()
 	elif area.is_in_group("Bullet") and age > 0.5:
-		print("DEBUG: Direct collision with player!")
-		if area.has_method("take_damage"):
-			area.take_damage(damage)
+		print("DEBUG: Bomb hit by bullet - exploding!")
+		# Make sure bomb explodes when hit by bullet
+		exploded = true  # Mark as exploded to prevent multiple explosions
 		explode()
 
 func explode():

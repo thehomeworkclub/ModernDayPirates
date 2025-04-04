@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://d1w65mx4uau1t"]
 
 [ext_resource type="Script" path="res://MP5Gun.gd" id="1_mp5"]
-[ext_resource type="PackedScene" path="res://AK74Bullet.tscn" id="2_bullet"]
+[ext_resource type="PackedScene" uid="uid://b8v1cvnsgvxad" path="res://AK74Bullet.tscn" id="2_bullet"]
 [ext_resource type="PackedScene" uid="uid://dxyd8b2i5lrp" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/MP5.fbx" id="3_mp5_model"]
 [ext_resource type="PackedScene" uid="uid://dgh33rhqxemot" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/MP5 magazine.fbx" id="4_magazine"]
 
