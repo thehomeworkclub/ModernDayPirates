@@ -11,10 +11,11 @@ var start_pos: Vector3
 var target_pos: Vector3
 var v_horizontal: Vector3
 var v_vertical: float
-var bomb_gravity: float = 30.0  # Reduced gravity for longer arcs
-var arc_height: float = 50.0  # Increased arc height for better visibility and trajectory
-var min_arc_duration: float = 2.5  # Longer minimum duration
-var max_arc_duration: float = 4.0  # Longer maximum duration
+var bomb_gravity: float = 8.0  # Further reduced gravity for even slower arcs
+var arc_height: float = 30.0  # Doubled arc height for higher trajectory
+var min_arc_duration: float = 6.0  # Doubled again (4x original) for extremely slow bombs
+var max_arc_duration: float = 12.0  # Doubled again (4x original) for extremely slow bombs
+var speed_divider: float = 2.0  # Force divide velocity by this number
 var arc_duration: float = 2.0
 var time_passed: float = 0.0
 var initialized = false
@@ -28,8 +29,8 @@ func _ready():
 	monitoring = true
 	monitorable = true
 	
-	# Make the bomb much larger for better visibility and easier shooting
-	scale = Vector3(3.0, 3.0, 3.0)  # Triple-sized bombs for better visibility and collision
+	# Reduce bomb size to 1/3 of previous size for better gameplay balance
+	scale = Vector3(1.0, 1.0, 1.0)  # Normal-sized bombs
 	
 	print("DEBUG: Bomb created at " + str(global_position))
 
@@ -120,11 +121,11 @@ func _physics_process(delta):
 	# Calculate new position using projectile motion equations
 	var new_pos = start_pos
 	
-	# Horizontal motion (constant velocity)
-	new_pos += v_horizontal * time_passed
+	# Horizontal motion (constant velocity) - FORCE DIVIDE BY speed_divider for much slower bombs
+	new_pos += (v_horizontal / speed_divider) * time_passed
 	
-	# Vertical motion (parabolic arc)
-	new_pos.y = start_pos.y + (v_vertical * time_passed) - (0.5 * bomb_gravity * time_passed * time_passed)
+	# Vertical motion (parabolic arc) - FORCE DIVIDE BY speed_divider for much slower bombs
+	new_pos.y = start_pos.y + ((v_vertical / speed_divider) * time_passed) - (0.5 * bomb_gravity * time_passed * time_passed)
 	
 	# Update bomb position
 	global_position = new_pos

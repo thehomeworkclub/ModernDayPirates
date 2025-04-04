@@ -405,10 +405,10 @@ func shoot_bomb() -> void:
 	bomb.collision_layer = 8  # Bomb layer
 	bomb.collision_mask = 3   # Player (1) and Bullet (2) layers
 	
-	# Create collision shape
+	# Create collision shape - make it MUCH LARGER for easier bullet hits
 	var collision = CollisionShape3D.new()
 	var sphere_shape = SphereShape3D.new()
-	sphere_shape.radius = 1.5  # Bigger collision radius for easier shooting
+	sphere_shape.radius = 6.0  # Doubled collision radius for much easier shooting
 	collision.shape = sphere_shape
 	bomb.add_child(collision)
 	
@@ -449,12 +449,11 @@ func shoot_bomb() -> void:
 	var spawn_offset = direction * 2.0  # Position bomb slightly ahead in player direction
 	var bomb_pos = global_position + Vector3(spawn_offset.x, 2.5, spawn_offset.z)
 	
-	# IMPORTANT: First add to scene, then position - this ensures it's not attached to the enemy
-	get_tree().current_scene.add_child(bomb)
-	bomb.global_position = bomb_pos
-	
-	# Explicitly set the bomb's transform to ensure it doesn't inherit from parent
+	# CRITICAL FIX: Set position BEFORE adding to scene to avoid 0,0,0 initialization
 	bomb.global_transform.origin = bomb_pos
+	
+	# Now add to scene after position is set
+	get_tree().current_scene.add_child(bomb)
 	
 	# Now initialize the bomb with targeting information AFTER it's in the scene
 	if bomb.has_method("initialize"):

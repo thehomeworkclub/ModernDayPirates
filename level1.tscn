@@ -78,7 +78,7 @@ emission_energy_multiplier = 0.3
 script = ExtResource("1_script")
 
 [node name="XROrigin3D" type="XROrigin3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.45716, 16.3239, -39.1217)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.38865, 16.6736, -39.1973)
 current = true
 
 [node name="Head" type="Node3D" parent="XROrigin3D"]
@@ -138,7 +138,7 @@ light_indirect_energy = 0.0
 
 [node name="PlayerShip" type="Area3D" parent="." groups=["Player", "player_boat"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.94615, 4.18604, -76.2186)
-collision_mask = 12
+collision_mask = 28
 script = ExtResource("11_81knf")
 
 [node name="Dry_Cargo_Ship" parent="PlayerShip" instance=ExtResource("3_nbyqe")]
@@ -156,6 +156,7 @@ ship_spawn_height = 0.0
 [node name="Area3D" parent="." groups=["player_boat"] instance=ExtResource("6_1kiwj")]
 transform = Transform3D(-2.64326, 0, -1.67425e-07, 0, 2.62623, 0, 2.31081e-07, 0, -1.91512, 8.38106, 0, -36.1083)
 visible = false
+collision_mask = 28
 
 [node name="sea" type="MeshInstance3D" parent="."]
 transform = Transform3D(-1.71122e-07, 0, -2.70399, 0, 1, 0, 3.91482, 0, -1.18195e-07, 0, -0.230235, 162.095)
