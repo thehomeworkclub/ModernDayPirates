@@ -29,6 +29,12 @@ var gun_sounds = {}
 
 # Map gun types to their sound sets - uses fallbacks as needed
 var gun_sound_map = {
+	"basic": {  # Add the default "basic" gun type that's used initially
+		"shoot": "generic_rifle_shoot",
+		"reload_start": "generic_rifle_reload",
+		"reload_end": "generic_rifle_reload", 
+		"bolt": "generic_rifle_bolt"
+	},
 	"ak74": {
 		"shoot": "ak74_shoot",
 		"reload_start": "generic_rifle_reload",
@@ -181,13 +187,34 @@ func determine_initial_music():
 	
 	print("AudioManager: Starting music for scene: ", scene_name)
 	
+	# Explicit check for if we're in a lobby scene
+	var is_lobby_scene = is_lobby_scene(scene_name)
+	
 	# Lobby scenes should play lofi
-	if scene_name == "CampaignMenu" or scene_name == "3dcampaignmenu" or "shop" in scene_name.to_lower():
+	if is_lobby_scene:
+		print("AudioManager: Detected lobby scene, playing lofi music")
 		is_in_lobby = true
 		play_music("lofi")
 	else:
+		print("AudioManager: Detected gameplay scene, playing round music")
 		is_in_lobby = false
 		play_round_music()
+
+# Helper function to determine if a scene is a lobby scene
+func is_lobby_scene(scene_name: String) -> bool:
+	# List of exact lobby scene names
+	var lobby_scenes = ["CampaignMenu", "3dcampaignmenu", "shop", "shop1", "ShopMenu", "PermanentShopMenu"]
+	
+	# First check exact matches
+	if scene_name in lobby_scenes:
+		return true
+		
+	# Then check partial matches
+	for lobby_name in ["shop", "menu", "lobby"]:
+		if lobby_name.to_lower() in scene_name.to_lower():
+			return true
+			
+	return false
 
 # Variable to track current scene path
 var current_scene_path = ""
@@ -215,11 +242,16 @@ func _on_scene_change(scene):
 	var scene_name = scene.name
 	print("AudioManager: Scene changed to: ", scene_name, " (", current_scene_path, ")")
 	
+	# Use the helper function to determine if this is a lobby scene
+	var is_lobby_scene = is_lobby_scene(scene_name)
+	
 	# Play appropriate music for the scene
-	if scene_name == "CampaignMenu" or scene_name == "3dcampaignmenu" or "shop" in scene_name.to_lower():
+	if is_lobby_scene:
+		print("AudioManager: Transitioning to lobby scene, playing lofi music")
 		is_in_lobby = true
 		cross_fade_to("lofi")
 	else:
+		print("AudioManager: Transitioning to gameplay scene, playing round music")
 		is_in_lobby = false
 		play_round_music()
 
