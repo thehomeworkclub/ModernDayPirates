@@ -7,9 +7,12 @@ signal gun_unregistered(gun_node: Node)
 signal wave_completed
 signal enemies_changed(count: int)
 
+# Game parameters
+var game_parameters = load("res://GameParameters.gd").new()
+
 # Wave management
 var game_started: bool = false
-var enemies_per_wave: int = 10  # Set to 10 for 10 kills before shop
+var enemies_per_wave: int = 10  # Will be updated from GameParameters
 var enemy_spawn_rate: float = 1.0
 var wave_difficulty_multiplier: float = 1.0
 var enemy_speed: float = 1.0
@@ -17,13 +20,14 @@ var enemy_health: float = 1.0
 var enemies_spawned_in_wave: int = 0
 var current_enemies_count: int = 0
 var current_bomber_id: int = -1  # Tracks which enemy is the designated bomber
+var bomber_ids = []  # Tracks all enemies allowed to bomb
 var next_enemy_id: int = 0  # Counter for assigning unique enemy IDs
 
 # Shop teleportation functionality
 var enemy_kill_count: int = 0
 var difficulty_level: int = 1
 var kills_before_shop: int = 10
-var shop_timer: float = 20.0  # Seconds to spend in shop
+var shop_timer: float = 15.0  # Seconds to spend in shop (updated to 15 seconds)
 var in_shop: bool = false
 var shop_timer_running: bool = false
 var shop_timer_remaining: float = 0.0
@@ -123,6 +127,10 @@ func teleport_to_level() -> void:
 	in_shop = false
 	shop_timer_running = false
 	
+	# Increment round counter for new round
+	current_round += 1
+	print("Starting round: " + str(current_round))
+	
 	# Save XR state
 	var xr_interface = XRServer.find_interface("OpenXR")
 	var was_vr_enabled = false
@@ -153,10 +161,11 @@ func register_enemy() -> int:
 	next_enemy_id += 1
 	print("Registered enemy with ID: ", new_id)
 	
-	# Automatically assign first enemy as bomber
-	if current_bomber_id == -1:
+	# Check if we need to assign a new bomber
+	if current_bomber_id == -1 and bomber_ids.size() < game_parameters.max_bombers:
 		current_bomber_id = new_id
-		print("Setting enemy ", new_id, " as initial bomber")
+		bomber_ids.append(new_id)
+		print("Setting enemy ", new_id, " as bomber (", bomber_ids.size(), "/", game_parameters.max_bombers, ")")
 	
 	update_enemy_count(current_enemies_count + 1)
 	return new_id
@@ -168,10 +177,16 @@ func enemy_defeated(enemy_id: int) -> void:
 	# Update enemy count
 	update_enemy_count(current_enemies_count - 1)
 	
-	# If the bomber was defeated, assign a new one
+	# If the bomber was defeated, remove from bomber list
 	if enemy_id == current_bomber_id:
 		current_bomber_id = -1
-		print("Bomber defeated, will assign new bomber")
+		bomber_ids.erase(enemy_id)
+		print("Bomber defeated, remaining bombers: ", bomber_ids.size())
+		
+		# Assign a new active bomber if other bombers exist
+		if bomber_ids.size() > 0:
+			current_bomber_id = bomber_ids[0]
+			print("Setting existing bomber as active: ", current_bomber_id)
 
 func update_enemy_count(count: int) -> void:
 	if current_enemies_count != count:
@@ -183,12 +198,25 @@ func complete_wave() -> void:
 	current_enemies_count = 0
 	emit_signal("enemies_changed", current_enemies_count)
 	emit_signal("wave_completed")
+	
+	# When wave completes, increment enemy kill count to trigger shop teleport
+	enemy_kill_count += game_parameters.get_total_ships_per_wave()
+	
+	# Check if we should teleport to shop
+	if enemy_kill_count >= kills_before_shop:
+		print("Wave complete - teleporting to shop")
+		call_deferred("teleport_to_shop")
 
 func initialize_game_state() -> void:
 	# Reset wave-related variables
 	enemies_spawned_in_wave = 0
 	current_enemies_count = 0
+	bomber_ids.clear()
+	current_bomber_id = -1
 	emit_signal("enemies_changed", current_enemies_count)
+	
+	# Update game parameters with current difficulty level
+	game_parameters.set_difficulty(difficulty_level)
 	
 	# Scale difficulty based on both voyage difficulty and current difficulty level
 	wave_difficulty_multiplier = 1.0 + (current_voyage_difficulty * 0.2) + (difficulty_level * 0.1)
@@ -198,8 +226,8 @@ func initialize_game_state() -> void:
 	# Scale enemy health with both difficulty sources
 	enemy_health = 1.0 + (current_voyage_difficulty * 0.2) + (difficulty_level * 0.3)
 	
-	# Always 10 enemies per wave for shop teleportation
-	enemies_per_wave = 10
+	# Get enemy count from game parameters
+	enemies_per_wave = game_parameters.get_total_ships_per_wave()
 	
 	print("Setting up initial game state with difficulty level: ", difficulty_level)
 	verify_equipment()

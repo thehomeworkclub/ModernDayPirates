@@ -110,3 +110,35 @@ Price Labels:
 - Transform: 11.312, -2.381, -9.427
 - Scale: 12.346 for both x and y
 - Pixel size: 0.001
+
+## Health and Damage System
+
+### Player-Boat Health System
+- Total health: 10 hearts
+- Bidirectional synchronization between boat and gun display
+- Health display appears on gun side for VR visibility
+- Heart textures: fullheart.png and emptyheart.png
+- Heart spacing: 0.05 units
+- Heart scale: 0.05 units
+
+### Bomb Damage Mechanics
+- Bomb detection via Area3D collision groups
+- Default bomb damage: 3 hearts
+- Bombs can be shot down by bullets in mid-air
+- Explosion effects created with ColorRect fade
+- Explosion timer: 0.5 seconds
+
+### Death Sequence
+- Simple red screen fade (full-screen ColorRect)
+- Fade duration: 2.0 seconds
+- Automatic return to campaign menu after fade
+- No complex UI elements for clean VR experience
+
+### Enemy Spawning System
+- Batch-based enemy spawning 
+- Initial batch size: 2 enemies
+- Spawn threshold: 3 active enemies for next batch
+- Batch timer: 2.0 seconds between batches
+- Immediate batch triggering for smoother gameplay
+- Enemy position validation to prevent overlaps
+- Min spawn distance between enemies: 25.0 units

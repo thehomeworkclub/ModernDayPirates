@@ -76,7 +76,18 @@ func add_health_display_to_gun():
 		
 		# Add to gun instance
 		gun_instance.add_child(health_display)
-		print_verbose("Health display added to gun")
+		print("Health display added to gun")
+		
+		# Force the health display to create hearts immediately
+		await get_tree().process_frame
+		if health_display and health_display.has_method("create_hearts"):
+			health_display.create_hearts()
+			print("Hearts created for gun health display")
+			
+			# Force an update to show starting health
+			if health_display.has_method("update_hearts"):
+				health_display.update_hearts()
+				print("Health display initialized with " + str(health_display.current_health) + "/" + str(health_display.max_health) + " hearts")
 
 func _process(delta):
 	# Only update position and check for input if controller is available

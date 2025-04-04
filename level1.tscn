@@ -1,6 +1,7 @@
-[gd_scene load_steps=23 format=3 uid="uid://bvrnxw8xf5syb"]
+[gd_scene load_steps=24 format=3 uid="uid://bvrnxw8xf5syb"]
 
 [ext_resource type="Script" path="res://level_1_script.gd" id="1_script"]
+[ext_resource type="Script" path="res://RoundDisplay.gd" id="2_display"]
 [ext_resource type="PackedScene" uid="uid://eum51m82whp" path="res://cargo_ships/meshes/Dry_Cargo_Ship.fbx" id="3_nbyqe"]
 [ext_resource type="Script" path="res://VRGunController.gd" id="3_vrguns"]
 [ext_resource type="Script" path="res://EnemySpawner.gd" id="4_pnw7a"]
@@ -93,6 +94,10 @@ enable_gun_switching = true
 [node name="XRController3DRight" type="XRController3D" parent="XROrigin3D"]
 tracker = &"right_hand"
 pose = &"aim"
+
+[node name="RoundDisplay" type="Node3D" parent="XROrigin3D/XRController3DRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 0.04, -0.05)
+script = ExtResource("2_display")
 
 [node name="LaserBeamRight" type="MeshInstance3D" parent="XROrigin3D/XRController3DRight"]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -5)

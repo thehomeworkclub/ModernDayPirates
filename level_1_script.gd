@@ -46,9 +46,11 @@ func _ready():
 	# Get the health display from the gun controller
 	if vr_gun_controller and vr_gun_controller.health_display:
 		health_display = vr_gun_controller.health_display
-		print_verbose("Gun health display referenced")
+		print("Gun health display referenced")
 	else:
 		print("INFO: Health display will be initialized when gun is created")
+		# Defer health display setup to ensure VRGunController has time to initialize
+		call_deferred("setup_health_display")
 		
 	# Apply performance optimizations for VR
 	optimize_for_vr()
@@ -110,7 +112,40 @@ func _ready():
 			print("Enemy wave spawning started")
 	else:
 		print("WARNING: Enemy spawner not found or initialized")
+
+func _input(event):
+	# TEST FOR DAMAGE: Press 9 for damage test
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_9:
+			damage_player(1)
+			print("Input damage test triggered (key 9)")
+
+# Setup the health display after everything is initialized
+func setup_health_display():
+	await get_tree().create_timer(0.1).timeout  # Give time for VRGunController to initialize
 	
+	# Try to get the health display again
+	if vr_gun_controller:
+		if vr_gun_controller.health_display:
+			health_display = vr_gun_controller.health_display
+			print("Gun health display initialized via deferred setup")
+		else:
+			# Force health display creation
+			vr_gun_controller.add_health_display_to_gun()
+			await get_tree().create_timer(0.1).timeout
+			
+			health_display = vr_gun_controller.health_display
+			print("Gun health display created via forced initialization")
+			
+		# Ensure a connection to the boat
+		var player_boat = get_tree().get_first_node_in_group("player_boat")
+		if player_boat and health_display:
+			if player_boat.has_method("get") and player_boat.get("health") != null:
+				health_display.current_health = player_boat.health
+				health_display.max_health = player_boat.max_health
+				health_display.update_hearts()
+				print("Synchronized health display with player boat: " + str(health_display.current_health) + "/" + str(health_display.max_health))
+
 # Apply performance optimizations for VR
 func optimize_for_vr():
 	print("Applying VR performance optimizations...")
@@ -210,9 +245,19 @@ func find_all_mesh_instances(node: Node) -> Array:
 
 # Player damage/health functions
 func damage_player(amount):
+	print("Level script damage_player called with amount: " + str(amount))
+
+	# Ensure we have health display
+	if not health_display and vr_gun_controller:
+		health_display = vr_gun_controller.health_display
+		print("Retrieving health display reference for damage")
+
 	if health_display:
+		print("Applying " + str(amount) + " damage to health display")
 		health_display.take_damage(amount)
-		print("Player took " + str(amount) + " damage")
+		
+		# Debug output
+		print("Player took " + str(amount) + " damage, health now: " + str(health_display.current_health))
 		
 		# Check for death
 		if health_display.current_health <= 0:
@@ -220,6 +265,20 @@ func damage_player(amount):
 			# Handle death - could restart level, show game over, etc.
 			# For now just reset health to demonstrate system
 			heal_player(max_player_health)
+	else:
+		print("ERROR: Cannot apply damage - health display not found!")
+		
+		# Try to find the health display again by searching the scene
+		var gun_controller = get_node_or_null("XROrigin3D/VRGunController")
+		if gun_controller:
+			if gun_controller.has_node("GunInstance/HealthDisplay"):
+				health_display = gun_controller.get_node("GunInstance/HealthDisplay")
+				health_display.take_damage(amount)
+				print("Found health display via direct path and applied damage")
+			else:
+				print("GunInstance/HealthDisplay node not found")
+		else:
+			print("VRGunController node not found")
 	
 func heal_player(amount):
 	if health_display:

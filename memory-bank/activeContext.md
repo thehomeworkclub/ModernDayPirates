@@ -3,6 +3,8 @@
 ## Current Focus
 We have successfully implemented a comprehensive VR weapons system with physical reloading mechanics optimized for use with a gunstock. The system allows for realistic magazine removal and insertion using physical hand movements. Seven different weapon models are now implemented with proper magazines, muzzle flashes, and recoil animations.
 
+We have also implemented boat-based gameplay with enemy ships that shoot bombs at the player's boat. The health system shows damage on both the player UI and directly on the gun as a row of 10 hearts.
+
 The completed weapon arsenal includes:
 1. M16A1 (Assault rifle - default)
 2. AK-74 (Assault rifle)
@@ -50,7 +52,15 @@ VR performance considerations remain important, especially as we add more weapon
    - Texture size limit: 1024px
 
 ## Recently Completed
-1. VR Weapons System Expansion
+1. Enemy Bombs and Health System Integration
+   - Fixed bomb explosion system to properly damage the player's boat
+   - Implemented bidirectional health synchronization between boat and gun display
+   - Added 10-heart health display on the side of the gun that mirrors boat health
+   - Created simple death sequence with red screen fade
+   - Fixed various property reference errors in GameManager
+   - Improved bomb collision detection with player boat
+
+2. VR Weapons System Expansion
    - Added 5 new weapon types with diverse characteristics:
      - SCAR-L: Tactical rifle with balanced stats (damage: 3, accuracy: 0.92)
      - HK416: High-precision rifle (damage: 3, accuracy: 0.95, low recoil: 0.15)

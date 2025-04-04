@@ -3,16 +3,20 @@ extends Area3D
 @export var base_health: int = 3
 @export var base_speed: float = 8.0  # Significantly increased speed
 @export var base_bronze_value: int = 2
-@export var bomb_damage: int = 3     # Set to exactly 3 hearts of damage
-@export var bomb_cooldown: float = 4.0  # 4 seconds per bomb as requested
-@export var bomb_chance: float = 0.7    # 70% chance to throw bombs when cooldown expires
 @export var player_ship_barrier: float = 150.0  # Massively increased distance from player where ships stop
+
+# Combat variables - will be set from GameParameters
+var bomb_damage: int = 2
+var bomb_cooldown: float = 10.0
+var bullet_damage: int = 1
+var bullet_cooldown: float = 5.0
 
 var health: int
 var speed_multiplier: float = 1.0
 var health_multiplier: float = 1.0
 var bronze_value: int = 0
 var time_since_last_bomb: float = 0.0
+var time_since_last_bullet: float = 0.0
 var at_barrier: bool = false
 var damage_timer: float = 0.0
 var player_ref: Node = null
@@ -37,11 +41,11 @@ var roll_multiplier: float = 0.04  # Reduced roll - small boats are more stable 
 var boat_model: Node3D = null  # Reference to the actual boat model for rotation
 var planing_angle: float = 0.12  # Constant upward tilt when moving fast (nose up)
 
-# Bombing capability - will be controlled centrally
-var can_shoot_bombs: bool = false
-# Debug - track if bombs are being shot
+# Combat capabilities
+var can_shoot_bombs: bool = false  # Will be set if this enemy is designated as a bomber
+var can_shoot_bullets: bool = true  # All enemies can shoot bullets
 var bombs_shot_count: int = 0
-# Unique ID for this enemy
+var bullets_shot_count: int = 0
 var enemy_id: int = -1
 
 func _ready() -> void:
@@ -50,6 +54,17 @@ func _ready() -> void:
 	
 	# Register with the GameManager to get a unique ID
 	enemy_id = GameManager.register_enemy()
+	
+	# Get game parameters
+	bomb_damage = GameManager.game_parameters.get_bomb_damage()
+	bomb_cooldown = GameManager.game_parameters.get_bomb_cooldown()
+	bullet_damage = GameManager.game_parameters.get_bullet_damage()
+	bullet_cooldown = GameManager.game_parameters.get_bullet_cooldown()
+	
+	# Check if we're designated as a bomber
+	can_shoot_bombs = GameManager.current_bomber_id == enemy_id
+	if can_shoot_bombs:
+		print("DEBUG: Enemy " + str(enemy_id) + " initialized as a bomber")
 	
 	# Make sure the player's boat is in Player group
 	var player_boat_node = get_tree().current_scene.find_child("Area3D", true, false)
@@ -150,11 +165,13 @@ func check_bomber_status() -> void:
 		# No current bomber exists, try to become the bomber
 		set_as_bomber()
 		
-# Set this ship as the designated bomber
+# Set this ship as a designated bomber
 func set_as_bomber() -> void:
 	can_shoot_bombs = true
-	GameManager.current_bomber_id = enemy_id
-	print("DEBUG: Enemy ID ", enemy_id, " set as the bomber")
+	GameManager.bomber_ids.append(enemy_id)
+	if GameManager.current_bomber_id == -1:
+		GameManager.current_bomber_id = enemy_id
+	print("DEBUG: Enemy ID ", enemy_id, " set as a bomber")
 
 func _physics_process(delta: float) -> void:
 	# Validate target position first
@@ -315,40 +332,43 @@ func apply_boat_bobbing_effect(delta: float, is_moving: bool) -> void:
 		# Apply roll (Z rotation) - this makes the boat rock side to side
 		boat_model.rotate_z(roll_angle)
 			
-# Function for shooting bombs when the ship is stationary
+# Function for shooting bombs and bullets when the ship is stationary
 func shoot_bombs_while_stationary(delta: float) -> void:
-	# Shoot bombs at player - prioritize designated bombers
 	# Calculate distance to player
 	var distance_to_player = global_position.distance_to(player_position)
 	
 	# Output debug info occasionally
 	if Engine.get_physics_frames() % 300 == 0:
-		print("DEBUG: Stationary enemy bomb check - distance to player: ", distance_to_player, 
-		", bomb timer: ", time_since_last_bomb, ", can bomb: ", can_shoot_bombs)
+		print("DEBUG: Enemy " + str(enemy_id) + " combat check - distance: ", distance_to_player, 
+		", bomb timer: ", time_since_last_bomb, ", bullet timer: ", time_since_last_bullet,
+		", can bomb: ", can_shoot_bombs, ", active bomber: ", (GameManager.current_bomber_id == enemy_id))
 	
-	# Only shoot if within range (close enough to hit, but not too close)
-	var max_shoot_range = 250.0  # Greatly increased shooting range to match actual distances
-	var min_shoot_range = 15.0  # Don't shoot if too close
+	# Combat distance ranges
+	var max_shoot_range = 250.0
+	var min_shoot_range = 15.0
 	
 	if distance_to_player < max_shoot_range && distance_to_player > min_shoot_range:
+		# Update timers
 		time_since_last_bomb += delta
-		if time_since_last_bomb >= bomb_cooldown:
-			# Designated bombers have full chance, others have reduced chance
-			var effective_chance = 1.0  # Always throw bombs regardless of bomber status
-			var roll = randf()
-			print("DEBUG: Stationary enemy bomb roll: ", roll, " vs threshold: ", effective_chance)
-			
-			if roll <= effective_chance:
-				print("DEBUG: Stationary enemy attempting to shoot bomb!")
-				shoot_bomb()
+		time_since_last_bullet += delta
+		
+		# Check if we can shoot a bomb (only if we're the active bomber)
+		if can_shoot_bombs and GameManager.current_bomber_id == enemy_id and time_since_last_bomb >= bomb_cooldown:
+			print("DEBUG: Enemy " + str(enemy_id) + " attempting to shoot bomb!")
+			shoot_bomb()
 			time_since_last_bomb = 0.0
+		
+		# Check if we can shoot a bullet (all enemies)
+		if time_since_last_bullet >= bullet_cooldown:
+			print("DEBUG: Enemy " + str(enemy_id) + " attempting to shoot bullet!")
+			shoot_bullet()
+			time_since_last_bullet = 0.0
 
 func shoot_bomb() -> void:
-	# BYPASS THE BOMBER CHECK - Allow all enemies to shoot bombs
-	# Set ourselves as the bomber to ensure bombs can be shot
-	GameManager.current_bomber_id = enemy_id
-	can_shoot_bombs = true
-	print("DEBUG: Enemy " + str(enemy_id) + " is now allowed to shoot bombs!")
+	# Only shoot bombs if we're designated as the active bomber
+	if GameManager.current_bomber_id != enemy_id:
+		print("DEBUG: Enemy " + str(enemy_id) + " is not the active bomber, cannot shoot bombs")
+		return
 		
 	# CRITICAL FIX: Re-find player reference if missing
 	if not player_ref:
@@ -372,42 +392,42 @@ func shoot_bomb() -> void:
 			count += 1
 	print("DEBUG: Enemy has " + str(count) + " existing bombs")
 	
-	# Increment debug counter
+	# Increment debug counter 
 	bombs_shot_count += 1
 	print("DEBUG: Enemy " + str(enemy_id) + " (designated bomber) attempting to shoot bomb #" + str(bombs_shot_count))
-	
-	# Create the bomb as a completely separate entity in the scene - never attached to the enemy boat
+
+	# Create the bomb as a completely separate entity in the scene
 	var bomb = Area3D.new()
 	bomb.name = "EnemyBomb_" + str(enemy_id) + "_" + str(bombs_shot_count)
 	bomb.add_to_group("EnemyBomb")
 	
 	# Set up collision
-	bomb.collision_layer = 8  # Bomb layer (new layer)
+	bomb.collision_layer = 8  # Bomb layer
 	bomb.collision_mask = 3   # Player (1) and Bullet (2) layers
 	
 	# Create collision shape
 	var collision = CollisionShape3D.new()
 	var sphere_shape = SphereShape3D.new()
-	sphere_shape.radius = 1.5  # Much bigger collision radius for easier shooting
+	sphere_shape.radius = 1.5  # Bigger collision radius for easier shooting
 	collision.shape = sphere_shape
 	bomb.add_child(collision)
 	
-	# Create main bomb body (sphere)
+	# Create bomb mesh (large red sphere)
 	var mesh_instance = MeshInstance3D.new()
 	mesh_instance.name = "BombMesh"
 	var sphere_mesh = SphereMesh.new()
-	sphere_mesh.radius = 1.5  # Much bigger visual size for easier visibility
-	sphere_mesh.height = 3.0  # Keep the height proportional
+	sphere_mesh.radius = 1.5
+	sphere_mesh.height = 3.0
 	mesh_instance.mesh = sphere_mesh
 	
-	# Create bomb material with stronger emissive properties for better visibility
+	# Create bomb material (red glowing)
 	var material = StandardMaterial3D.new()
-	material.albedo_color = Color(0.9, 0.1, 0.0)  # Brighter red
+	material.albedo_color = Color(0.9, 0.1, 0.0)  # Red
 	material.metallic = 0.7
 	material.roughness = 0.3
 	material.emission_enabled = true
 	material.emission = Color(1.0, 0.3, 0.0)
-	material.emission_energy = 2.5  # Increased glow
+	material.emission_energy = 2.5
 	sphere_mesh.material = material
 	
 	mesh_instance.mesh.surface_set_material(0, material)
@@ -449,6 +469,114 @@ func shoot_bomb() -> void:
 		print("ERROR: Bomb creation failed!")
 		bomb.queue_free()
 
+func shoot_bullet() -> void:
+	# Increment debug counter
+	bullets_shot_count += 1
+	print("DEBUG: Enemy " + str(enemy_id) + " shooting bullet #" + str(bullets_shot_count))
+	
+	# Make sure we have a player reference
+	if not player_ref or not is_instance_valid(player_ref):
+		print("DEBUG: Cannot shoot bullet - no valid player reference")
+		return
+	
+	# Create an enemy bullet using a box shape like player bullets but larger
+	var bullet = Area3D.new()
+	bullet.name = "EnemyBullet_" + str(enemy_id) + "_" + str(bullets_shot_count)
+	bullet.add_to_group("EnemyBullet")
+	
+	# Set up collision - only collide with player, not player bullets
+	bullet.collision_layer = 16  # Enemy bullet layer
+	bullet.collision_mask = 1    # Player layer only
+	
+	# Calculate direction to player - straight line
+	var direction = (player_position - global_position).normalized()
+	
+	# Create a box collision shape (like player bullets)
+	var collision = CollisionShape3D.new()
+	var box_shape = BoxShape3D.new()
+	# Make it longer in the direction of travel
+	box_shape.size = Vector3(0.8, 0.8, 3.0)  # Bigger than player bullets for visibility
+	collision.shape = box_shape
+	bullet.add_child(collision)
+	
+	# Create bullet mesh - box shape like player bullets
+	var mesh_instance = MeshInstance3D.new()
+	mesh_instance.name = "BulletMesh"
+	var box_mesh = BoxMesh.new()
+	mesh_instance.mesh = box_mesh
+	
+	# Scale the mesh to make it look like an elongated bullet
+	mesh_instance.transform.basis = Basis().scaled(Vector3(0.8, 0.8, 3.0))
+	
+	# Create bullet material - red to distinguish from player bullets
+	var material = StandardMaterial3D.new()
+	material.albedo_color = Color(1.0, 0.2, 0.0)  # Red
+	material.metallic = 0.7
+	material.roughness = 0.2
+	material.emission_enabled = true
+	material.emission = Color(1.0, 0.3, 0.0)  # Red glow
+	material.emission_energy = 2.0
+	mesh_instance.set_surface_override_material(0, material)
+	
+	bullet.add_child(mesh_instance)
+	
+	# Position the bullet in front of the enemy, pointing toward player
+	var spawn_offset = direction * 2.0
+	var bullet_pos = global_position + Vector3(spawn_offset.x, 1.5, spawn_offset.z)
+	
+	# Add to scene first
+	get_tree().current_scene.add_child(bullet)
+	bullet.global_position = bullet_pos
+	
+	# Rotate bullet to face direction of travel
+	bullet.look_at(bullet.global_position + direction, Vector3.UP)
+	
+	# Add script properties
+	var actual_bullet_damage = GameManager.game_parameters.get_bullet_damage() if GameManager.has_method("get") and GameManager.get("game_parameters") != null else bullet_damage
+	
+	# Create script for the bullet
+	bullet.set_script(GDScript.new())
+	bullet.get_script().source_code = """
+extends Area3D
+
+var direction = Vector3%s
+var speed = 50.0
+var damage = %d
+var owner_id = %d
+var lifetime = 0.0
+var max_lifetime = 5.0
+
+func _ready() -> void:
+	area_entered.connect(_on_area_entered)
+	
+func _physics_process(delta: float) -> void:
+	# Move in straight line toward target
+	global_translate(direction * speed * delta)
+	
+	# Track lifetime and destroy if too old
+	lifetime += delta
+	if lifetime > max_lifetime:
+		queue_free()
+
+func _on_area_entered(area: Area3D) -> void:
+	if area.is_in_group("Player") or area.is_in_group("player_boat"):
+		if area.has_method("take_damage"):
+			print("DEBUG: Enemy bullet hit player, applying damage: ", damage)
+			area.take_damage(damage)
+			queue_free()
+"""
+	
+	# Format the script with the actual values - replace placeholders with actual values
+	var script_code = bullet.get_script().source_code
+	script_code = script_code.replace("%s", str(direction))
+	script_code = script_code.replace("%d", str(actual_bullet_damage))
+	script_code = script_code.replace("%d", str(enemy_id))  # Replace the second %d
+	bullet.get_script().source_code = script_code
+	
+	bullet.get_script().reload()
+	
+	print("DEBUG: Enemy bullet fired successfully")
+	
 func _on_area_entered(area: Area3D) -> void:
 	print("DEBUG: Enemy collision with ", area.name)
 	

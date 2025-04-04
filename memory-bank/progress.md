@@ -2,6 +2,16 @@
 
 ## Completed Features
 
+### Combat and Health System
+- ✓ Implemented boat health system with 10 hearts
+- ✓ Created bidirectional health synchronization between boat and gun display
+- ✓ Fixed bomb explosion system to properly interact with player boat
+- ✓ Enhanced bomb collision detection for reliable damage application
+- ✓ Created simplified death sequence with red screen fade
+- ✓ Fixed property reference errors in GameManager and RoundBoard scripts
+- ✓ Connected gun sight health display with boat damage system
+- ✓ Implemented boat group structure for proper reference and targeting
+
 ### VR Weapons System
 - ✓ Implemented base rifle framework with inheritance pattern
 - ✓ Created physical reloading system with magazine detachment/reattachment
@@ -43,10 +53,10 @@
 - ✓ Scene transitions
 
 ## In Progress
-- Integration of new game levels from temp-game/
-- Enemy system integration
-- Wave-based spawning system implementation
+- Enemy ship AI improvements
+- Wave-based spawning system refinement
 - Weapon selection interface for VR (currently keyboard-only for debugging)
+- Bomb balancing and visual effects enhancement
 
 ### Asset Integration
 - ✓ Imported cargo ship meshes and textures from temp-game/Cargo_Ships/
@@ -90,4 +100,4 @@
 6. Connect rifle system with enemy damage system
 
 ## Known Issues
-- None currently reported for menu or weapons systems
+- Bomb damage might need balancing for optimal difficulty

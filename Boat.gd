@@ -145,41 +145,87 @@ func take_damage(amount: int) -> void:
 	
 	print("DEBUG: Player took " + str(amount) + " damage, health now: " + str(health))
 	
-	# Update the gun health display if it exists
+	# DIRECT HEALTH DISPLAY UPDATE - Force update XROrigin controllers
+	force_health_update()
+	
+	# Update the gun health display if it exists - CRITICAL SECTION
 	var xr_origin = get_tree().get_first_node_in_group("Player")
 	if xr_origin:
 		var vr_gun_controller = xr_origin.get_node_or_null("VRGunController")
-		if vr_gun_controller and vr_gun_controller.health_display:
-			print("DEBUG: Updating gun health display to match boat health: " + str(health))
-			vr_gun_controller.health_display.current_health = health
-			vr_gun_controller.health_display.update_hearts()
+		if vr_gun_controller:
+			if vr_gun_controller.has_method("get") and vr_gun_controller.get("health_display"):
+				print("DEBUG: Updating gun health display to match boat health: " + str(health))
+				vr_gun_controller.health_display.current_health = health
+				vr_gun_controller.health_display.update_hearts()
+			else:
+				print("DEBUG: VRGunController found but health_display is null")
+		else:
+			print("DEBUG: XROrigin found but VRGunController not found")
+	else:
+		print("DEBUG: No Player group node found")
+		
+	# DIRECT TEST - Enable key-based testing for quick heart updates
+	if Input.is_key_pressed(KEY_F1):
+		force_health_update()
+		
+# Manual testing function to update the gun hearts display
+func force_health_update() -> void:
+	print("DEBUG: Force updating health display - DIRECT SCENE SEARCH METHOD")
 	
-	if health <= 0:
-		# Game over!
-		health = 0
-		get_tree().paused = true
+	# SEARCH EVERYWHERE FOR HEALTHDISPLAY
+	var origin_nodes = get_tree().get_nodes_in_group("Player")
+	print("DEBUG: Found " + str(origin_nodes.size()) + " player nodes")
+	
+	# First try - XROrigin/VRGunController path
+	for origin in origin_nodes:
+		print("DEBUG: Checking player node: " + origin.name + " (type: " + str(origin.get_class()) + ")")
 		
-		# Create a simple red overlay that fades in
-		var overlay = ColorRect.new()
-		overlay.name = "GameOverOverlay"
-		overlay.color = Color(1, 0, 0, 0) # Start transparent red
-		overlay.anchor_right = 1.0
-		overlay.anchor_bottom = 1.0
+		# APPROACH 1: Direct known path
+		for child in origin.get_children():
+			print("DEBUG: Found child: " + child.name)
+			if "GunController" in child.name:
+				print("DEBUG: Found controller: " + child.name)
+				var gun_controller = child
+				
+				if gun_controller.has_method("get") and gun_controller.get("health_display") != null:
+					print("DEBUG: Found health_display via property!")
+					gun_controller.health_display.current_health = health
+					gun_controller.health_display.update_hearts()
+					return
+					
+				for gun_child in gun_controller.get_children():
+					print("DEBUG: Checking gun controller child: " + gun_child.name)
+					if gun_child.name == "GunInstance":
+						for instance_child in gun_child.get_children():
+							if instance_child.name == "HealthDisplay":
+								print("DEBUG: FOUND HEALTH DISPLAY VIA DEEP PATH!")
+								instance_child.current_health = health
+								instance_child.update_hearts()
+								return
+	
+	# APPROACH 2: Recursive search through entire scene
+	print("DEBUG: Trying recursive health display search...")
+	var found_displays = []
+	_find_health_displays(get_tree().current_scene, found_displays)
+	
+	for display in found_displays:
+		print("DEBUG: Found health display: " + str(display.get_path()))
+		display.current_health = health
+		display.update_hearts()
+		return
+
+# Helper to recursively find health displays
+func _find_health_displays(node: Node, result: Array) -> void:
+	if node.get_script() and node.get_script().resource_path == "res://GunHealthDisplay.gd":
+		print("DEBUG: Found health display via script path at: " + str(node.get_path()))
+		result.append(node)
 		
-		# Add to the UI layer
-		var canvas_layer = CanvasLayer.new()
-		canvas_layer.layer = 100 # Make sure it's above everything
-		get_tree().current_scene.add_child(canvas_layer)
-		canvas_layer.add_child(overlay)
+	if node.name == "HealthDisplay" and node.has_method("update_hearts"):
+		print("DEBUG: Found health display via name at: " + str(node.get_path()))
+		result.append(node)
 		
-		# Create a fade animation
-		var tween = get_tree().create_tween()
-		tween.tween_property(overlay, "color:a", 1.0, 2.0)
-		
-		# Return to campaign menu after fade
-		await get_tree().create_timer(2.0).timeout
-		get_tree().paused = false
-		get_tree().change_scene_to_file("res://3dcampaignmenu.tscn")
+	for child in node.get_children():
+		_find_health_displays(child, result)
 
 func heal(amount: float) -> void:
 	var heal_amount = int(amount)
@@ -215,12 +261,18 @@ func _on_area_entered(area: Area3D) -> void:
 		# ULTRA-RELIABLE BOMB DETECTION - Large collision box ensures this will trigger
 		print("DEBUG: 💥 BOMB HIT BOAT DIRECTLY! 💥")
 		
-		# Get bomb damage if available or use higher default damage
-		var bomb_damage = 15  # Higher default damage
+		# Use GameParameters damage value instead of hardcoded
+		var bomb_damage = 2  # Default base damage
+		
+		# Try to get bomb damage from the area first
 		if area.has_method("get_damage"):
 			bomb_damage = area.get_damage()
 		elif area.get("damage") != null:
 			bomb_damage = area.get("damage")
+		
+		# As fallback, try to get from GameParameters
+		if GameManager.has_method("get") and GameManager.get("game_parameters") != null:
+			bomb_damage = GameManager.game_parameters.get_bomb_damage()
 		
 		# Apply damage directly
 		take_damage(bomb_damage)

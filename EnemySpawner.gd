@@ -91,6 +91,9 @@ func start_wave_spawning() -> void:
 	spawning_paused = false
 	wave_in_progress = true
 	
+	# Update total enemies per wave from GameParameters
+	GameManager.enemies_per_wave = GameManager.game_parameters.get_total_ships_per_wave()
+	
 	print("DEBUG: WAVE START - Will spawn " + str(GameManager.enemies_per_wave) + " enemies")
 	
 	# Set spawn timer wait time based on difficulty (but ensure it's not too fast or too slow)
@@ -108,8 +111,8 @@ func start_wave_spawning() -> void:
 	start_next_batch()
 
 func calculate_first_batch_size() -> void:
-	# Spawn 2 enemies in first batch to create more engagement
-	current_batch_size = 2
+	# Get the base ships per batch from game parameters
+	current_batch_size = GameManager.game_parameters.get_ships_per_batch()
 	
 	print("DEBUG: First batch will spawn " + str(current_batch_size) + " enemies")
 

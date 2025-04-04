@@ -1,6 +1,6 @@
 extends Area3D
 
-var damage: int = 3  # Set to exactly 3 hearts of damage as requested
+var damage: int = 2  # Default damage, will be updated from GameParameters during initialization
 var age: float = 0.0
 var owner_id: int = -1
 var target_player = null
@@ -51,7 +51,14 @@ func get_damage() -> int:
 func initialize(dir: Vector3, dmg: int, target: Node3D = null):
 	exploded = false  # Reset on initialization
 	print("DEBUG: Initializing bomb at " + str(global_position))
-	damage = dmg
+	
+	# Get damage from GameParameters if available, otherwise use the provided value
+	if GameManager.has_method("get") and GameManager.get("game_parameters") != null:
+		damage = GameManager.game_parameters.get_bomb_damage() 
+	else:
+		damage = dmg
+		
+	print("DEBUG: Bomb initialized with damage: " + str(damage))
 	start_pos = global_position
 	
 	# Look for any player or player boat in the scene

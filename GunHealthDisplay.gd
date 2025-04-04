@@ -26,6 +26,19 @@ func _ready():
 	
 	# Sync with boat health on startup
 	call_deferred("sync_with_boat_health")
+	
+	# Add a direct test keyboard handler
+	set_process_input(true)
+
+func _input(event):
+	# Add keyboard shortcuts for testing
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_MINUS or event.keycode == KEY_KP_SUBTRACT:
+			take_damage(1)
+			print("DEBUG: Manual damage test triggered - current health: " + str(current_health))
+		elif event.keycode == KEY_EQUAL or event.keycode == KEY_KP_ADD:
+			heal(1)
+			print("DEBUG: Manual healing test triggered - current health: " + str(current_health))
 
 func sync_with_boat_health():
 	# Wait a frame to ensure all nodes are loaded
@@ -38,6 +51,8 @@ func sync_with_boat_health():
 		max_health = boat.max_health
 		print("DEBUG: Gun health display synced with boat: " + str(current_health) + "/" + str(max_health))
 		update_hearts()
+	else:
+		print("DEBUG: Failed to sync with boat health - boat not found or missing health property")
 
 func _process(delta):
 	# Check for damage input (key 9)
@@ -86,15 +101,16 @@ func create_hearts():
 		heart_sprites.append(heart)
 	
 	update_hearts()
+	print("DEBUG: Created " + str(heart_sprites.size()) + " heart sprites")
 
 func take_damage(amount):
 	current_health = max(0, current_health - amount)
 	update_hearts()
-	print("Player took damage! Health: " + str(current_health) + "/" + str(max_health))
+	print("DEBUG: GunHealthDisplay - Player took damage! Health: " + str(current_health) + "/" + str(max_health))
 	
 	# Check for death
 	if current_health <= 0:
-		print("Player died!")
+		print("DEBUG: GunHealthDisplay - Player died!")
 		# For testing, reset health after death
 		await get_tree().create_timer(1.0).timeout
 		heal(max_health)
@@ -102,9 +118,12 @@ func take_damage(amount):
 func heal(amount):
 	current_health = min(max_health, current_health + amount)
 	update_hearts()
-	print("Player healed! Health: " + str(current_health) + "/" + str(max_health))
+	print("DEBUG: GunHealthDisplay - Player healed! Health: " + str(current_health) + "/" + str(max_health))
 
 func update_hearts():
+	# Print debug to confirm this function is called
+	print("DEBUG: Updating heart display: " + str(current_health) + "/" + str(max_health) + " hearts")
+	
 	# Update the heart textures based on current health
 	for i in range(heart_sprites.size()):
 		if is_instance_valid(heart_sprites[i]):
