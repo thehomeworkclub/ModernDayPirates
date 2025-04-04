@@ -11,7 +11,7 @@ var health: float
 var is_dead: bool = false
 
 # Signals
-signal enemy_died(enemy)
+signal enemy_died
 
 func _ready():
 	# Initialize health
@@ -49,7 +49,7 @@ func take_damage(amount):
 
 func die():
 	is_dead = true
-	emit_signal("enemy_died", self)
+	enemy_died.emit()
 	queue_free()
 
 func get_max_health():

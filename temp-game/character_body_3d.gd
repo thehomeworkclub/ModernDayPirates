@@ -5,10 +5,11 @@ var SPEED = 5.0
 const JUMP_VELOCITY = 4.5
 var hp = 100
 var hitimmunity = 20
-
+var camera = $Camera3D
 func _ready():
 	PlayerVariables.player = self
 	add_to_group("player")
+	camera.set_current()
 	
 func damage(damage):
 	hp -= damage
@@ -53,10 +54,13 @@ func _physics_process(delta):
 
 		# If the collider is with a mob
 		if collision.get_collider() is Enemy:
+			
 			var mob = collision.get_collider()
+			if mob.is_dead:
+				break
 			hitimmunity = 40
 			# we check that we are hitting it from above.
-			mob.take_damage(10)
+			mob.take_damage(50)
 			
 			break
 				# If so, we squash it and bounce.

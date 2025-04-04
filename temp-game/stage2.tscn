@@ -1,7 +1,108 @@
 [gd_scene load_steps=9 format=3 uid="uid://3kc06w3jdfh1"]
 
 [ext_resource type="PackedScene" uid="uid://bfvdd5geoyuf0" path="res://Cargo Ships III/Meshes/Dry_Cargo_Ship_1.fbx" id="1_lvdsm"]
-[ext_resource type="Script" path="res://level_1_script.gd" id="1_she11"]
+
+[sub_resource type="GDScript" id="GDScript_r63w0"]
+resource_name = "level_2_script"
+script/source = "extends Node3D
+
+@onready var scene = preload(\"res://player.tscn\")
+
+@onready var boss_enemy = preload(\"res://enemies/bosses/melee boss/Boss.tscn\")
+@onready var melee_enemy = preload(\"res://enemies/melee enemy/MeleeEnemy.tscn\")
+@onready var boss_spawn = $bossspawn
+@onready var wave_center = $wave_center.global_position
+@onready var wave_timer = $WaveTimer
+signal wave_ended
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	var player = scene.instantiate()
+	player.position = Vector3(1, 5, 1)
+	add_child(player)
+	wave_1()
+	wave_ended.connect(_spawn_wave_2)
+	boss_wave()
+	
+func boss_wave():
+	var boss = boss_enemy.instantiate()
+	boss.position = boss_spawn.global_position
+	add_child(boss)
+
+func wave_1():
+	var state = {\"died\": 0}
+	var positions = [
+		Vector3(wave_center.x+5, wave_center.y, wave_center.z),
+		wave_center,
+		Vector3(wave_center.x-5, wave_center.y, wave_center.z),
+		Vector3(wave_center.x+5, wave_center.y, wave_center.z+5),
+		Vector3(wave_center.x-5, wave_center.y, wave_center.z+5)
+		]
+	spawn_melee_wave(positions, state, 5)
+	
+
+func _spawn_wave_2():
+	wave_ended.disconnect(_spawn_wave_2)
+	wave_ended.connect(_spawn_wave_3)
+	var state = {\"died\": 0}
+	var total = 6
+	var positions = [
+		Vector3(wave_center.x+5, wave_center.y, wave_center.z),
+		wave_center,
+		Vector3(wave_center.x-5, wave_center.y, wave_center.z),
+		Vector3(wave_center.x+5, wave_center.y, wave_center.z+5),
+		Vector3(wave_center.x-5, wave_center.y, wave_center.z+5)
+		]
+	spawn_ranged_wave(positions, state, total)
+	print(\"second wave passed\")
+
+func _spawn_wave_3():
+	wave_ended.disconnect(_spawn_wave_3)
+	wave_ended.connect(_end_wave)
+	var state = {\"died\": 0}
+	var total = 5
+	var positions_melee = [
+		Vector3(wave_center.x+5, wave_center.y, wave_center.z),
+		wave_center,
+		Vector3(wave_center.x-5, wave_center.y, wave_center.z),
+		Vector3(wave_center.x+5, wave_center.y, wave_center.z-5),
+		Vector3(wave_center.x-5, wave_center.y, wave_center.z-5)
+		]
+	var positions_ranged = [
+		Vector3(wave_center.x+3, wave_center.y, wave_center.z+4),
+		Vector3(wave_center.x-3, wave_center.y, wave_center.z+4)
+		]
+	spawn_melee_wave(positions_melee, state, total)
+	spawn_ranged_wave(positions_ranged, state, total)
+
+		
+func spawn_melee_wave(positions, death_count, total):
+	for pos in positions:
+		var enemy = GlobalVars.spawn_melee(Level2Vars, pos, self)
+		enemy.enemy_died.connect(
+			func():
+				death_count.died += 1
+				if death_count.died >= total:
+					wave_ended.emit()
+		)
+func spawn_ranged_wave(positions, death_count, total):
+	for pos in positions:
+		var enemy = GlobalVars.spawn_ranged(Level2Vars, pos, self)
+		enemy.enemy_died.connect(
+			func():
+				death_count.died += 1
+				if death_count.died >= total:
+					wave_ended.emit()
+		)
+
+func _end_wave():
+	pass
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	
+	pass
+"
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_3rnfi"]
 sky_top_color = Color(1, 0.683406, 0.265762, 1)
@@ -46,7 +147,7 @@ agent_height = 2.0
 [sub_resource type="BoxMesh" id="BoxMesh_xxdju"]
 
 [node name="Node3D" type="Node3D"]
-script = ExtResource("1_she11")
+script = SubResource("GDScript_r63w0")
 
 [node name="WorldEnvironment2" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_urgim")
