@@ -52,7 +52,17 @@ VR performance considerations remain important, especially as we add more weapon
    - Texture size limit: 1024px
 
 ## Recently Completed
-1. Enemy Weapons and Health System Improvements
+1. Wave Spawning System Improvements
+   - Fixed wave progression and enemy spawning mechanics
+   - Implemented proper 5-wave rounds with 2 enemies per wave
+   - Fixed issue where killing one enemy would remove all enemies
+   - Fixed issue where rounds were ending prematurely after 1 wave
+   - Improved wave completion detection with better tracking
+   - Added reliable force-check mechanism for wave transitions
+   - Removed double-counting of enemy kills in GameManager
+   - Fixed enemy count tracking with explicit remove_from_tracking system
+
+2. Enemy Weapons and Health System Improvements
    - Upgraded enemy bullets to use M16A1Bullet.tscn model scaled at 5x
    - Added red coloration to enemy bullets for visual distinction
    - Fixed health system to maintain exactly 10 maximum health
@@ -61,7 +71,7 @@ VR performance considerations remain important, especially as we add more weapon
    - Fixed bidirectional health synchronization between boat and gun display
    - Improved bomb collision detection with player boat
 
-2. VR Weapons System Expansion
+3. VR Weapons System Expansion
    - Added 5 new weapon types with diverse characteristics:
      - SCAR-L: Tactical rifle with balanced stats (damage: 3, accuracy: 0.92)
      - HK416: High-precision rifle (damage: 3, accuracy: 0.95, low recoil: 0.15)

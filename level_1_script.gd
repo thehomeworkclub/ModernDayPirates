@@ -3,6 +3,7 @@ extends Node3D
 @onready var melee_enemy = preload("res://enemies/melee enemy/MeleeEnemy.tscn")
 @onready var boss_spawn = $bossspawn
 @onready var wave_center = $wave_center.global_position
+var scene_transition = null
 # Health display is now attached to the gun, so we'll access it through the VRGunController
 @onready var vr_gun_controller = $XROrigin3D/VRGunController
 @onready var health_display = null  # Will be initialized in _ready()
@@ -32,6 +33,14 @@ func _ready():
 	if xr_interface:
 		xr_interface.initialize()
 		get_viewport().use_xr = true
+		
+	# Initialize scene transition
+	if not scene_transition:
+		scene_transition = load("res://SceneTransition.tscn").instantiate()
+		get_tree().root.add_child(scene_transition)
+	
+	# Connect to GameManager's wave_completed signal to track round completion
+	GameManager.connect("wave_completed", _on_wave_completed)
 
 	# Set up VR 
 	if xr_origin:
@@ -122,6 +131,12 @@ func _input(event):
 		if event.keycode == KEY_9:
 			damage_player(1)
 			print("Input damage test triggered (key 9)")
+			
+	# TEST SCENE TRANSITION: Press 0 for scene transition test
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_0:
+			print("Testing scene transition to shop")
+			transition_to_shop()
 
 # Setup the health display after everything is initialized
 func setup_health_display():
@@ -287,6 +302,37 @@ func heal_player(amount):
 	if health_display:
 		health_display.heal(amount)
 		print("Player healed " + str(amount) + " health")
+
+# Handle wave completion notification from GameManager
+func _on_wave_completed():
+	print("LEVEL1: Received wave_completed signal")
+	print("LEVEL1: Current wave progress: " + str(GameManager.waves_completed_in_round) + "/" + 
+		str(GameManager.game_parameters.waves_per_round))
+	
+	# Check if all waves in the round are completed
+	if GameManager.waves_completed_in_round >= GameManager.game_parameters.waves_per_round:
+		print("LEVEL1: All waves in round completed, transitioning to shop in 2 seconds")
+		# Wait a moment before transitioning to shop to allow for cleanup
+		get_tree().create_timer(2.0).timeout.connect(transition_to_shop)
+	else:
+		print("LEVEL1: More waves remain in this round: " + str(GameManager.waves_completed_in_round) + "/" + 
+			str(GameManager.game_parameters.waves_per_round))
+
+# Transition to shop scene with fade effect
+func transition_to_shop():
+	print("LEVEL1: Transitioning to shop scene now")
+	# Try to use the global SceneTransition singleton first
+	if get_node_or_null("/root/SceneTransition") != null:
+		print("LEVEL1: Using global SceneTransition singleton")
+		get_node("/root/SceneTransition").change_scene_with_fade("res://shop1.tscn")
+	# Fall back to our local scene_transition if global isn't working
+	elif scene_transition:
+		print("LEVEL1: Using local scene_transition instance")
+		scene_transition.change_scene_with_fade("res://shop1.tscn")
+	else:
+		# Fallback if scene transition not available
+		print("LEVEL1: No transition available, using direct scene change")
+		get_tree().change_scene_to_file("res://shop1.tscn")
 
 func boss_wave():
 	if ResourceLoader.exists("res://enemies/bosses/melee boss/boss.tscn"):

@@ -584,9 +584,8 @@ func take_damage(damage: int) -> void:
 		CurrencyManager.add_silver(2)
 		CurrencyManager.add_gold(1, 1.0)
 		
-		# Increment kill counter in GameManager for shop teleporting
-		GameManager.enemy_kill_count += 1
-		print("Enemy kill count: " + str(GameManager.enemy_kill_count))
+		# Don't increment enemy_kill_count anymore - we use wave completion instead
+		print("DEBUG: Enemy defeated, not incrementing enemy_kill_count")
 		
 		# IMPORTANT - Update enemy count first
 		# We need to decrease enemy count BEFORE notifying GameManager to ensure 

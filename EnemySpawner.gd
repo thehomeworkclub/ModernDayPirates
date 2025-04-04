@@ -569,10 +569,19 @@ func complete_wave() -> void:
 	wave_in_progress = false
 	pause_spawning()
 	
-	print("DEBUG: Wave complete signal emitted")
+	print("DEBUG: ========= WAVE COMPLETE SIGNAL EMITTED =========")
+	print("DEBUG: Current waves completed: " + str(GameManager.waves_completed_in_round))
+	print("DEBUG: Waves per round: " + str(GameManager.game_parameters.waves_per_round))
 	
 	# Notify GameManager
 	GameManager.complete_wave()
+	
+	# Debug the updated state after completion
+	print("DEBUG: After completion - waves completed: " + str(GameManager.waves_completed_in_round))
+	
+	# For testing, let's force the round completion after a single wave
+	# TESTING LINE - COMMENT OR REMOVE AFTER TESTING
+	# GameManager.waves_completed_in_round = GameManager.game_parameters.waves_per_round
 	
 # Called by enemies to explicitly remove themselves from tracking
 func remove_from_tracking(enemy: Node) -> void:

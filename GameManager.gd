@@ -26,7 +26,7 @@ var next_enemy_id: int = 0  # Counter for assigning unique enemy IDs
 # Shop teleportation functionality
 var enemy_kill_count: int = 0
 var difficulty_level: int = 1
-var kills_before_shop: int = 10
+var kills_before_shop: int = 1  # Reduced to ensure shop transitions happen reliably at end of round
 var shop_timer: float = 15.0  # Seconds to spend in shop (updated to 15 seconds)
 var in_shop: bool = false
 var shop_timer_running: bool = false
@@ -73,23 +73,16 @@ func _ready() -> void:
 	initialize_game_state()
 
 func _process(delta: float) -> void:
-	# Shop teleportation logic
-	if not in_shop:
-		# Check if we've reached the kill count to teleport to shop
-		if enemy_kill_count >= kills_before_shop:
-			print("Reached " + str(kills_before_shop) + " enemy kills, teleporting to shop")
-			teleport_to_shop()
-	else:
-		# We're in the shop, update shop timer
-		if shop_timer_running:
-			shop_timer_remaining -= delta
-			if shop_timer_remaining <= 0:
-				print("Shop timer expired, teleporting back to level")
-				teleport_to_level()
+	# Only handle shop timer when in shop
+	if in_shop and shop_timer_running:
+		shop_timer_remaining -= delta
+		if shop_timer_remaining <= 0:
+			print("Shop timer expired, teleporting back to level")
+			teleport_to_level()
 
 # Teleport to shop after defeating N enemies
 func teleport_to_shop() -> void:
-	print("Teleporting to shop")
+	print("GAMEMANAGER: Teleporting to shop1.tscn")
 	in_shop = true
 	shop_timer_running = true
 	shop_timer_remaining = shop_timer
@@ -97,7 +90,7 @@ func teleport_to_shop() -> void:
 	
 	# Increase difficulty for next round
 	difficulty_level += 1
-	print("Difficulty level increased to: " + str(difficulty_level))
+	print("GAMEMANAGER: Difficulty level increased to: " + str(difficulty_level))
 	
 	# Save XR state
 	var xr_interface = XRServer.find_interface("OpenXR")
@@ -105,9 +98,16 @@ func teleport_to_shop() -> void:
 	if xr_interface and xr_interface.is_initialized():
 		was_vr_enabled = true
 	
-	# Change to shop scene
-	print("Loading shop scene...")
-	var err = get_tree().change_scene_to_file("res://shop.tscn")
+	# Use the scene transition system if available
+	if get_node_or_null("/root/SceneTransition") != null:
+		print("GAMEMANAGER: Using SceneTransition to load shop1.tscn")
+		get_node("/root/SceneTransition").change_scene_with_fade("res://shop1.tscn")
+		# Return early as the scene transition will handle the rest
+		return
+	
+	# Fallback to direct scene change
+	print("GAMEMANAGER: SceneTransition not found, direct loading shop1.tscn")
+	var err = get_tree().change_scene_to_file("res://shop1.tscn")
 	if err == OK:
 		print("Shop scene loaded")
 		
@@ -124,13 +124,13 @@ func teleport_to_shop() -> void:
 
 # Teleport back to level1 after shop timer expires
 func teleport_to_level() -> void:
-	print("Teleporting back to level with difficulty: " + str(difficulty_level))
+	print("GAMEMANAGER: Teleporting back to level with difficulty: " + str(difficulty_level))
 	in_shop = false
 	shop_timer_running = false
 	
 	# Increment round counter for new round
 	current_round += 1
-	print("Starting round: " + str(current_round))
+	print("GAMEMANAGER: Starting round: " + str(current_round))
 	
 	# Save XR state
 	var xr_interface = XRServer.find_interface("OpenXR")
@@ -141,8 +141,15 @@ func teleport_to_level() -> void:
 	# Reinitialize game state with new difficulty
 	initialize_game_state()
 	
-	# Change back to level1 scene
-	print("Loading level1 scene...")
+	# Use the scene transition system if available
+	if get_node_or_null("/root/SceneTransition") != null:
+		print("GAMEMANAGER: Using SceneTransition to load level1.tscn")
+		get_node("/root/SceneTransition").change_scene_with_fade("res://level1.tscn")
+		# Return early as the scene transition will handle the rest
+		return
+	
+	# Fallback to direct scene change
+	print("GAMEMANAGER: SceneTransition not found, direct loading level1.tscn")
 	var err = get_tree().change_scene_to_file("res://level1.tscn")
 	if err == OK:
 		print("Level1 scene loaded")
@@ -210,29 +217,39 @@ func update_enemy_count(count: int) -> void:
 		emit_signal("enemies_changed", current_enemies_count)
 
 func complete_wave() -> void:
-	print("Wave completed")
+	print("GAMEMANAGER: Wave completed")
 	current_enemies_count = 0
 	emit_signal("enemies_changed", current_enemies_count)
 	
 	# Track wave progression within the round
 	waves_completed_in_round += 1
 	current_wave += 1
-	print("Wave " + str(waves_completed_in_round) + "/" + str(game_parameters.waves_per_round) + " completed")
+	print("GAMEMANAGER: Wave " + str(waves_completed_in_round) + "/" + str(game_parameters.waves_per_round) + " completed")
 	
 	# DO NOT increment enemy kill count here - it's already incremented by each defeated enemy
 	# This was causing double-counting and premature round completion
 	
+	# Print enhanced debug information about game state
+	print("GAMEMANAGER: Current state:")
+	print("- Round: " + str(current_round))
+	print("- Wave: " + str(current_wave))
+	print("- Waves completed in round: " + str(waves_completed_in_round))
+	print("- Total waves per round: " + str(game_parameters.waves_per_round))
+	print("- Enemy kill count: " + str(enemy_kill_count))
+	
 	# Check if we've completed all waves in the round
 	if waves_completed_in_round >= game_parameters.waves_per_round:
-		print("Round complete! All " + str(game_parameters.waves_per_round) + " waves finished")
-		waves_completed_in_round = 0
+		print("GAMEMANAGER: ROUND " + str(current_round) + " COMPLETE! All " + 
+			str(game_parameters.waves_per_round) + " waves finished")
 		
-		# Check if we should teleport to shop
-		if enemy_kill_count >= kills_before_shop:
-			print("Round complete - teleporting to shop")
-			call_deferred("teleport_to_shop")
+		# Important: Don't reset waves_completed_in_round here, as it could cause issues with shop transitions
+		# It will be reset when the player is teleported or a new round begins
+		
+		# Trigger shop transition
+		call_deferred("teleport_to_shop")
 	else:
-		print("Starting next wave (" + str(waves_completed_in_round + 1) + "/" + str(game_parameters.waves_per_round) + ")")
+		print("GAMEMANAGER: Starting next wave (" + str(waves_completed_in_round + 1) + "/" + 
+			str(game_parameters.waves_per_round) + ")")
 	
 	# Send the wave_completed signal AFTER processing wave counting
 	# This ensures all state updates are done before handlers are called

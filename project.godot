@@ -24,6 +24,7 @@ GlobalVars="*res://global/global_vars.gd"
 Level1Vars="*res://global/level_1_vars.gd"
 PlayerVariables="*res://global/player_variables.gd"
 VRPerformanceBoost="*res://vr_performance_boost.gd"
+SceneTransition="*res://SceneTransitionAutoload.gd"
 
 [dotnet]
 

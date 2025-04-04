@@ -1,6 +1,7 @@
-[gd_scene load_steps=11 format=3 uid="uid://baxby7v2hxbd5"]
+[gd_scene load_steps=12 format=3 uid="uid://baxby7v2hxbd5"]
 
 [ext_resource type="Script" path="res://shop1.gd" id="1_drt4w"]
+[ext_resource type="Script" path="res://ShopTimer.gd" id="2_timer"]
 [ext_resource type="Texture2D" uid="uid://cw3ty3m6moqyd" path="res://shopart/bronzeshop.png" id="2_bronze"]
 [ext_resource type="Texture2D" uid="uid://y6o0qruy3iei" path="res://shopart/silvershop.png" id="3_silver"]
 [ext_resource type="Texture2D" uid="uid://debk7ty8ewt0b" path="res://shopart/goldshop.png" id="4_gold"]
@@ -34,6 +35,9 @@ rings = 4
 
 [node name="ShopRoot" type="Node3D"]
 script = ExtResource("1_drt4w")
+
+[node name="ShopTimer" type="Node" parent="."]
+script = ExtResource("2_timer")
 
 [node name="ShopBackgrounds" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.312, -2.381, -9.427)

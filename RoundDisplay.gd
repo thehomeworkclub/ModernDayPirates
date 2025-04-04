@@ -32,6 +32,11 @@ func update_display() -> void:
 			var current_wave = GameManager.waves_completed_in_round + 1
 			if current_wave > total_waves:
 				current_wave = total_waves
+			
+			# Enhanced debug output
+			print("ROUNDDISPLAY: Displaying wave " + str(current_wave) + "/" + str(total_waves) +
+				", GameManager reports waves_completed_in_round: " + str(GameManager.waves_completed_in_round))
+			
 			round_text += "\nWave: " + str(current_wave) + "/" + str(total_waves)
 		
 		label.text = round_text

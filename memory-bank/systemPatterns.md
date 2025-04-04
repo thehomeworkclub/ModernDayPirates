@@ -149,10 +149,27 @@ Price Labels:
 - Bullet damage: Scales with game difficulty
 
 #### Enemy Spawning System
-- Batch-based enemy spawning 
-- Initial batch size: 2 enemies
+- Batch-based enemy spawning with 2 enemies per wave
+- 5 waves per round as defined in GameParameters
+- Refined wave progression tracking
 - Spawn threshold: 3 active enemies for next batch
 - Batch timer: 2.0 seconds between batches
-- Immediate batch triggering for smoother gameplay
+- 2.0 second delay between waves
+- Wave completion detection systems:
+  - Direct explicit enemy tracking in spawned_enemies list
+  - Force-check mechanism for handling race conditions
+  - Explicit removal via remove_from_tracking system
 - Enemy position validation to prevent overlaps
 - Min spawn distance between enemies: 25.0 units
+
+#### Wave and Round Management
+- GameManager.complete_wave() handles wave progression
+- Waves per round: 5 (configured in GameParameters.gd)
+- Enemies per wave: 2 (configured in GameParameters.gd)
+- Wave completion flow:
+  1. All enemies for wave must be spawned
+  2. All enemies must be defeated (count_active_enemies() == 0)
+  3. Next wave begins after 2-second delay
+  4. After 5 waves, round is complete
+- Each defeated enemy adds to enemy_kill_count
+- Teleport to shop when kill count reaches threshold
