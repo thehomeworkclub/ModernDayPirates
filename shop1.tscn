@@ -1,10 +1,16 @@
-[gd_scene load_steps=12 format=3 uid="uid://baxby7v2hxbd5"]
+[gd_scene load_steps=18 format=3 uid="uid://baxby7v2hxbd5"]
 
 [ext_resource type="Script" path="res://shop1.gd" id="1_drt4w"]
+[ext_resource type="Texture2D" uid="uid://faag428l6dow" path="res://shopart/bronzeshop.png" id="2_bronze"]
 [ext_resource type="Script" path="res://ShopTimer.gd" id="2_timer"]
-[ext_resource type="Texture2D" uid="uid://cw3ty3m6moqyd" path="res://shopart/bronzeshop.png" id="2_bronze"]
-[ext_resource type="Texture2D" uid="uid://y6o0qruy3iei" path="res://shopart/silvershop.png" id="3_silver"]
-[ext_resource type="Texture2D" uid="uid://debk7ty8ewt0b" path="res://shopart/goldshop.png" id="4_gold"]
+[ext_resource type="Texture2D" uid="uid://dw6virp0xv8po" path="res://shopart/silvershop.png" id="3_silver"]
+[ext_resource type="Texture2D" uid="uid://bhrl807fxlsss" path="res://shopart/goldshop.png" id="4_gold"]
+[ext_resource type="PackedScene" uid="uid://cv04sq6duhy0s" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/M16A1.fbx" id="6_qg12x"]
+[ext_resource type="PackedScene" uid="uid://du4ngp1s3morv" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/AK-74.fbx" id="7_8tpgo"]
+[ext_resource type="PackedScene" uid="uid://b31iny8xxsu0u" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/scar-l.fbx" id="8_jp715"]
+[ext_resource type="PackedScene" uid="uid://blvus5ljyjn56" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/hk416.fbx" id="9_dptpt"]
+[ext_resource type="PackedScene" uid="uid://dxyd8b2i5lrp" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/MP5.fbx" id="10_bd428"]
+[ext_resource type="PackedScene" uid="uid://baaai5e72rjil" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/mosin nagant.fbx" id="11_u70f1"]
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_currency"]
 viewport_path = NodePath("CurrencyViewport")
@@ -364,3 +370,21 @@ mesh = SubResource("SphereMesh_cursor")
 [node name="RayCastRight" type="RayCast3D" parent="XROrigin3D/XRController3DRight"]
 target_position = Vector3(0, 0, -10)
 debug_shape_custom_color = Color(0, 0.501961, 1, 0.501961)
+
+[node name="M16A1" parent="." instance=ExtResource("6_qg12x")]
+transform = Transform3D(-2.18557e-09, 0, 0.05, 0, 0.05, 0, -0.05, 0, -2.18557e-09, 10.9009, -2.2374, -9.4103)
+
+[node name="AK-74" parent="." instance=ExtResource("7_8tpgo")]
+transform = Transform3D(-1.31134e-09, 0, 0.03, 0, 0.03, 0, -0.03, 0, -1.31134e-09, 11.3015, -2.24577, -9.4103)
+
+[node name="scar-l" parent="." instance=ExtResource("8_jp715")]
+transform = Transform3D(-1.31134e-09, 0, 0.03, 0, 0.03, 0, -0.03, 0, -1.31134e-09, 11.7037, -2.22829, -9.41928)
+
+[node name="hk416" parent="." instance=ExtResource("9_dptpt")]
+transform = Transform3D(-1.26763e-09, 0, 0.029, 0, 0.029, 0, -0.029, 0, -1.26763e-09, 10.8828, -2.55089, -9.42059)
+
+[node name="MP5" parent="." instance=ExtResource("10_bd428")]
+transform = Transform3D(-1.74846e-08, 0, 0.4, 0, 0.4, 0, -0.4, 0, -1.74846e-08, 11.3096, -2.55341, -9.4139)
+
+[node name="mosin nagant" parent="." instance=ExtResource("11_u70f1")]
+transform = Transform3D(-1.00536e-08, 0, 0.23, 0, 0.23, 0, -0.23, 0, -1.00536e-08, 11.6961, -2.55621, -9.42224)

@@ -1,5 +1,56 @@
 # System Patterns
 
+## Shop System Architecture
+
+### Shop Tab Organization
+```
+Shop System
+├── Bronze Shop (Weapons)
+│   └── Gun Selection with fixed prices
+├── Silver Shop (Direct Stat Boosts)
+│   └── +10% per level or +1 health per level
+└── Gold Shop (Percentage Multipliers)
+    └── x1.05 multiplier per level (multiplicative)
+```
+
+### Upgrade Calculation Pattern
+1. Base Stats: 
+   - Initial values set in GameManager (health, damage, speed, etc.)
+
+2. Direct Boosts (Silver Shop):
+   - Formula: base_stat + (level-1) * increment_value
+   - Example: extra_damage = (level-1) * 0.1 (10% per level)
+   - Health Special Case: extra_health = (level-1) * 1.0 (1 heart per level)
+
+3. Percentage Multipliers (Gold Shop):
+   - Formula: (base_stat + direct_boost) * percentage_multiplier
+   - Percentage Calculation: pow(1.05, level-1) (5% compounding per level)
+   - Example: damage = (1.0 + extra_damage) * percent_damage_increase
+
+4. Price Scaling:
+   - Formula: BASE_PRICE * pow(CURVE_FACTOR, level-1)
+   - Constants: BASE_PRICE = 10, CURVE_FACTOR = 1.5
+   - Results in exponential price growth
+
+### Shop UI Pattern
+- Currency Display: Top of screen, persistent across tabs
+- Tab Selection: Top row of clickable buttons
+- Item Display: Grid of 6 items (2x3) with:
+  - Level number display (Label3D)
+  - Price/description label (PriceLabel)
+  - Visual differentiation for maxed items (green text)
+- Bronze Shop: Checkmarks for selected weapons
+- Silver/Gold Shops: Numeric upgrade levels with effect descriptions
+
+### Shop-GameManager Integration
+- Upgrades stored in GameManager dictionaries:
+  - bronze_upgrade_levels (gun selection)
+  - silver_upgrade_levels (direct boosts)
+  - gold_upgrade_levels (percentage multipliers)
+- GameManager.update_player_stats() recalculates all stats
+- Persistence throughout gameplay sessions
+- Reset only triggered on player death via reset_upgrade_levels()
+
 ## VR Rifle System
 
 ### Rifle Inheritance Pattern
@@ -111,15 +162,33 @@ Price Labels:
 - Scale: 12.346 for both x and y
 - Pixel size: 0.001
 
+### Shop Items
+Bronze Shop (Weapons):
+- Fixed prices: 50-300 bronze
+- Selection indicator: "✓" with "EQUIPPED" text in green
+- Mutually exclusive selection (only one active)
+
+Silver Shop (Direct Boosts):
+- Level indicator: Numeric value (1-10)
+- Description format: "+X% [Stat]" or "+X Health"
+- Price formula: BASE_PRICE * pow(CURVE_FACTOR, level-1)
+
+Gold Shop (Multipliers):
+- Level indicator: Numeric value (1-10)
+- Description format: "xX.XX [Stat]" (e.g., "x1.15 Damage")
+- Multiplier calculation: pow(1.05, level-1)
+
 ## Health and Damage System
 
 ### Player-Boat Health System
-- Total health: 10 hearts
+- Total health: 10 hearts base + upgrades
 - Bidirectional synchronization between boat and gun display
 - Health display appears on gun side for VR visibility
 - Heart textures: fullheart.png and emptyheart.png
 - Heart spacing: 0.05 units
 - Heart scale: 0.05 units
+- Health calculation: (base_health + extra_health) * percent_health_increase
+- Display rounding: Only show full hearts (10.0 health = 10 hearts)
 
 ### Bomb Damage Mechanics
 - Bomb detection via Area3D collision groups

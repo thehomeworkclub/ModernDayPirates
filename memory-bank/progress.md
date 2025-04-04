@@ -2,6 +2,21 @@
 
 ## Completed Features
 
+### Shop System
+- ✓ Implemented three-tab shop with bronze, silver, and gold sections
+- ✓ Created gun selection system in bronze tab with weapon-specific prices
+- ✓ Added direct stat upgrade system in silver tab with stack-based bonuses
+- ✓ Added percentage multiplier system in gold tab with multiplicative effects
+- ✓ Set up shop upgrade persistence between level transitions
+- ✓ Connected weapon selection to gun types with in-shop switching
+- ✓ Enhanced shop UI to show current bonuses and effects 
+- ✓ Implemented exponential price scaling for higher level upgrades
+- ✓ Created stat calculation system in GameManager for centralized handling
+- ✓ Added maxed upgrade display with green color highlighting
+- ✓ Implemented dynamic descriptions for current upgrade levels
+- ✓ Fixed health display to properly show upgraded max health
+- ✓ Ensured all upgrade systems reset only on player death, not wave changes
+
 ### Combat and Health System
 - ✓ Implemented boat health system with fixed maximum of 10 hearts
 - ✓ Created bidirectional health synchronization between boat and gun display
@@ -14,6 +29,7 @@
 - ✓ Fixed property reference errors in GameManager and RoundBoard scripts
 - ✓ Connected gun sight health display with boat damage system
 - ✓ Implemented boat group structure for proper reference and targeting
+- ✓ Enhanced health system to support upgrade-based max health increases
 
 ### VR Weapons System
 - ✓ Implemented base rifle framework with inheritance pattern
@@ -36,6 +52,7 @@
 - ✓ Added weapon switching via keyboard number keys (1-7)
 - ✓ Fixed ghost magazine issue when switching weapons
 - ✓ Added proper textured models for all weapons with correct UIDs
+- ✓ Implemented damage/speed/fire-rate multipliers from shop upgrades
 
 ### 3D Campaign Menu
 - ✓ Implemented VR laser pointer interaction system
@@ -70,6 +87,7 @@
 - Enemy ship AI improvements
 - Weapon selection interface for VR (currently keyboard-only for debugging)
 - Bomb balancing and visual effects enhancement
+- Shop tutorial system
 
 ### Asset Integration
 - ✓ Imported cargo ship meshes and textures from temp-game/Cargo_Ships/
@@ -84,7 +102,6 @@
   - Summoner abilities
 - Implement wave spawning in VR space
 - Connect level progression with campaign menu
-- Weapon system integration with rifle framework
 - Ship damage mechanics
 - Save/load system
 - Leader boards
@@ -103,6 +120,9 @@
 - Optimized detection thresholds for VR motion
 - Implemented diverse weapon types with consistent reloading mechanics
 - Fixed ghost object issues with proper cleanup during weapon switching
+- Created unified stat calculation system with direct and percentage effects
+- Implemented persistence of upgrades between gameplay sessions
+- Designed intuitive UI feedback for shop upgrades
 
 ## Next Steps
 1. Implement VR controller-based weapon selection interface
@@ -111,6 +131,7 @@
 4. Adapt enemy systems for VR combat
 5. Implement wave spawning mechanics
 6. Connect rifle system with enemy damage system
+7. Add shop tutorial system for new players
 
 ## Known Issues
 - Bomb damage might need balancing for optimal difficulty

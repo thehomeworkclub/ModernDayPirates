@@ -22,32 +22,32 @@ const CURVE_FACTOR = 1.5
 
 # Fixed prices for bronze menu (guns)
 const BRONZE_PRICES = {
-    "ItemBox1": 50,   # M16A1 (Default)
-    "ItemBox2": 100,  # AK74
-    "ItemBox3": 150,  # SCAR-L
-    "ItemBox4": 200,  # HK416
-    "ItemBox5": 250,  # MP5
-    "ItemBox6": 300   # Mosin/Model1897
+	"ItemBox1": 50,   # M16A1 (Default)
+	"ItemBox2": 100,  # AK74
+	"ItemBox3": 150,  # SCAR-L
+	"ItemBox4": 200,  # HK416
+	"ItemBox5": 250,  # MP5
+	"ItemBox6": 300   # Mosin/Model1897
 }
 
 # Item descriptions for silver shop
 const SILVER_DESCRIPTIONS = {
-    "ItemBox1": "Extra Silver",
-    "ItemBox2": "Faster Bullets",
-    "ItemBox3": "Extra Bronze", 
-    "ItemBox4": "Extra Damage",
-    "ItemBox5": "Faster Fire Rate",
-    "ItemBox6": "Extra Health"
+	"ItemBox1": "Extra Silver",
+	"ItemBox2": "Faster Bullets",
+	"ItemBox3": "Extra Bronze", 
+	"ItemBox4": "Extra Damage",
+	"ItemBox5": "Faster Fire Rate",
+	"ItemBox6": "Extra Health"
 }
 
 # Item descriptions for gold shop
 const GOLD_DESCRIPTIONS = {
-    "ItemBox1": "Bronze Bonus",
-    "ItemBox2": "Silver Bonus",
-    "ItemBox3": "Gold Bonus",
-    "ItemBox4": "Damage Boost",
-    "ItemBox5": "Fire Rate Boost",
-    "ItemBox6": "Health Boost"
+	"ItemBox1": "Bronze Bonus",
+	"ItemBox2": "Silver Bonus",
+	"ItemBox3": "Gold Bonus",
+	"ItemBox4": "Damage Boost",
+	"ItemBox5": "Fire Rate Boost",
+	"ItemBox6": "Health Boost"
 }
 
 var normal_ray_color = Color(0, 0.5, 1, 0.6)
@@ -237,7 +237,7 @@ func update_item_display(item_name: String):
 			if levels[item_name] == 1:
 				# Selected gun
 				label.text = "✓"
-				price_label.text = "EQUIPPED"
+				price_label.text = ""
 				price_label.modulate = Color(0, 0.5, 0, 1)  # Green for equipped
 			else:
 				# Available to purchase

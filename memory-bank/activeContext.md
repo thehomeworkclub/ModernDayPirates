@@ -5,6 +5,8 @@ We have successfully implemented a comprehensive VR weapons system with physical
 
 We have also implemented boat-based gameplay with enemy ships that shoot bombs at the player's boat. The health system shows damage on both the player UI and directly on the gun as a row of 10 hearts.
 
+Recently, we've enhanced the shop system to include persistent upgrades across game sessions, with three distinct shop tabs offering different types of upgrades. The system saves both currencies and upgrade levels between shop visits, only resetting if the player dies.
+
 The completed weapon arsenal includes:
 1. M16A1 (Assault rifle - default)
 2. AK-74 (Assault rifle)
@@ -26,9 +28,44 @@ Key implementation details:
 - Simplified two-state system (ATTACHED_TO_GUN and DETACHED)
 - Visual toggling of magazines with duplicated models for hand attachment
 
+## Shop System Upgrade
+We've implemented a three-tab shop system with persistent upgrades:
+
+1. Bronze Shop (Weapons):
+   - Functions as a weapon selector with varying prices (50-300 bronze)
+   - Each weapon can be purchased with bronze currency
+   - Visual indicators show equipped weapons with a green checkmark
+   - Selected weapon persists between levels until player death
+
+2. Silver Shop (Direct Stat Boosts):
+   - Six different direct upgrades that add base stats:
+     - Extra Silver (+10% per level)
+     - Faster Bullets (+10% per level)
+     - Extra Bronze (+10% per level) 
+     - Extra Damage (+10% per level)
+     - Faster Fire Rate (+10% per level)
+     - Extra Health (+1 heart per level)
+   - Each level increases cost according to progression formula
+   - UI shows current bonus and next upgrade cost
+   - Maxed upgrades display in green
+
+3. Gold Shop (Percentage Multipliers):
+   - Six multiplier upgrades applied after direct stat boosts:
+     - Bronze Bonus (x1.05 per level, multiplicative)
+     - Silver Bonus (x1.05 per level, multiplicative)
+     - Gold Bonus (x1.05 per level, multiplicative)
+     - Damage Boost (x1.05 per level, multiplicative)
+     - Fire Rate Boost (x1.05 per level, multiplicative)
+     - Health Boost (x1.05 per level, multiplicative)
+   - UI shows current multiplier value with clear labels
+   - Exponential growth with each level (multiplicative stacking)
+
+All shop upgrades persist between waves and only reset on player death.
+
 ## VR Positioning Reference
 - Campaign menu VR position: Vector3(10.954, -7.596, 4.236)
 - Level1 XROrigin3D editor position: Vector3(2.45716, 16.3239, 85.035)
+- Shop VR position: Vector3(11.312, -2.381, -9.427)
 - Camera height: 1.8
 - Ray length: 10.0
 - Button press distance: 0.03
@@ -52,7 +89,19 @@ VR performance considerations remain important, especially as we add more weapon
    - Texture size limit: 1024px
 
 ## Recently Completed
-1. Wave Spawning System Improvements
+1. Shop System with Persistent Upgrades
+   - Implemented three-tab shop with bronze, silver, and gold sections
+   - Created gun selection system in bronze tab
+   - Added stat upgrades in silver tab (direct boosts)
+   - Added multiplier upgrades in gold tab (percentage boosts)
+   - Ensured all upgrades persist between shop visits
+   - Proper shop integration with GameManager for tracking states
+   - Fixed UI to show current upgrade levels and effects
+   - Implemented price scaling for higher level upgrades
+   - Connected shop upgrades to in-game combat effects
+   - Enhanced GameManager to handle all stat calculations
+
+2. Wave Spawning System Improvements
    - Fixed wave progression and enemy spawning mechanics
    - Implemented proper 5-wave rounds with 2 enemies per wave
    - Fixed issue where killing one enemy would remove all enemies
@@ -62,7 +111,7 @@ VR performance considerations remain important, especially as we add more weapon
    - Removed double-counting of enemy kills in GameManager
    - Fixed enemy count tracking with explicit remove_from_tracking system
 
-2. Enemy Weapons and Health System Improvements
+3. Enemy Weapons and Health System Improvements
    - Upgraded enemy bullets to use M16A1Bullet.tscn model scaled at 5x
    - Added red coloration to enemy bullets for visual distinction
    - Fixed health system to maintain exactly 10 maximum health
@@ -71,7 +120,7 @@ VR performance considerations remain important, especially as we add more weapon
    - Fixed bidirectional health synchronization between boat and gun display
    - Improved bomb collision detection with player boat
 
-3. VR Weapons System Expansion
+4. VR Weapons System Expansion
    - Added 5 new weapon types with diverse characteristics:
      - SCAR-L: Tactical rifle with balanced stats (damage: 3, accuracy: 0.92)
      - HK416: High-precision rifle (damage: 3, accuracy: 0.95, low recoil: 0.15)
@@ -82,37 +131,20 @@ VR performance considerations remain important, especially as we add more weapon
    - Fixed ghost magazine issue when switching weapons
    - Added proper textured models for all weapons with appropriate UIDs
 
-2. VR Rifle System Core
-   - Physical reloading with magazine detachment/reattachment
-   - Realistic weapon models and magazines
-   - Single bullet firing system that overrides base gun system
-   - Subtle muzzle flash effects
-   - Haptic feedback on both controllers
-   - Recoil animations
-   - Support for automatic and semi-automatic firing modes
-   - Bolt-action mechanism for Mosin Nagant
-   - Pellet spread system for shotgun
-
-3. Core System Integration
-   - XR controller integration for interaction
-   - Ray casting for precise VR interaction
-   - Animation system for visual feedback
-   - Haptic feedback for tactile confirmation
-
 ## Next Steps
 1. Gameplay Integration:
-   - Connect rifle system with enemy damage system
+   - Add more enemy types to challenge different weapon strategies
    - Implement ammo pickup/management
-   - Balance gameplay around different weapon types
-   - Add visual effects for different weapon types (unique muzzle flashes, etc.)
-   - Implement weapon unlocking/progression system
-   - Add haptic feedback variation for different weapons
+   - Further balance gameplay around different weapon types and upgrades
+   - Add visual effects for upgraded weapons (enhanced effects based on level)
+   - Expand weapon unlocking with achievement-based progression
 
 2. Quality of Life Improvements:
    - Implement weapon selection via VR controllers (not just keyboard)
    - Add visual indicator for current selected weapon
    - Create weapon rack for in-game selection
    - Refine magazine positioning for optimal usability
+   - Add shop tutorials or help indicators
 
 ## Active Considerations
 - Maintain consistent interaction patterns across all rifle types
@@ -120,9 +152,11 @@ VR performance considerations remain important, especially as we add more weapon
 - Ensure magazine models are properly positioned for each new rifle
 - Balance reload difficulty across different weapon types
 - Design weapon attributes to encourage use of different rifles
+- Balance shop upgrade costs and effects for proper gameplay progression
 
 ## Documentation Status
 - Rifle system fully documented in VR_RIFLE_SYSTEM.md
 - Magazine positioning documented in .clinerules
 - Interaction patterns established
 - Debug logging implemented
+- Shop upgrade system now implemented and documented

@@ -68,6 +68,7 @@ _data = {
 }
 
 [node name="AK74Gun" type="Node3D"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.208356, 0, 0)
 script = ExtResource("1_ak74")
 bullet_scene = ExtResource("2_bullet")
 
