@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://bvrnxw8xf5syb"]
+[gd_scene load_steps=23 format=3 uid="uid://bvrnxw8xf5syb"]
 
 [ext_resource type="Script" path="res://level_1_script.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://eum51m82whp" path="res://cargo_ships/meshes/Dry_Cargo_Ship.fbx" id="3_nbyqe"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://RoundBoard.gd" id="8_lc0v4"]
 [ext_resource type="Script" path="res://BombCleaner.gd" id="9_fj7i8"]
 [ext_resource type="PackedScene" path="res://TargetPlane.tscn" id="10_3k7rt"]
+[ext_resource type="Script" path="res://Boat.gd" id="11_81knf"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_laser"]
 transparency = 1
@@ -47,6 +48,9 @@ background_mode = 2
 sky = SubResource("Sky_b2uq0")
 ambient_light_color = Color(0.6, 0.6, 0.6, 1)
 ambient_light_sky_contribution = 0.5
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_njkxu"]
+size = Vector3(10, 5, 20)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_y1l8n"]
 size = Vector2(250, 250)
@@ -127,8 +131,15 @@ light_color = Color(1, 0.84, 0.69, 1)
 light_energy = 0.7
 light_indirect_energy = 0.0
 
-[node name="Dry_Cargo_Ship" parent="." instance=ExtResource("3_nbyqe")]
+[node name="PlayerShip" type="Area3D" parent="." groups=["Player", "player_boat"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.94615, 4.18604, -50.4967)
+collision_mask = 12
+script = ExtResource("11_81knf")
+
+[node name="Dry_Cargo_Ship" parent="PlayerShip" instance=ExtResource("3_nbyqe")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerShip"]
+shape = SubResource("BoxShape3D_njkxu")
 
 [node name="EnemySpawner" type="Node3D" parent="." groups=["EnemySpawner"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 45)

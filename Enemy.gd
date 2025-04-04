@@ -3,9 +3,9 @@ extends Area3D
 @export var base_health: int = 3
 @export var base_speed: float = 8.0  # Significantly increased speed
 @export var base_bronze_value: int = 2
-@export var bomb_damage: int = 5     # Changed from 15 to 5 for correct bomb damage
-@export var bomb_cooldown: float = 4.0  # Reduced cooldown to increase bomb frequency
-@export var bomb_chance: float = 0.7    # Increased chance to throw a bomb when cooldown expires
+@export var bomb_damage: int = 3     # Set to exactly 3 hearts of damage
+@export var bomb_cooldown: float = 4.0  # 4 seconds per bomb as requested
+@export var bomb_chance: float = 0.7    # 70% chance to throw bombs when cooldown expires
 @export var player_ship_barrier: float = 150.0  # Massively increased distance from player where ships stop
 
 var health: int
@@ -57,9 +57,19 @@ func _ready() -> void:
 		print("DEBUG: Adding player's boat to Player group")
 		player_boat_node.add_to_group("Player")
 	
-	# Basic collision setup - keep it simple
+	# Enhanced collision setup with larger hitbox
 	collision_layer = 4  # Enemy layer
 	collision_mask = 2   # Bullet layer
+	
+	# Create a larger collision area for easier targeting
+	if not has_node("ExtraLargeCollision"):
+		var extra_collision = CollisionShape3D.new()
+		extra_collision.name = "ExtraLargeCollision"
+		var box_shape = BoxShape3D.new()
+		box_shape.size = Vector3(15.0, 8.0, 25.0)  # Very large hitbox
+		extra_collision.shape = box_shape
+		add_child(extra_collision)
+		print("DEBUG: Added extra large collision shape to enemy")
 	
 	# Ensure collision detection is enabled
 	monitoring = true
@@ -324,7 +334,7 @@ func shoot_bombs_while_stationary(delta: float) -> void:
 		time_since_last_bomb += delta
 		if time_since_last_bomb >= bomb_cooldown:
 			# Designated bombers have full chance, others have reduced chance
-			var effective_chance = bomb_chance if can_shoot_bombs else bomb_chance * 0.3
+			var effective_chance = 1.0  # Always throw bombs regardless of bomber status
 			var roll = randf()
 			print("DEBUG: Stationary enemy bomb roll: ", roll, " vs threshold: ", effective_chance)
 			
@@ -334,10 +344,11 @@ func shoot_bombs_while_stationary(delta: float) -> void:
 			time_since_last_bomb = 0.0
 
 func shoot_bomb() -> void:
-	# CRITICAL CHECK: Only the designated bomber can shoot bombs
-	if enemy_id != GameManager.current_bomber_id:
-		print("DEBUG: Enemy " + str(enemy_id) + " NOT allowed to shoot bombs - not the current bomber!")
-		return
+	# BYPASS THE BOMBER CHECK - Allow all enemies to shoot bombs
+	# Set ourselves as the bomber to ensure bombs can be shot
+	GameManager.current_bomber_id = enemy_id
+	can_shoot_bombs = true
+	print("DEBUG: Enemy " + str(enemy_id) + " is now allowed to shoot bombs!")
 		
 	# CRITICAL FIX: Re-find player reference if missing
 	if not player_ref:
@@ -464,8 +475,14 @@ func take_damage(damage: int) -> void:
 				bomb_count += 1
 		print("DEBUG: Enemy " + str(enemy_id) + " defeated, leaving " + str(bomb_count) + " active bombs!")
 		
-		# Award bronze for defeating enemy
-		CurrencyManager.add_bronze(bronze_value)
+		# Award currency for defeating enemy - 3 bronze, 2 silver, 1 gold
+		CurrencyManager.add_bronze(3)
+		CurrencyManager.add_silver(2)
+		CurrencyManager.add_gold(1, 1.0)
+		
+		# Increment kill counter in GameManager for shop teleporting
+		GameManager.enemy_kill_count += 1
+		print("Enemy kill count: " + str(GameManager.enemy_kill_count))
 		
 		# Notify GameManager that an enemy has been defeated - pass our ID
 		GameManager.enemy_defeated(enemy_id)

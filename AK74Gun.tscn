@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://fej0f8n68stl"]
 
 [ext_resource type="Script" path="res://AK74Gun.gd" id="1_ak74"]
-[ext_resource type="PackedScene" path="res://AK74Bullet.tscn" id="2_bullet"]
+[ext_resource type="PackedScene" uid="uid://b8v1cvnsgvxad" path="res://AK74Bullet.tscn" id="2_bullet"]
 [ext_resource type="PackedScene" uid="uid://du4ngp1s3morv" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/AK-74.fbx" id="3_ak74_model"]
 [ext_resource type="PackedScene" uid="uid://rm0u2kkcwmk7" path="res://assets/guns_hands/VRFPS_Kit/Models/Cartridges/545 ak magazine.fbx" id="4_ak_magazine"]
 

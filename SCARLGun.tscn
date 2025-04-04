@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://dt6vg0kyerwsi"]
 
 [ext_resource type="Script" path="res://SCARLGun.gd" id="1_scarl"]
-[ext_resource type="PackedScene" path="res://M16A1Bullet.tscn" id="2_bullet"]
+[ext_resource type="PackedScene" uid="uid://dts5s7r3ghmwc" path="res://M16A1Bullet.tscn" id="2_bullet"]
 [ext_resource type="PackedScene" uid="uid://b31iny8xxsu0u" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/scar-l.fbx" id="3_scarl_model"]
 [ext_resource type="PackedScene" uid="uid://drdfisyp8ih1k" path="res://assets/guns_hands/VRFPS_Kit/Models/Weapons/stanag 556 magazine.fbx" id="4_magazine"]
 
