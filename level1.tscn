@@ -96,7 +96,7 @@ tracker = &"right_hand"
 pose = &"aim"
 
 [node name="RoundDisplay" type="Node3D" parent="XROrigin3D/XRController3DRight"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 0.04, -0.05)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.04, -0.05)
 script = ExtResource("2_display")
 
 [node name="LaserBeamRight" type="MeshInstance3D" parent="XROrigin3D/XRController3DRight"]

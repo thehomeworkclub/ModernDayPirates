@@ -3,7 +3,7 @@
 ## Current Focus
 We have successfully implemented a comprehensive VR weapons system with physical reloading mechanics optimized for use with a gunstock. The system allows for realistic magazine removal and insertion using physical hand movements. Seven different weapon models are now implemented with proper magazines, muzzle flashes, and recoil animations.
 
-We have also implemented boat-based gameplay with enemy ships that shoot bombs at the player's boat. The health system shows damage on both the player UI and directly on the gun as a row of 10 hearts.
+We have also implemented boat-based gameplay with enemy ships that shoot bombs at the player's boat. The health system shows damage on both the player UI and directly on the gun as a row of 10 hearts. This has now been enhanced with a wave and round tracker display on the right side of the gun, using custom icons with text indicators that match the heart display style.
 
 Recently, we've enhanced the shop system to include persistent upgrades across game sessions, with three distinct shop tabs offering different types of upgrades. The system saves both currencies and upgrade levels between shop visits, only resetting if the player dies.
 
@@ -69,6 +69,8 @@ All shop upgrades persist between waves and only reset on player death.
 - Camera height: 1.8
 - Ray length: 10.0
 - Button press distance: 0.03
+- RoundDisplay position: Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.04, -0.05)
+- Wave/Round icon spacing: 0.15 (horizontally aligned via z-axis after rotation)
 
 ## Performance Optimizations
 VR performance considerations remain important, especially as we add more weapon models:
@@ -87,6 +89,27 @@ VR performance considerations remain important, especially as we add more weapon
    - Target FPS: 90 (VR standard)
    - Physics tick rate: 60
    - Texture size limit: 1024px
+
+## HUD Elements
+The game features several HUD elements attached to the player's view and gun:
+
+1. Health Display (Left side of gun):
+   - Row of heart icons showing current health (maximum 10)
+   - Uses fullheart.png and emptyheart.png
+   - Properly occluded behind gun model
+   - Shows upgrade-based max health from shop purchases
+
+2. Wave/Round Display (Right side of gun):
+   - Custom icons for wave and round indicators (waveicon.png and roundicon.png)
+   - Text labels positioned in corner of each icon
+   - Wave counter shows current/total (e.g., "1/5") in white text
+   - Round counter shows current round number in black text
+   - Icons horizontally aligned using z-axis spacing after rotation
+   - Proper depth testing ensures they're not visible through the gun
+   - Position can be adjusted via RoundDisplay.gd variables:
+     - Icon scale: 0.56
+     - Icon spacing: 0.15
+     - Label offset: Vector2(0.02, 0.02)
 
 ## Recently Completed
 1. Shop System with Persistent Upgrades

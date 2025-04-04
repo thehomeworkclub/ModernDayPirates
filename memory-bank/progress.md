@@ -30,6 +30,9 @@
 - ✓ Connected gun sight health display with boat damage system
 - ✓ Implemented boat group structure for proper reference and targeting
 - ✓ Enhanced health system to support upgrade-based max health increases
+- ✓ Implemented enhanced in-game HUD elements for wave/round tracking
+- ✓ Created icon-based wave and round display on the gun with proper occlusion
+- ✓ Added proper depth testing for UI elements to match heart icons behavior
 
 ### VR Weapons System
 - ✓ Implemented base rifle framework with inheritance pattern
