@@ -219,8 +219,8 @@ func complete_wave() -> void:
 	current_wave += 1
 	print("Wave " + str(waves_completed_in_round) + "/" + str(game_parameters.waves_per_round) + " completed")
 	
-	# When wave completes, increment enemy kill count to trigger shop teleport
-	enemy_kill_count += game_parameters.get_total_ships_per_wave()
+	# DO NOT increment enemy kill count here - it's already incremented by each defeated enemy
+	# This was causing double-counting and premature round completion
 	
 	# Check if we've completed all waves in the round
 	if waves_completed_in_round >= game_parameters.waves_per_round:

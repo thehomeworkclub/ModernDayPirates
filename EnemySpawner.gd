@@ -267,12 +267,8 @@ func _on_wave_completed() -> void:
 	for marker in markers:
 		marker.queue_free()
 	
-	# Also clean up any stray enemy objects that might still exist
-	var stray_enemies = get_tree().get_nodes_in_group("Enemy")
-	if stray_enemies.size() > 0:
-		print("DEBUG: Found " + str(stray_enemies.size()) + " stray enemies, cleaning up")
-		for enemy in stray_enemies:
-			enemy.queue_free()
+	# DO NOT clean up enemies - they should be defeated naturally by the player
+	# The premature cleanup was causing the other enemies to disappear
 		
 	print("Wave completed, cleaned up for next wave")
 	
@@ -542,12 +538,13 @@ func check_wave_completion() -> void:
 	if enemies_spawned < GameManager.enemies_per_wave or not wave_in_progress:
 		return
 		
-	# CRITICAL: Completely trust GameManager's count
-	var active_count = GameManager.current_enemies_count
+	# Count enemies directly using the spawned_enemies list rather than trusting GameManager
+	var our_count = count_active_enemies()
 	
 	# Add extra debugging to track this function's execution
-	print("DEBUG: Checking wave completion - active enemies: " + str(active_count) + 
-		", enemies spawned: " + str(enemies_spawned) + "/" + str(GameManager.enemies_per_wave))
+	print("DEBUG: Checking wave completion - our count: " + str(our_count) + 
+		", GM count: " + str(GameManager.current_enemies_count) +
+		", spawned: " + str(enemies_spawned) + "/" + str(GameManager.enemies_per_wave))
 	
 	# Force a cleanup of spawned_enemies list to ensure accurate counting
 	for i in range(spawned_enemies.size() - 1, -1, -1):
@@ -555,18 +552,13 @@ func check_wave_completion() -> void:
 			print("DEBUG: Cleaning up invalid enemy from list during wave check")
 			spawned_enemies.remove_at(i)
 	
-	# If active count is 0 according to GameManager, schedule a force completion check
-	if active_count <= 0 and enemies_spawned >= GameManager.enemies_per_wave:
+	# Only complete the wave if ALL enemies for this wave have been spawned AND defeated
+	if our_count <= 0 and enemies_spawned >= GameManager.enemies_per_wave:
 		print("DEBUG: WAVE COMPLETE - All " + str(GameManager.enemies_per_wave) + 
 			" enemies have been spawned and defeated")
 		complete_wave()
 	else:
-		# Check if we're down to 0 enemies in GameManager but still have scene objects
-		# This could be a race condition - schedule a force check
-		if active_count == 0 and not force_wave_check_scheduled:
-			schedule_force_wave_completion_check()
-			
-		print("DEBUG: Wave not complete yet - " + str(active_count) + 
+		print("DEBUG: Wave not complete yet - " + str(our_count) + 
 			" enemies still active out of " + str(GameManager.enemies_per_wave) + " total")
 
 func complete_wave() -> void:
